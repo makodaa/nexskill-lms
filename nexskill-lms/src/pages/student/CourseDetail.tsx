@@ -445,8 +445,17 @@ const CourseDetail: React.FC = () => {
               </div>
 
               {isEnrolled ? (
-                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl text-center">
-                  <span className="text-green-700 font-medium">✓ Enrolled!</span>
+                <div className="space-y-3 mb-6">
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-2xl text-center">
+                    <span className="text-green-700 font-medium">✓ Enrolled!</span>
+                  </div>
+                  <Link
+                    to={`/student/courses/${course.id}/circle`}
+                    className="w-full py-3 px-4 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium rounded-full flex items-center justify-center gap-2 hover:shadow-lg hover:scale-[1.02] transition-all"
+                  >
+                    <span>💬</span>
+                    <span>Join Circle Chat</span>
+                  </Link>
                 </div>
               ) : (
                 <div className="space-y-3 mb-6">

@@ -11,9 +11,13 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
   const navItems = [
     { path: '/student/dashboard', label: 'Dashboard', icon: '📊' },
     { path: '/student/courses', label: 'My Courses', icon: '📚' },
+    { path: '/student/community', label: 'Community', icon: '💬' },
+    { path: '/student/coaching', label: 'Coaching', icon: '👨‍🏫' },
+    { path: '/student/ai-coach', label: 'AI Coach', icon: '🤖' },    
     { path: '/student/live-classes', label: 'Live Classes', icon: '🎥' },
     { path: '/student/certificates', label: 'Certificates', icon: '🏆' },
-    { path: '/student/ai-coach', label: 'AI Coach', icon: '🤖' },
+    { path: '/student/membership', label: 'Membership', icon: '💎' },
+    { path: '/student/profile', label: 'Profile', icon: '👤' },
     { path: '/student/settings', label: 'Settings', icon: '⚙️' },
   ];
 

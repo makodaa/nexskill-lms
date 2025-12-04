@@ -9,6 +9,7 @@ const Login: React.FC = () => {
     password: '',
     rememberMe: false,
   });
+  const [role, setRole] = useState<'student' | 'coach'>('student');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -20,14 +21,22 @@ const Login: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy login - navigate directly to dashboard
-    navigate('/student/dashboard');
+    // Dummy login - navigate based on selected role
+    if (role === 'coach') {
+      navigate('/coach/dashboard');
+    } else {
+      navigate('/student/dashboard');
+    }
   };
 
   const handleSocialLogin = (provider: string) => {
-    // Dummy social login - navigate directly to dashboard
-    console.log(`Logging in with ${provider}`);
-    navigate('/student/dashboard');
+    // Dummy social login - navigate based on selected role
+    console.log(`Logging in with ${provider} as ${role}`);
+    if (role === 'coach') {
+      navigate('/coach/dashboard');
+    } else {
+      navigate('/student/dashboard');
+    }
   };
 
   return (
@@ -37,6 +46,34 @@ const Login: React.FC = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-text-primary mb-2">Welcome back</h1>
           <p className="text-text-secondary text-sm">Sign in to continue learning</p>
+        </div>
+
+        {/* Role Selection */}
+        <div className="mb-6">
+          <div className="grid grid-cols-2 gap-3 p-1 bg-slate-100 rounded-full">
+            <button
+              type="button"
+              onClick={() => setRole('student')}
+              className={`py-2.5 px-4 rounded-full font-medium text-sm transition-all ${
+                role === 'student'
+                  ? 'bg-gradient-to-r from-brand-primary to-brand-primary-light text-white shadow-md'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              👨‍🎓 Student
+            </button>
+            <button
+              type="button"
+              onClick={() => setRole('coach')}
+              className={`py-2.5 px-4 rounded-full font-medium text-sm transition-all ${
+                role === 'coach'
+                  ? 'bg-gradient-to-r from-brand-primary to-brand-primary-light text-white shadow-md'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              👨‍🏫 Coach
+            </button>
+          </div>
         </div>
 
         {/* Login Form */}
