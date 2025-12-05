@@ -5,6 +5,7 @@ import ProfileInterestsGoals from '../../components/profile/ProfileInterestsGoal
 import ProfileLanguagePreferences from '../../components/profile/ProfileLanguagePreferences';
 import ProfileNotificationSettings from '../../components/profile/ProfileNotificationSettings';
 import ProfileAccountSettingsForm from '../../components/profile/ProfileAccountSettingsForm';
+import ThemeToggle from '../../components/system/ThemeToggle';
 
 type TabType = 'account' | 'preferences' | 'notifications' | 'privacy' | 'accessibility';
 
@@ -161,6 +162,11 @@ const StudentSettings: React.FC = () => {
             {/* Preferences Tab */}
             {activeTab === 'preferences' && (
               <div className="space-y-6">
+                {/* Theme Toggle */}
+                <div className="bg-white rounded-2xl shadow-sm border border-[#EDF0FB] p-6">
+                  <ThemeToggle variant="button" showLabel={true} />
+                </div>
+
                 <ProfileInterestsGoals
                   mode="edit"
                   interests={interestsGoals.interests}

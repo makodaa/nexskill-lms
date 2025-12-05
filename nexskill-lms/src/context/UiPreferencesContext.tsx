@@ -36,14 +36,28 @@ export const UiPreferencesProvider: React.FC<UiPreferencesProviderProps> = ({ ch
   useEffect(() => {
     const root = document.documentElement;
     
+    const applyTheme = (isDark: boolean) => {
+      if (isDark) {
+        root.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+      }
+    };
+
     if (theme === 'dark') {
-      root.classList.add('dark');
+      applyTheme(true);
     } else if (theme === 'light') {
-      root.classList.remove('dark');
+      applyTheme(false);
     } else if (theme === 'system') {
-      // TODO: Implement system theme detection
-      // For now, default to light
-      root.classList.remove('dark');
+      // Detect system preference
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      applyTheme(mediaQuery.matches);
+      
+      // Listen for system theme changes
+      const handler = (e: MediaQueryListEvent) => applyTheme(e.matches);
+      mediaQuery.addEventListener('change', handler);
+      
+      return () => mediaQuery.removeEventListener('change', handler);
     }
   }, [theme]);
 
