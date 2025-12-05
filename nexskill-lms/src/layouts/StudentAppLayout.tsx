@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
 
 interface StudentAppLayoutProps {
   children: React.ReactNode;
@@ -72,7 +73,14 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
 
         {/* Main Content Area */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          {children}
+          {/* Top Bar with Global Controls */}
+          <div className="flex items-center justify-end px-8 pt-6 pb-4 border-b border-[#EDF0FB]">
+            <GlobalTopBarControls />
+          </div>
+          
+          <div className="flex-1 overflow-auto">
+            {children}
+          </div>
         </main>
       </div>
     </div>

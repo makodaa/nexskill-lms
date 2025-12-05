@@ -1,4 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { UiPreferencesProvider } from './context/UiPreferencesContext';
+import ErrorBoundary from './components/system/ErrorBoundary';
 import Login from './pages/auth/Login';
 import SignUp from './pages/auth/SignUp';
 import EmailVerification from './pages/auth/EmailVerification';
@@ -52,13 +54,20 @@ import FunnelDashboardPage from './pages/admin/funnels/FunnelDashboardPage';
 import FunnelBuilderPage from './pages/admin/funnels/FunnelBuilderPage';
 import ContactsPage from './pages/admin/contacts/ContactsPage';
 import ContactProfilePlaceholderPage from './pages/admin/contacts/ContactProfilePlaceholderPage';
+import Error404Page from './pages/system/Error404Page';
+import Error500Page from './pages/system/Error500Page';
+import MaintenanceModePage from './pages/system/MaintenanceModePage';
+import SecurityCenterPage from './pages/admin/security/SecurityCenterPage';
+import CookieConsentBanner from './components/system/CookieConsentBanner';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Redirect root to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+    <UiPreferencesProvider>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <Routes>
+            {/* Redirect root to login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
         
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
@@ -132,12 +141,24 @@ function App() {
         <Route path="/admin/crm-marketing" element={<AdminCrmMarketingPage />} />
         <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
         <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+        <Route path="/admin/security" element={<SecurityCenterPage />} />
         <Route path="/admin/settings" element={<AdminSystemSettingsPage />} />
         
         {/* Public Certificate Verification Route */}
         <Route path="/certificates/verify/:hash" element={<CertificateVerify />} />
+        
+        {/* System Error & Maintenance Routes */}
+        <Route path="/404" element={<Error404Page />} />
+        <Route path="/500" element={<Error500Page />} />
+        <Route path="/maintenance" element={<MaintenanceModePage />} />
+        
+        {/* Catch-all route for 404 */}
+        <Route path="*" element={<Error404Page />} />
       </Routes>
     </BrowserRouter>
+      </ErrorBoundary>
+      <CookieConsentBanner />
+    </UiPreferencesProvider>
   );
 }
 

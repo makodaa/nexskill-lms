@@ -1,5 +1,6 @@
 import React, { type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
 
 interface AdminAppLayoutProps {
   children: ReactNode;
@@ -20,6 +21,7 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
     { label: 'Notifications', path: '/admin/notifications', icon: '🔔' },
     { label: 'Analytics', path: '/admin/analytics', icon: '📈' },
     { label: 'Reports', path: '/admin/reports', icon: '📋' },
+    { label: 'Security', path: '/admin/security', icon: '🔒' },
     { label: 'Settings', path: '/admin/settings', icon: '⚙️' },
   ];
 
@@ -90,6 +92,11 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
 
             {/* Main Content */}
             <main className="flex-1 p-8">
+              {/* Top Bar with Global Controls */}
+              <div className="flex items-center justify-end mb-6">
+                <GlobalTopBarControls />
+              </div>
+              
               {children}
             </main>
           </div>
