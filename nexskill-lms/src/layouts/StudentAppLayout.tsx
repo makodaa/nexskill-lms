@@ -28,14 +28,17 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] p-8">
       <div className="max-w-[1440px] mx-auto bg-white rounded-[32px] shadow-card overflow-hidden flex" style={{ minHeight: 'calc(100vh - 64px)' }}>
         {/* Left Sidebar */}
-        <aside className="w-[230px] flex-shrink-0 flex flex-col p-6 border-r border-[#EDF0FB]">
+        <aside className="w-[240px] flex-shrink-0 flex flex-col p-6 border-r border-[#EDF0FB]">
           {/* Logo */}
           <div className="mb-8">
             <Link to="/student/dashboard" className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-primary to-brand-primary-light flex items-center justify-center">
                 <span className="text-white font-bold text-xl">N</span>
               </div>
-              <span className="text-xl font-bold text-brand-primary">NexSkill</span>
+              <div>
+                <span className="text-xl font-bold text-brand-primary block leading-tight">NexSkill</span>
+                <span className="text-xs text-slate-600">Student Portal</span>
+              </div>
             </Link>
           </div>
 

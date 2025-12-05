@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import StudentAppLayout from '../../layouts/StudentAppLayout';
 
 // Dummy data
@@ -55,6 +55,7 @@ const liveClasses = [
 ];
 
 const StudentDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [showAICoach, setShowAICoach] = useState(true);
   const [timeFilter] = useState('This week');
 
@@ -103,7 +104,10 @@ const StudentDashboard: React.FC = () => {
             <div className="lg:col-span-1 bg-white rounded-3xl shadow-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium text-text-secondary">Progress</h3>
-                <button className="px-3 py-1 bg-[#F5F7FF] rounded-full text-xs font-medium text-text-secondary flex items-center gap-1">
+                <button 
+                  onClick={() => console.log('Change time filter')}
+                  className="px-3 py-1 bg-[#F5F7FF] rounded-full text-xs font-medium text-text-secondary flex items-center gap-1"
+                >
                   {timeFilter}
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -184,7 +188,10 @@ const StudentDashboard: React.FC = () => {
                       You're 3 lessons away from completing <span className="font-medium text-text-primary">'UI Design Basics'</span>. 
                       Keep up the momentum! Based on your learning pace, you can finish this course by this weekend.
                     </p>
-                    <button className="px-5 py-2 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white text-sm font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] transition-all">
+                    <button 
+                      onClick={() => navigate('/student/courses/1/lessons/9')}
+                      className="px-5 py-2 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white text-sm font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] transition-all"
+                    >
                       Start next lesson
                     </button>
                   </div>
@@ -253,7 +260,10 @@ const StudentDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <button className="w-full py-2 px-4 bg-white hover:bg-gray-50 text-brand-primary text-sm font-medium rounded-full transition-colors">
+                  <button 
+                    onClick={() => navigate(`/student/courses/${course.id}`)}
+                    className="w-full py-2 px-4 bg-white hover:bg-gray-50 text-brand-primary text-sm font-medium rounded-full transition-colors"
+                  >
                     Continue
                   </button>
                 </div>
@@ -285,7 +295,10 @@ const StudentDashboard: React.FC = () => {
                         with {liveClass.instructor}
                       </p>
                     </div>
-                    <button className="px-5 py-2 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white text-sm font-medium rounded-full hover:shadow-lg hover:scale-[1.02] transition-all">
+                    <button 
+                      onClick={() => navigate(`/student/live-class/${liveClass.id}`)}
+                      className="px-5 py-2 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white text-sm font-medium rounded-full hover:shadow-lg hover:scale-[1.02] transition-all"
+                    >
                       Join
                     </button>
                   </div>

@@ -39,67 +39,53 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F7FF] via-[#FEFEFE] to-[#FFF9F5]">
-      <div className="max-w-7xl mx-auto my-8 px-4">
-        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
-          <div className="flex">
-            {/* Sidebar */}
-            <aside className="w-64 bg-gradient-to-b from-[#304DB5] to-[#5E7BFF] p-6 flex flex-col min-h-screen">
-              {/* Brand */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-2xl">
-                    🛡️
-                  </div>
-                  <div>
-                    <h1 className="text-white font-bold text-lg">NexSkill</h1>
-                    <p className="text-[#B8C9FF] text-xs">Admin Console</p>
-                  </div>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#F0F4FF] via-[#E8EEFF] to-[#F0F4FF] p-8">
+      <div className="max-w-[1440px] mx-auto bg-white rounded-[32px] shadow-card overflow-hidden flex" style={{ minHeight: 'calc(100vh - 64px)' }}>
+        {/* Left Sidebar */}
+        <aside className="w-[240px] flex-shrink-0 flex flex-col p-6 border-r border-[#EDF0FB]">
+          {/* Logo */}
+          <div className="mb-8">
+            <Link to="/admin/dashboard" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center">
+                <span className="text-white text-xl">🛡️</span>
               </div>
-
-              {/* Navigation */}
-              <nav className="flex-1 space-y-2">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.path}
-                    to={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-full transition-all ${
-                      isActive(item.path)
-                        ? 'bg-white text-[#304DB5] shadow-md'
-                        : 'text-white hover:bg-white/10'
-                    }`}
-                  >
-                    <span className="text-xl">{item.icon}</span>
-                    <span className="font-semibold">{item.label}</span>
-                  </Link>
-                ))}
-              </nav>
-
-              {/* Admin Profile */}
-              <div className="mt-8 pt-6 border-t border-white/20">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold">
-                    AD
-                  </div>
-                  <div>
-                    <p className="text-white font-semibold text-sm">Admin User</p>
-                    <p className="text-[#B8C9FF] text-xs">Platform Admin</p>
-                  </div>
-                </div>
+              <div>
+                <span className="text-xl font-bold text-[#304DB5] block leading-tight">NexSkill</span>
+                <span className="text-xs text-slate-600">Admin Console</span>
               </div>
-            </aside>
-
-            {/* Main Content */}
-            <main className="flex-1 p-8">
-              {/* Top Bar with Global Controls */}
-              <div className="flex items-center justify-end mb-6">
-                <GlobalTopBarControls />
-              </div>
-              
-              {children}
-            </main>
+            </Link>
           </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 space-y-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                  isActive(item.path)
+                    ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white shadow-md'
+                    : 'text-text-secondary hover:bg-[#F0F4FF] hover:text-text-primary'
+                }`}
+              >
+                <span className="text-lg">{item.icon}</span>
+                <span className="text-sm font-medium">{item.label}</span>
+              </Link>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Top Bar */}
+          <header className="px-8 py-4 border-b border-[#EDF0FB] flex items-center justify-end">
+            <GlobalTopBarControls />
+          </header>
+
+          {/* Page Content */}
+          <main className="flex-1 flex flex-col overflow-hidden">
+            {children}
+          </main>
         </div>
       </div>
     </div>

@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentAuthLayout from '../../layouts/StudentAuthLayout';
+import { useAuth } from '../../context/AuthContext';
+import { allRoles, labelByRole, roleIcons, type UserRole } from '../../types/roles';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { loginMock } = useAuth();
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
     rememberMe: false,
   });
-  const [role, setRole] = useState<'student' | 'coach'>('student');
+  const [selectedRole, setSelectedRole] = useState<UserRole>('STUDENT');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -21,22 +25,19 @@ const Login: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Dummy login - navigate based on selected role
-    if (role === 'coach') {
-      navigate('/coach/dashboard');
-    } else {
-      navigate('/student/dashboard');
-    }
+    
+    // Use the display name or fallback to email
+    const displayName = formData.name.trim() || formData.email.split('@')[0] || 'User';
+    
+    // Mock login with selected role
+    loginMock(displayName, selectedRole);
   };
 
   const handleSocialLogin = (provider: string) => {
-    // Dummy social login - navigate based on selected role
-    console.log(`Logging in with ${provider} as ${role}`);
-    if (role === 'coach') {
-      navigate('/coach/dashboard');
-    } else {
-      navigate('/student/dashboard');
-    }
+    // Mock social login with selected role
+    console.log(`Logging in with ${provider} as ${selectedRole}`);
+    const displayName = `${provider} User`;
+    loginMock(displayName, selectedRole);
   };
 
   return (
@@ -45,39 +46,53 @@ const Login: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-text-primary mb-2">Welcome back</h1>
-          <p className="text-text-secondary text-sm">Sign in to continue learning</p>
+          <p className="text-text-secondary text-sm">Sign in to NexSkill LMS</p>
         </div>
 
         {/* Role Selection */}
         <div className="mb-6">
-          <div className="grid grid-cols-2 gap-3 p-1 bg-slate-100 rounded-full">
-            <button
-              type="button"
-              onClick={() => setRole('student')}
-              className={`py-2.5 px-4 rounded-full font-medium text-sm transition-all ${
-                role === 'student'
-                  ? 'bg-gradient-to-r from-brand-primary to-brand-primary-light text-white shadow-md'
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              👨‍🎓 Student
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('coach')}
-              className={`py-2.5 px-4 rounded-full font-medium text-sm transition-all ${
-                role === 'coach'
-                  ? 'bg-gradient-to-r from-brand-primary to-brand-primary-light text-white shadow-md'
-                  : 'text-text-secondary hover:text-text-primary'
-              }`}
-            >
-              👨‍🏫 Coach
-            </button>
-          </div>
+          <label className="block text-sm font-medium text-text-primary mb-2">
+            Select Your Role
+          </label>
+          <select
+            value={selectedRole}
+            onChange={(e) => setSelectedRole(e.target.value as UserRole)}
+            className="w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all appearance-none cursor-pointer"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
+              backgroundPosition: 'right 1rem center',
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: '1.5em 1.5em',
+              paddingRight: '2.5rem',
+            }}
+          >
+            {allRoles.map((role) => (
+              <option key={role} value={role}>
+                {roleIcons[role]} {labelByRole[role]}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-5">
+          {/* Display Name Input */}
+          <div>
+            <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
+              Display Name
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder="Enter your display name"
+              className="w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all"
+              required
+            />
+          </div>
+
           {/* Email Input */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
@@ -91,7 +106,6 @@ const Login: React.FC = () => {
               onChange={handleInputChange}
               placeholder="Enter your email"
               className="w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all"
-              required
             />
           </div>
 

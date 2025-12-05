@@ -120,7 +120,7 @@ const StudentProfileView: React.FC = () => {
                 </button>
 
                 <button
-                  onClick={() => navigate('/student/settings/account')}
+                  onClick={() => navigate('/student/settings')}
                   className="w-full py-3 px-4 bg-white text-slate-700 font-medium rounded-full border-2 border-slate-200 hover:border-slate-300 transition-all text-left flex items-center justify-between"
                 >
                   <span>Account settings</span>

@@ -18,7 +18,7 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
     { path: '/coach/students', label: 'Students', icon: '🎓' },
     { path: '/coach/earnings', label: 'Earnings', icon: '💰' },
     { path: '/coach/messages', label: 'Messages', icon: '💬' },
-    { path: '/coach/settings', label: 'Settings', icon: '⚙️' },
+    { path: '/coach/profile', label: 'Settings', icon: '⚙️' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
