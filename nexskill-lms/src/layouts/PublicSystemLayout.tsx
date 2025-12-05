@@ -10,7 +10,7 @@ const PublicSystemLayout: React.FC<PublicSystemLayoutProps> = ({ children }) => 
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF]">
       {/* Brand Header */}
       <div className="mb-8 text-center">
-        <BrandLogo size="md" showText={true} direction="horizontal" />
+        <BrandLogo size="md" showText={true} direction="row" />
       </div>
 
       {/* Content Card */}
