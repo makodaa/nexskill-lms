@@ -1,53 +1,161 @@
-# React + TypeScript + Vite
+# NexSkill LMS
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive Learning Management System built with React, TypeScript, and Vite. Features multi-role support, dark mode, AI-powered learning tools, and a modern user interface.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- 🎓 **Multi-Role System**: Student, Coach, Admin, Platform Owner, Sub-Coach, Content Editor, Community Manager, Support Staff, and Org Owner roles
+- 🌓 **Dark Mode**: Full dark mode support with system theme detection
+- 🤖 **AI Integration**: AI-powered study plans, recommendations, and coaching insights
+- 📱 **Responsive Design**: Mobile-first design with Tailwind CSS
+- 🎨 **Modern UI**: Beautiful gradients, animations, and interactive components
+- 📊 **Analytics Dashboard**: Comprehensive dashboards for each role
+- 🔐 **Role-Based Access**: Protected routes and role-specific layouts
+- 📜 **Blockchain Certificates**: Certificate verification and sharing
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js 20.19+ or 22.12+
+- npm or yarn
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Install dependencies
+npm install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Start development server
+npm run dev
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
+The app runs on `http://localhost:5173` by default.
+
+## Deployment to Vercel
+
+### Option 1: Deploy via CLI
+
+```bash
+# Install Vercel CLI
+npm install -g vercel
+
+# Deploy
+vercel
+
+# Deploy to production
+vercel --prod
+```
+
+### Option 2: Deploy via GitHub
+
+1. Push your code to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Click "Add New Project"
+4. Import your repository
+5. Click "Deploy"
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed deployment instructions.
+
+## Project Structure
+
+```
+nexskill-lms/
+├── src/
+│   ├── components/        # Reusable UI components
+│   │   ├── admin/        # Admin-specific components
+│   │   ├── ai/           # AI-powered components
+│   │   ├── auth/         # Authentication components
+│   │   ├── coach/        # Coach-specific components
+│   │   └── ...           # Other role-specific components
+│   ├── context/          # React Context providers
+│   ├── layouts/          # Layout components for each role
+│   ├── pages/            # Page components
+│   │   ├── admin/        # Admin pages
+│   │   ├── auth/         # Authentication pages
+│   │   ├── coach/        # Coach pages
+│   │   ├── student/      # Student pages
+│   │   └── ...           # Other role pages
+│   ├── types/            # TypeScript type definitions
+│   ├── utils/            # Utility functions
+│   ├── App.tsx           # Main app component with routing
+│   └── main.tsx          # App entry point
+├── public/               # Static assets
+├── dist/                 # Production build (generated)
+└── vercel.json          # Vercel configuration
+```
+
+## Available Roles
+
+Access different portals by logging in with these roles:
+
+- **Student** (`/student/*`): Course enrollment, learning, certificates
+- **Coach** (`/coach/*`): Course creation, student management, earnings
+- **Admin** (`/admin/*`): Platform analytics, user management, system health
+- **Platform Owner** (`/owner/*`): Full platform control, role management
+- **Sub-Coach** (`/subcoach/*`): Assistant teaching, grading, sessions
+- **Content Editor** (`/content/*`): Content review, translations, resources
+- **Community Manager** (`/community/*`): Forum moderation, engagement
+- **Support Staff** (`/support/*`): Ticket management, student support
+- **Org Owner** (`/org/*`): Team management, seat allocation, billing
+
+## Dark Mode
+
+Dark mode is implemented using:
+- Tailwind CSS `dark:` variant
+- `UiPreferencesContext` for state management
+- localStorage for persistence
+- System theme detection
+
+Toggle dark mode from the user menu in any layout.
+
+## Technologies
+
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **Tailwind CSS** - Styling
+- **React Router** - Navigation
+- **Lucide React** - Icons
+
+## Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## Environment Variables
+
+Create a `.env.local` file for local development (optional):
+
+```env
+VITE_API_URL=https://api.nexskill.com
+VITE_APP_NAME=NexSkill LMS
+```
+
+## Documentation
+
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - Deployment guide
+- [DARK_MODE_README.md](./DARK_MODE_README.md) - Dark mode implementation
+- [COURSE_BUILDER_README.md](./COURSE_BUILDER_README.md) - Course builder guide
+- [SYSTEM_ERROR_README.md](./SYSTEM_ERROR_README.md) - Error handling guide
+
+## License
+
+Private - All Rights Reserved
+
+## Support
+
+For issues or questions, contact the development team.
 import reactDom from 'eslint-plugin-react-dom'
 
 export default defineConfig([

@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import StudentAuthLayout from '../../layouts/StudentAuthLayout';
 import { useAuth } from '../../context/AuthContext';
 import { allRoles, labelByRole, roleIcons, type UserRole } from '../../types/roles';
 
 const Login: React.FC = () => {
-  // const navigate = useNavigate();
   const { loginMock } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
