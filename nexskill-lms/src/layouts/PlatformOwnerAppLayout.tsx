@@ -2,6 +2,7 @@ import React, { type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
+import BrandLogo from '../components/brand/BrandLogo';
 
 interface PlatformOwnerAppLayoutProps {
   children: ReactNode;
@@ -30,9 +31,7 @@ const PlatformOwnerAppLayout: React.FC<PlatformOwnerAppLayoutProps> = ({ childre
           {/* Logo */}
           <div className="mb-8">
             <Link to="/owner/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-                <span className="text-white text-xl">👑</span>
-              </div>
+              <BrandLogo size="md" showText={false} />
               <div>
                 <span className="text-xl font-bold text-purple-600 block leading-tight">NexSkill</span>
                 <span className="text-xs text-slate-600">Platform Owner</span>

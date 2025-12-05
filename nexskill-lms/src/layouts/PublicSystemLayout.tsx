@@ -1,4 +1,5 @@
 import React from 'react';
+import BrandLogo from '../components/brand/BrandLogo';
 
 interface PublicSystemLayoutProps {
   children: React.ReactNode;
@@ -9,12 +10,7 @@ const PublicSystemLayout: React.FC<PublicSystemLayoutProps> = ({ children }) => 
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF]">
       {/* Brand Header */}
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center text-white font-bold text-xl">
-            N
-          </div>
-          <span className="text-2xl font-bold text-[#111827]">NexSkill LMS</span>
-        </div>
+        <BrandLogo size="md" showText={true} direction="horizontal" />
       </div>
 
       {/* Content Card */}

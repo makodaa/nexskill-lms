@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
+import BrandLogo from '../components/brand/BrandLogo';
 
 interface ContentEditorAppLayoutProps {
   children: React.ReactNode;
@@ -30,9 +31,7 @@ const ContentEditorAppLayout: React.FC<ContentEditorAppLayoutProps> = ({ childre
           {/* Logo */}
           <div className="mb-8">
             <Link to="/content/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center">
-                <span className="text-white font-bold text-xl">N</span>
-              </div>
+              <BrandLogo size="md" showText={false} />
               <div>
                 <span className="text-xl font-bold text-amber-600 block leading-tight">NexSkill</span>
                 <span className="text-xs text-slate-600">Content Editor</span>

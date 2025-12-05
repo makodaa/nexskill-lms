@@ -1,4 +1,5 @@
 import React from 'react';
+import BrandLockup from '../components/brand/BrandLockup';
 
 interface StudentAuthLayoutProps {
   children: React.ReactNode;
@@ -16,12 +17,7 @@ const StudentAuthLayout: React.FC<StudentAuthLayoutProps> = ({
       <div className={`w-full ${widthClass} bg-white rounded-[32px] shadow-card p-8 md:p-12`}>
         {/* Logo */}
         <div className="flex items-center justify-center mb-8">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-primary to-brand-primary-light flex items-center justify-center">
-              <span className="text-white font-bold text-xl">N</span>
-            </div>
-            <span className="text-2xl font-bold text-brand-primary">NexSkill</span>
-          </div>
+          <BrandLockup orientation="vertical" />
         </div>
 
         {/* Content */}

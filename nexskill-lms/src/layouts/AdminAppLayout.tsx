@@ -1,6 +1,7 @@
 import React, { type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
+import BrandLogo from '../components/brand/BrandLogo';
 
 interface AdminAppLayoutProps {
   children: ReactNode;
@@ -46,9 +47,7 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
           {/* Logo */}
           <div className="mb-8">
             <Link to="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center">
-                <span className="text-white text-xl">🛡️</span>
-              </div>
+              <BrandLogo size="md" showText={false} />
               <div>
                 <span className="text-xl font-bold text-[#304DB5] block leading-tight">NexSkill</span>
                 <span className="text-xs text-slate-600">Admin Console</span>
