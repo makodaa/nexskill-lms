@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { allRoles, labelByRole, roleIcons, type UserRole } from '../../types/roles';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { loginMock } = useAuth();
   const [formData, setFormData] = useState({
     name: '',
