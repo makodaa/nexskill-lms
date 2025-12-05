@@ -111,7 +111,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6">
+    <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-slate-900">Curriculum</h2>
         <button
@@ -127,13 +127,13 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
 
       <div className="space-y-4">
         {curriculum.map((module, moduleIndex) => (
-          <div key={module.id} className="border border-slate-200 rounded-xl overflow-hidden">
+          <div key={module.id} className="border border-slate-200 dark:border-gray-700 rounded-xl overflow-hidden">
             {/* Module Header */}
-            <div className="bg-slate-50 p-4">
+            <div className="bg-slate-50 dark:bg-gray-800 p-4">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => toggleModule(module.id)}
-                  className="text-slate-600 hover:text-slate-900 transition-colors"
+                  className="text-slate-600 dark:text-dark-text-secondary hover:text-slate-900 dark:text-dark-text-primary transition-colors"
                 >
                   <svg
                     className={`w-5 h-5 transition-transform ${expandedModules.has(module.id) ? 'rotate-90' : ''}`}
@@ -149,7 +149,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
                   type="text"
                   value={module.title}
                   onChange={(e) => handleModuleTitleChange(module.id, e.target.value)}
-                  className="flex-1 px-3 py-1.5 bg-white rounded-lg border border-slate-200 font-semibold text-slate-900 focus:border-[#304DB5] focus:outline-none"
+                  className="flex-1 px-3 py-1.5 bg-white dark:bg-dark-background-card rounded-lg border border-slate-200 dark:border-gray-700 font-semibold text-slate-900 dark:text-dark-text-primary focus:border-[#304DB5] focus:outline-none"
                 />
                 <button
                   onClick={() => handleAddLesson(module.id)}
@@ -164,16 +164,16 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
             {expandedModules.has(module.id) && (
               <div className="p-4 space-y-2">
                 {module.lessons.length === 0 ? (
-                  <p className="text-sm text-slate-500 text-center py-4">No lessons yet. Click"Add lesson" to start.</p>
+                  <p className="text-sm text-slate-500 dark:text-dark-text-muted text-center py-4">No lessons yet. Click"Add lesson" to start.</p>
                 ) : (
                   module.lessons.map((lesson, lessonIndex) => (
-                    <div key={lesson.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                    <div key={lesson.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-gray-800 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700 dark:bg-gray-800 transition-colors">
                       {/* Drag Handle */}
                       <div className="flex flex-col gap-0.5">
                         <button
                           onClick={() => handleMoveLesson(module.id, lesson.id, 'up')}
                           disabled={lessonIndex === 0}
-                          className="text-slate-400 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="text-slate-400 hover:text-slate-600 dark:text-dark-text-secondary disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -182,7 +182,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
                         <button
                           onClick={() => handleMoveLesson(module.id, lesson.id, 'down')}
                           disabled={lessonIndex === module.lessons.length - 1}
-                          className="text-slate-400 hover:text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="text-slate-400 hover:text-slate-600 dark:text-dark-text-secondary disabled:opacity-30 disabled:cursor-not-allowed"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -196,7 +196,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
                         <p className="font-medium text-slate-900">{lesson.title}</p>
                         <p className="text-xs text-slate-600">{lesson.duration}</p>
                       </div>
-                      <span className="px-2 py-1 text-xs font-medium text-slate-600 bg-white rounded border border-slate-200 capitalize">
+                      <span className="px-2 py-1 text-xs font-medium text-slate-600 dark:text-dark-text-secondary bg-white dark:bg-dark-background-card rounded border border-slate-200 dark:border-gray-700 capitalize">
                         {lesson.type}
                       </span>
 
@@ -233,7 +233,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
                 />
               </svg>
             </div>
-            <p className="text-lg text-slate-600 mb-2">No modules yet</p>
+            <p className="text-lg text-slate-600 dark:text-dark-text-secondary mb-2">No modules yet</p>
             <p className="text-sm text-slate-500">Start building your course by adding a module</p>
           </div>
         )}

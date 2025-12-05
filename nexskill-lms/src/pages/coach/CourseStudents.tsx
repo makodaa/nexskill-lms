@@ -181,7 +181,7 @@ const CourseStudents: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search students..."
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#EDF0FB] focus:outline-none focus:ring-2 focus:ring-[#304DB5] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#EDF0FB] dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#304DB5] focus:border-transparent"
               />
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9CA3B5]"
@@ -203,7 +203,7 @@ const CourseStudents: React.FC = () => {
               onChange={(e) =>
                 setFilterStatus(e.target.value as 'all' | 'active' | 'at-risk' | 'completed')
               }
-              className="px-4 py-3 rounded-xl border border-[#EDF0FB] focus:outline-none focus:ring-2 focus:ring-[#304DB5] focus:border-transparent bg-white text-[#111827] font-medium"
+              className="px-4 py-3 rounded-xl border border-[#EDF0FB] dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-[#304DB5] focus:border-transparent bg-white text-[#111827] font-medium"
             >
               <option value="all">All students</option>
               <option value="active">Active</option>

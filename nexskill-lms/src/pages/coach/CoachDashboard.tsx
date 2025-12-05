@@ -117,20 +117,20 @@ const CoachDashboard: React.FC = () => {
     <CoachAppLayout>
       <div className="flex-1 overflow-y-auto">
         {/* Header */}
-        <div className="bg-white border-b border-slate-200 px-8 py-6">
+        <div className="bg-white dark:bg-dark-background-card border-b border-slate-200 dark:border-gray-700 dark:border-gray-700 px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome back, Coach</h1>
-              <p className="text-slate-600">Here's an overview of your teaching performance</p>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-dark-text-primary mb-2">Welcome back, Coach</h1>
+              <p className="text-slate-600 dark:text-dark-text-secondary">Here's an overview of your teaching performance</p>
             </div>
             <div className="flex gap-3">
-              <div className="px-4 py-2 bg-blue-50 rounded-full border border-blue-200">
-                <span className="text-sm font-semibold text-[#304DB5]">
+              <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-full border border-blue-200 dark:border-blue-800">
+                <span className="text-sm font-semibold text-[#304DB5] dark:text-blue-400">
                   Active courses: {courses.length}
                 </span>
               </div>
-              <div className="px-4 py-2 bg-purple-50 rounded-full border border-purple-200">
-                <span className="text-sm font-semibold text-purple-700">
+              <div className="px-4 py-2 bg-purple-50 dark:bg-purple-900/20 rounded-full border border-purple-200 dark:border-purple-800">
+                <span className="text-sm font-semibold text-purple-700 dark:text-purple-400">
                   Active students: {studentMetrics.activeStudents}
                 </span>
               </div>
@@ -143,34 +143,34 @@ const CoachDashboard: React.FC = () => {
           {/* Row 1: Revenue Overview + Student Metrics */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Revenue Overview - Spans 2 columns */}
-            <div className="lg:col-span-2 bg-white rounded-3xl shadow-xl p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Revenue</h2>
+            <div className="lg:col-span-2 bg-white dark:bg-dark-background-card rounded-3xl shadow-xl p-8">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">Revenue</h2>
               
               {/* Main KPI */}
               <div className="mb-6">
                 <div className="text-5xl font-bold text-[#304DB5] mb-2">
                   ${revenueData.currentMonth.toLocaleString()}
                 </div>
-                <p className="text-lg text-slate-600">This month</p>
+                <p className="text-lg text-slate-600 dark:text-dark-text-secondary">This month</p>
               </div>
 
               {/* Secondary KPIs */}
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 bg-slate-50 rounded-xl">
-                  <p className="text-sm text-slate-600 mb-1">Total all-time</p>
-                  <p className="text-2xl font-bold text-slate-900">
+                <div className="p-4 bg-slate-50 dark:bg-gray-800 rounded-xl">
+                  <p className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Total all-time</p>
+                  <p className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary">
                     ${revenueData.totalAllTime.toLocaleString()}
                   </p>
                 </div>
                 <div className="p-4 bg-green-50 rounded-xl">
-                  <p className="text-sm text-slate-600 mb-1">Month-over-month</p>
+                  <p className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Month-over-month</p>
                   <p className="text-2xl font-bold text-green-600">+{revenueData.monthOverMonth}%</p>
                 </div>
               </div>
 
               {/* Simple Bar Chart */}
               <div>
-                <p className="text-sm font-semibold text-slate-700 mb-3">Last 6 months</p>
+                <p className="text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-3">Last 6 months</p>
                 <div className="flex items-end justify-between gap-2 h-32">
                   {revenueData.lastSixMonths.map((item, index) => (
                     <div key={index} className="flex-1 flex flex-col items-center gap-2">
@@ -190,37 +190,37 @@ const CoachDashboard: React.FC = () => {
 
             {/* Student Count & Engagement */}
             <div className="space-y-4">
-              <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-xl">👥</span>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-600">Active students</p>
+                    <p className="text-sm text-slate-600 dark:text-dark-text-secondary">Active students</p>
                     <p className="text-3xl font-bold text-[#304DB5]">{studentMetrics.activeStudents}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                     <span className="text-xl">🆕</span>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-600">New this week</p>
+                    <p className="text-sm text-slate-600 dark:text-dark-text-secondary">New this week</p>
                     <p className="text-3xl font-bold text-green-600">{studentMetrics.newThisWeek}</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-md p-6">
+              <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
                     <span className="text-xl">⭐</span>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-600">Average rating</p>
+                    <p className="text-sm text-slate-600 dark:text-dark-text-secondary">Average rating</p>
                     <p className="text-3xl font-bold text-yellow-600">{studentMetrics.averageRating}</p>
                   </div>
                 </div>
@@ -229,25 +229,25 @@ const CoachDashboard: React.FC = () => {
           </div>
 
           {/* Row 2: Course Performance */}
-          <div className="bg-white rounded-2xl shadow-md p-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Course performance</h2>
+          <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">Course performance</h2>
             <div className="space-y-4">
               {courses.map((course) => (
                 <div
                   key={course.id}
                   onClick={() => handleCourseClick(course.name)}
-                  className="p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-all cursor-pointer"
+                  className="p-4 bg-slate-50 dark:bg-gray-800 rounded-xl hover:bg-slate-100 transition-all cursor-pointer"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-1">{course.name}</h3>
-                      <div className="flex items-center gap-4 text-sm text-slate-600">
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-dark-text-primary mb-1">{course.name}</h3>
+                      <div className="flex items-center gap-4 text-sm text-slate-600 dark:text-dark-text-secondary">
                         <span>👥 {course.enrolledStudents} students</span>
                         <span>⭐ {course.rating}</span>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-slate-600 mb-1">Completion rate</p>
+                      <p className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Completion rate</p>
                       <p className="text-xl font-bold text-[#304DB5]">{course.completionRate}%</p>
                     </div>
                   </div>
@@ -266,19 +266,19 @@ const CoachDashboard: React.FC = () => {
           {/* Row 3: Upcoming Sessions + AI Shortcuts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Upcoming Coaching Sessions */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Upcoming coaching sessions</h2>
+            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">Upcoming coaching sessions</h2>
               <div className="space-y-4">
                 {upcomingSessions.map((session) => (
                   <div
                     key={session.id}
-                    className="p-4 border border-slate-200 rounded-xl hover:border-[#5E7BFF] transition-all"
+                    className="p-4 border border-slate-200 dark:border-gray-700 rounded-xl hover:border-[#5E7BFF] transition-all"
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <p className="text-sm font-semibold text-[#304DB5] mb-1">{session.dateTime}</p>
-                        <p className="text-lg font-semibold text-slate-900">{session.studentName}</p>
-                        <p className="text-sm text-slate-600">{session.sessionType}</p>
+                        <p className="text-lg font-semibold text-slate-900 dark:text-dark-text-primary">{session.studentName}</p>
+                        <p className="text-sm text-slate-600 dark:text-dark-text-secondary">{session.sessionType}</p>
                       </div>
                       <span
                         className={`px-3 py-1 text-xs font-bold rounded-full ${
@@ -302,8 +302,8 @@ const CoachDashboard: React.FC = () => {
             </div>
 
             {/* AI Tool Shortcuts */}
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">AI tool shortcuts</h2>
+            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">AI tool shortcuts</h2>
               <div className="grid grid-cols-2 gap-4">
                 {aiShortcuts.map((shortcut) => (
                   <button
@@ -314,16 +314,16 @@ const CoachDashboard: React.FC = () => {
                     <div className="text-3xl mb-3 group-hover:scale-110 transition-transform">
                       {shortcut.icon}
                     </div>
-                    <p className="text-sm font-semibold text-slate-900 leading-tight">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-dark-text-primary leading-tight">
                       {shortcut.label}
                     </p>
                   </button>
                 ))}
               </div>
-              <div className="mt-6 p-4 bg-slate-50 rounded-xl">
+              <div className="mt-6 p-4 bg-slate-50 dark:bg-gray-800 rounded-xl">
                 <div className="flex items-start gap-2">
                   <span className="text-lg">✨</span>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-slate-600 dark:text-dark-text-secondary">
                     AI-powered tools to help you create better content, analyze student performance, and
                     optimize your teaching.
                   </p>

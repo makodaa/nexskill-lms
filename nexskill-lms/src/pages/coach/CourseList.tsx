@@ -58,11 +58,11 @@ const CourseList: React.FC = () => {
     <CoachAppLayout>
       <div className="flex-1 overflow-y-auto">
         {/* Header */}
-        <div className="bg-white border-b border-slate-200 px-8 py-6">
+        <div className="bg-white border-b border-slate-200 dark:border-gray-700 px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">My courses</h1>
-              <p className="text-slate-600">Manage your published and draft courses</p>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-dark-text-primary mb-2">My courses</h1>
+              <p className="text-slate-600 dark:text-dark-text-secondary">Manage your published and draft courses</p>
             </div>
             <button
               onClick={handleCreateNew}
@@ -80,24 +80,24 @@ const CourseList: React.FC = () => {
         <div className="p-8">
           {/* Stats Overview */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-              <p className="text-sm text-slate-600 mb-1">Total courses</p>
+            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700 p-5">
+              <p className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Total courses</p>
               <p className="text-3xl font-bold text-[#304DB5]">{dummyCourses.length}</p>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-              <p className="text-sm text-slate-600 mb-1">Published</p>
+            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700 p-5">
+              <p className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Published</p>
               <p className="text-3xl font-bold text-green-600">
                 {dummyCourses.filter((c) => c.status === 'published').length}
               </p>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-              <p className="text-sm text-slate-600 mb-1">Drafts</p>
-              <p className="text-3xl font-bold text-slate-600">
+            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700 p-5">
+              <p className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Drafts</p>
+              <p className="text-3xl font-bold text-slate-600 dark:text-dark-text-secondary">
                 {dummyCourses.filter((c) => c.status === 'draft').length}
               </p>
             </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-              <p className="text-sm text-slate-600 mb-1">Total students</p>
+            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700 p-5">
+              <p className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Total students</p>
               <p className="text-3xl font-bold text-purple-600">
                 {dummyCourses.reduce((sum, c) => sum + c.enrolledStudents, 0)}
               </p>

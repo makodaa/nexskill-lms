@@ -269,7 +269,7 @@ const EarningsDashboard: React.FC = () => {
           </div>
           <div className="space-y-6">
             {/* Quick Stats Card */}
-            <div className="bg-white rounded-2xl border border-[#EDF0FB] p-6 shadow-md">
+            <div className="bg-white dark:bg-dark-background-card rounded-2xl border border-[#EDF0FB] dark:border-gray-700 p-6 shadow-md">
               <h3 className="text-sm font-semibold text-[#5F6473] uppercase tracking-wider mb-4">
                 Quick Stats
               </h3>
@@ -286,7 +286,7 @@ const EarningsDashboard: React.FC = () => {
                   <p className="text-sm text-[#5F6473]">Avg. Transaction</p>
                   <p className="text-lg font-bold text-[#304DB5]">$179</p>
                 </div>
-                <div className="flex items-center justify-between pt-3 border-t border-[#EDF0FB]">
+                <div className="flex items-center justify-between pt-3 border-t border-[#EDF0FB] dark:border-gray-700">
                   <p className="text-sm text-[#5F6473]">Success Rate</p>
                   <p className="text-lg font-bold text-[#22C55E]">94.8%</p>
                 </div>

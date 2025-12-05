@@ -34,7 +34,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6">
+    <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-slate-900">Course settings</h2>
         <button
@@ -53,10 +53,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
       <div className="space-y-6">
         {/* General Info */}
         <div>
-          <h3 className="text-lg font-bold text-slate-900 mb-4">General information</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-dark-text-primary mb-4">General information</h3>
           <div className="space-y-4">
             <div>
-              <label htmlFor="title" className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="title" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                 Course title
               </label>
               <input
@@ -65,12 +65,12 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 name="title"
                 value={settings.title}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
               />
             </div>
 
             <div>
-              <label htmlFor="subtitle" className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="subtitle" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                 Subtitle / tagline
               </label>
               <input
@@ -80,13 +80,13 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 value={settings.subtitle}
                 onChange={handleInputChange}
                 placeholder="A brief tagline to complement your title"
-                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label htmlFor="category" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label htmlFor="category" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                   Category
                 </label>
                 <select
@@ -94,7 +94,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                   name="category"
                   value={settings.category}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                 >
                   <option value="">Select</option>
                   <option value="Web Development">Web Development</option>
@@ -104,7 +104,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
               </div>
 
               <div>
-                <label htmlFor="level" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label htmlFor="level" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                   Level
                 </label>
                 <select
@@ -112,7 +112,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                   name="level"
                   value={settings.level}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                 >
                   <option value="beginner">Beginner</option>
                   <option value="intermediate">Intermediate</option>
@@ -121,7 +121,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
               </div>
 
               <div>
-                <label htmlFor="language" className="block text-sm font-semibold text-slate-700 mb-2">
+                <label htmlFor="language" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                   Language
                 </label>
                 <input
@@ -130,7 +130,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                   name="language"
                   value={settings.language}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                 />
               </div>
             </div>
@@ -139,10 +139,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
 
         {/* Course Details */}
         <div>
-          <h3 className="text-lg font-bold text-slate-900 mb-4">Course details</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-dark-text-primary mb-4">Course details</h3>
           <div className="space-y-4">
             <div>
-              <label htmlFor="shortDescription" className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="shortDescription" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                 Short description
               </label>
               <textarea
@@ -152,12 +152,12 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 onChange={handleInputChange}
                 rows={2}
                 placeholder="One or two sentences for the course card"
-                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
               />
             </div>
 
             <div>
-              <label htmlFor="longDescription" className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="longDescription" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                 Long description
               </label>
               <textarea
@@ -167,12 +167,12 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 onChange={handleInputChange}
                 rows={6}
                 placeholder="Detailed description of what students will learn"
-                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none"
               />
             </div>
 
             <div>
-              <label htmlFor="tags" className="block text-sm font-semibold text-slate-700 mb-2">
+              <label htmlFor="tags" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                 Tags
               </label>
               <input
@@ -182,7 +182,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 value={settings.tags}
                 onChange={handleInputChange}
                 placeholder="javascript, react, frontend (comma-separated)"
-                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
               />
             </div>
           </div>
@@ -190,7 +190,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
 
         {/* Visibility */}
         <div>
-          <h3 className="text-lg font-bold text-slate-900 mb-4">Visibility</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-dark-text-primary mb-4">Visibility</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {(['public', 'unlisted', 'private'] as const).map((vis) => (
               <button
@@ -200,10 +200,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 className={`p-4 rounded-xl border-2 transition-all text-left ${
                   settings.visibility === vis
                     ? 'border-[#5E7BFF] bg-blue-50'
-                    : 'border-slate-200 hover:border-slate-300'
+                    : 'border-slate-200 dark:border-gray-700 hover:border-slate-300'
                 }`}
               >
-                <p className="font-semibold text-slate-900 capitalize mb-1">{vis}</p>
+                <p className="font-semibold text-slate-900 dark:text-dark-text-primary capitalize mb-1">{vis}</p>
                 <p className="text-xs text-slate-600">
                   {vis === 'public' && 'Visible to all users'}
                   {vis === 'unlisted' && 'Only via direct link'}

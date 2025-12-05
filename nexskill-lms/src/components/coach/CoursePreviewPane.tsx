@@ -24,13 +24,13 @@ const CoursePreviewPane: React.FC<CoursePreviewPaneProps> = ({
         </div>
 
         {/* View mode toggle */}
-        <div className="flex gap-2 bg-slate-100 p-1 rounded-xl">
+        <div className="flex gap-2 bg-slate-100 dark:bg-gray-800 p-1 rounded-xl">
           <button
             onClick={() => setViewMode('desktop')}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               viewMode === 'desktop'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-dark-background-card text-slate-900 dark:text-dark-text-primary shadow-sm'
+                : 'text-slate-600 dark:text-dark-text-secondary hover:text-slate-900'
             }`}
           >
             🖥️ Desktop
@@ -39,8 +39,8 @@ const CoursePreviewPane: React.FC<CoursePreviewPaneProps> = ({
             onClick={() => setViewMode('mobile')}
             className={`px-4 py-2 rounded-lg font-medium transition-all ${
               viewMode === 'mobile'
-                ? 'bg-white text-slate-900 shadow-sm'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-dark-background-card text-slate-900 dark:text-dark-text-primary shadow-sm'
+                : 'text-slate-600 dark:text-dark-text-secondary hover:text-slate-900'
             }`}
           >
             📱 Mobile
@@ -54,9 +54,9 @@ const CoursePreviewPane: React.FC<CoursePreviewPaneProps> = ({
           viewMode === 'desktop' ? 'max-w-full' : 'max-w-md'
         }`}
       >
-        <div className="bg-slate-100 rounded-2xl p-6 shadow-inner">
+        <div className="bg-slate-100 dark:bg-gray-800 rounded-2xl p-6 shadow-inner">
           {/* Simulated course landing page */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white dark:bg-dark-background-card rounded-xl shadow-lg overflow-hidden">
             {/* Hero section */}
             <div className="h-48 bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center">
               <div className="text-6xl">🎓</div>
@@ -85,8 +85,8 @@ const CoursePreviewPane: React.FC<CoursePreviewPaneProps> = ({
               </div>
 
               <div className="pt-4 border-t border-slate-200">
-                <h3 className="font-bold text-slate-900 mb-2">About this course</h3>
-                <p className="text-sm text-slate-700 leading-relaxed">
+                <h3 className="font-bold text-slate-900 dark:text-dark-text-primary mb-2">About this course</h3>
+                <p className="text-sm text-slate-700 dark:text-dark-text-primary leading-relaxed">
                   {courseDescription || 'Course description will appear here'}
                 </p>
               </div>
@@ -104,7 +104,7 @@ const CoursePreviewPane: React.FC<CoursePreviewPaneProps> = ({
         <div className="flex items-start gap-3">
           <span className="text-2xl">👁️</span>
           <div>
-            <p className="font-semibold text-slate-900 mb-1">Preview mode</p>
+            <p className="font-semibold text-slate-900 dark:text-dark-text-primary mb-1">Preview mode</p>
             <p className="text-sm text-slate-600">
               This is a simplified preview. The actual course page will include curriculum details, reviews, and more.
             </p>

@@ -24,8 +24,8 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-2">Drip schedule</h2>
-      <p className="text-slate-600 mb-6">
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-2">Drip schedule</h2>
+      <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
         Control when students can access course content. Release modules gradually over time.
       </p>
 
@@ -34,8 +34,8 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
         <div className="flex items-start gap-3">
           <span className="text-2xl">💡</span>
           <div>
-            <p className="font-semibold text-slate-900 mb-1">Drip content modes</p>
-            <ul className="text-sm text-slate-600 space-y-1">
+            <p className="font-semibold text-slate-900 dark:text-dark-text-primary mb-1">Drip content modes</p>
+            <ul className="text-sm text-slate-600 dark:text-dark-text-secondary space-y-1">
               <li>• <strong>Immediate:</strong> Available as soon as student enrolls</li>
               <li>• <strong>Days after enrollment:</strong> Unlocked X days after joining</li>
               <li>• <strong>Specific date:</strong> Unlocked on a calendar date</li>
@@ -47,7 +47,7 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
       {modules.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">📅</div>
-          <p className="text-xl font-semibold text-slate-900 mb-2">No modules yet</p>
+          <p className="text-xl font-semibold text-slate-900 dark:text-dark-text-primary mb-2">No modules yet</p>
           <p className="text-slate-600">Create modules in the Curriculum section first</p>
         </div>
       ) : (
@@ -55,19 +55,19 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
           {modules.map((module, index) => (
             <div
               key={module.moduleId}
-              className="bg-white rounded-2xl border-2 border-slate-200 p-6"
+              className="bg-white dark:bg-dark-background-card rounded-2xl border-2 border-slate-200 dark:border-gray-700 p-6"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center font-bold text-slate-700">
                   {index + 1}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-slate-900 mb-4">{module.moduleTitle}</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-dark-text-primary mb-4">{module.moduleTitle}</h3>
 
                   <div className="space-y-3">
                     {/* Mode selector */}
                     <div>
-                      <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                         Release mode
                       </label>
                       <select
@@ -75,7 +75,7 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
                         onChange={(e) =>
                           updateModule(module.moduleId, { mode: e.target.value as DripMode })
                         }
-                        className="w-full px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                       >
                         <option value="immediate">Immediate (no restriction)</option>
                         <option value="days-after-enrollment">Days after enrollment</option>
@@ -86,7 +86,7 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
                     {/* Conditional inputs */}
                     {module.mode === 'days-after-enrollment' && (
                       <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                           Unlock after (days)
                         </label>
                         <input
@@ -96,14 +96,14 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
                             updateModule(module.moduleId, { daysAfter: parseInt(e.target.value) || 0 })
                           }
                           min="0"
-                          className="w-full px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                          className="w-full px-4 py-2.5 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                         />
                       </div>
                     )}
 
                     {module.mode === 'specific-date' && (
                       <div>
-                        <label className="block text-sm font-semibold text-slate-700 mb-2">
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
                           Unlock on date
                         </label>
                         <input
@@ -112,7 +112,7 @@ const DripSchedulePanel: React.FC<DripSchedulePanelProps> = ({ modules, onChange
                           onChange={(e) =>
                             updateModule(module.moduleId, { specificDate: e.target.value })
                           }
-                          className="w-full px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                          className="w-full px-4 py-2.5 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                         />
                       </div>
                     )}

@@ -37,7 +37,7 @@ const ResourceUploadPanel: React.FC<ResourceUploadPanelProps> = ({ resources, on
 
   return (
     <div>
-      <h3 className="text-lg font-bold text-slate-900 mb-4">Resources</h3>
+      <h3 className="text-lg font-bold text-slate-900 dark:text-dark-text-primary mb-4">Resources</h3>
 
       {/* Resource List */}
       {resources.length > 0 && (
@@ -45,11 +45,11 @@ const ResourceUploadPanel: React.FC<ResourceUploadPanelProps> = ({ resources, on
           {resources.map((resource, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200"
+              className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200"
             >
               <span className="text-2xl">{getFileIcon(resource.type)}</span>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-slate-900 truncate">{resource.name}</p>
+                <p className="font-medium text-slate-900 dark:text-dark-text-primary truncate">{resource.name}</p>
                 <p className="text-xs text-slate-600">{resource.size}</p>
               </div>
               <button
@@ -80,7 +80,7 @@ const ResourceUploadPanel: React.FC<ResourceUploadPanelProps> = ({ resources, on
         />
         <button
           type="button"
-          className="w-full py-4 px-6 border-2 border-dashed border-slate-300 rounded-2xl hover:border-slate-400 hover:bg-slate-50 transition-all text-center"
+          className="w-full py-4 px-6 border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-2xl hover:border-slate-400 hover:bg-slate-50 dark:hover:bg-gray-800 dark:bg-gray-800 transition-all text-center"
         >
           <div className="flex items-center justify-center gap-2">
             <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +88,7 @@ const ResourceUploadPanel: React.FC<ResourceUploadPanelProps> = ({ resources, on
             </svg>
             <span className="font-medium text-slate-700">Add resource</span>
           </div>
-          <p className="text-xs text-slate-500 mt-1">PDF, DOCX, ZIP, or other files</p>
+          <p className="text-xs text-slate-500 dark:text-dark-text-muted mt-1">PDF, DOCX, ZIP, or other files</p>
         </button>
       </div>
     </div>

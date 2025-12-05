@@ -183,7 +183,7 @@ const CoachingToolsHub: React.FC = () => {
             <p className="text-xs opacity-80 mt-1">This year</p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-[#EDF0FB] p-6 shadow-md">
+          <div className="bg-white dark:bg-dark-background-card rounded-2xl border border-[#EDF0FB] dark:border-gray-700 p-6 shadow-md">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-[#5F6473]">Upcoming</p>
               <svg
@@ -204,7 +204,7 @@ const CoachingToolsHub: React.FC = () => {
             <p className="text-xs text-[#9CA3B5] mt-1">Next 7 days</p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-[#EDF0FB] p-6 shadow-md">
+          <div className="bg-white dark:bg-dark-background-card rounded-2xl border border-[#EDF0FB] dark:border-gray-700 p-6 shadow-md">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-[#5F6473]">Active Students</p>
               <svg
@@ -225,7 +225,7 @@ const CoachingToolsHub: React.FC = () => {
             <p className="text-xs text-[#9CA3B5] mt-1">Currently coaching</p>
           </div>
 
-          <div className="bg-white rounded-2xl border border-[#EDF0FB] p-6 shadow-md">
+          <div className="bg-white dark:bg-dark-background-card rounded-2xl border border-[#EDF0FB] dark:border-gray-700 p-6 shadow-md">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-[#5F6473]">Avg Rating</p>
               <svg
@@ -242,8 +242,8 @@ const CoachingToolsHub: React.FC = () => {
         </div>
 
         {/* Tool Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg border border-[#EDF0FB] overflow-hidden">
-          <div className="flex overflow-x-auto border-b border-[#EDF0FB]">
+        <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-lg border border-[#EDF0FB] dark:border-gray-700 overflow-hidden">
+          <div className="flex overflow-x-auto border-b border-[#EDF0FB] dark:border-gray-700">
             {toolTabs.map((tool) => (
               <button
                 key={tool.id}
@@ -251,7 +251,7 @@ const CoachingToolsHub: React.FC = () => {
                 className={`flex items-center gap-2 px-6 py-4 font-semibold whitespace-nowrap transition-all ${
                   activeTool === tool.id
                     ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white'
-                    : 'text-[#5F6473] hover:bg-[#F5F7FF]'
+                    : 'text-[#5F6473] hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800'
                 }`}
               >
                 <span className="text-xl">{tool.icon}</span>

@@ -29,27 +29,27 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-slate-900 mb-2">Publish course</h2>
-      <p className="text-slate-600 mb-6">
+      <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-2">Publish course</h2>
+      <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
         Review the checklist and publish your course to make it available to students.
       </p>
 
       {/* Status indicator */}
-      <div className="mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+      <div className="mb-6 p-4 bg-slate-50 dark:bg-gray-800 rounded-2xl border border-slate-200">
         <div className="flex items-center gap-3">
           <span className="text-2xl">
             {courseStatus === 'published' ? '✅' : courseStatus === 'draft' ? '📝' : '📦'}
           </span>
           <div>
             <p className="font-semibold text-slate-900">Current status</p>
-            <p className="text-sm text-slate-600 capitalize">{courseStatus}</p>
+            <p className="text-sm text-slate-600 dark:text-dark-text-secondary capitalize">{courseStatus}</p>
           </div>
         </div>
       </div>
 
       {/* Readiness checklist */}
       <div className="mb-6">
-        <h3 className="font-bold text-slate-900 mb-4">Readiness checklist</h3>
+        <h3 className="font-bold text-slate-900 dark:text-dark-text-primary mb-4">Readiness checklist</h3>
         <div className="space-y-3">
           {checks.map((check) => (
             <div
@@ -57,7 +57,7 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
               className={`flex items-center gap-3 p-4 rounded-xl border-2 ${
                 check.completed
                   ? 'bg-green-50 border-green-200'
-                  : 'bg-slate-50 border-slate-200'
+                  : 'bg-slate-50 dark:bg-gray-800 border-slate-200'
               }`}
             >
               <div
@@ -83,7 +83,7 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
           <div className="flex items-start gap-3">
             <span className="text-2xl">⚠️</span>
             <div>
-              <p className="font-semibold text-slate-900 mb-1">Not ready to publish</p>
+              <p className="font-semibold text-slate-900 dark:text-dark-text-primary mb-1">Not ready to publish</p>
               <p className="text-sm text-slate-600">
                 Complete all checklist items before publishing your course.
               </p>
@@ -111,7 +111,7 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
             <div className="flex items-start gap-3">
               <span className="text-2xl">🎉</span>
               <div>
-                <p className="font-semibold text-slate-900 mb-1">Course is live!</p>
+                <p className="font-semibold text-slate-900 dark:text-dark-text-primary mb-1">Course is live!</p>
                 <p className="text-sm text-slate-600">
                   Your course is now visible to students. You can continue editing while published.
                 </p>
@@ -120,13 +120,13 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
           </div>
           <button
             onClick={onUnpublish}
-            className="w-full py-4 px-6 bg-slate-200 text-slate-700 font-semibold rounded-full hover:bg-slate-300 transition-all"
+            className="w-full py-4 px-6 bg-slate-200 text-slate-700 dark:text-dark-text-primary font-semibold rounded-full hover:bg-slate-300 transition-all"
           >
             Unpublish course
           </button>
         </div>
       ) : (
-        <div className="p-4 bg-slate-100 border border-slate-300 rounded-xl text-center">
+        <div className="p-4 bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-600 rounded-xl text-center">
           <p className="text-slate-600">This course is archived.</p>
         </div>
       )}

@@ -168,8 +168,8 @@ const CourseBuilder: React.FC = () => {
         return (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">🎬</div>
-            <p className="text-xl font-semibold text-slate-900 mb-2">Lesson content</p>
-            <p className="text-slate-600 mb-6">
+            <p className="text-xl font-semibold text-slate-900 dark:text-dark-text-primary mb-2">Lesson content</p>
+            <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
               Edit individual lessons from the Curriculum section
             </p>
             <button
@@ -215,7 +215,7 @@ const CourseBuilder: React.FC = () => {
         <div className="mb-6">
           <button
             onClick={() => navigate('/coach/courses')}
-            className="text-sm text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-1"
+            className="text-sm text-slate-600 dark:text-dark-text-secondary hover:text-slate-900 dark:hover:text-dark-text-primary transition-colors flex items-center gap-1"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -235,7 +235,7 @@ const CourseBuilder: React.FC = () => {
 
           {/* Main content area */}
           <div className="flex-1">
-            <div className="bg-white rounded-3xl shadow-lg p-8">{renderSection()}</div>
+            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-lg p-8">{renderSection()}</div>
           </div>
         </div>
       </div>

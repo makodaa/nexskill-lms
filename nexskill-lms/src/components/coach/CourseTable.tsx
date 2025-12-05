@@ -23,32 +23,32 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview })
       case 'published':
         return 'bg-green-100 text-green-700 border-green-200';
       case 'draft':
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-dark-text-primary border-slate-200';
       case 'scheduled':
         return 'bg-blue-100 text-blue-700 border-blue-200';
       default:
-        return 'bg-slate-100 text-slate-700 border-slate-200';
+        return 'bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-dark-text-primary border-slate-200';
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700 overflow-hidden">
       {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="bg-slate-50 dark:bg-gray-800 border-b border-slate-200 dark:border-gray-700">
             <tr>
-              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Course</th>
-              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Status</th>
-              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Students</th>
-              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Rating</th>
-              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700">Last updated</th>
-              <th className="text-right py-4 px-6 text-sm font-semibold text-slate-700">Actions</th>
+              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Course</th>
+              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Status</th>
+              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Students</th>
+              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Rating</th>
+              <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Last updated</th>
+              <th className="text-right py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Actions</th>
             </tr>
           </thead>
           <tbody>
             {courses.map((course) => (
-              <tr key={course.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+              <tr key={course.id} className="border-b border-slate-100 hover:bg-slate-50 dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors">
                 <td className="py-4 px-6">
                   <p className="font-semibold text-slate-900">{course.title}</p>
                 </td>
@@ -83,7 +83,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview })
                     </button>
                     <button
                       onClick={() => onPreview(course.id)}
-                      className="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                      className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-dark-text-secondary hover:bg-slate-100 dark:hover:bg-gray-700 dark:bg-gray-800 rounded-lg transition-colors"
                     >
                       Preview
                     </button>
@@ -109,7 +109,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview })
           <div key={course.id} className="p-4">
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
-                <h3 className="font-semibold text-slate-900 mb-2">{course.title}</h3>
+                <h3 className="font-semibold text-slate-900 dark:text-dark-text-primary mb-2">{course.title}</h3>
                 <span
                   className={`inline-block px-3 py-1 text-xs font-bold rounded-full border ${getStatusColor(
                     course.status
@@ -121,19 +121,19 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview })
             </div>
             <div className="grid grid-cols-3 gap-3 mb-3 text-sm">
               <div>
-                <p className="text-slate-600 text-xs mb-1">Students</p>
+                <p className="text-slate-600 dark:text-dark-text-secondary text-xs mb-1">Students</p>
                 <p className="font-medium text-slate-900">{course.enrolledStudents}</p>
               </div>
               <div>
-                <p className="text-slate-600 text-xs mb-1">Rating</p>
+                <p className="text-slate-600 dark:text-dark-text-secondary text-xs mb-1">Rating</p>
                 <div className="flex items-center gap-1">
                   <span className="text-yellow-500">⭐</span>
                   <span className="font-medium text-slate-900">{course.rating.toFixed(1)}</span>
                 </div>
               </div>
               <div>
-                <p className="text-slate-600 text-xs mb-1">Updated</p>
-                <p className="font-medium text-slate-900 text-xs">{course.lastUpdated}</p>
+                <p className="text-slate-600 dark:text-dark-text-secondary text-xs mb-1">Updated</p>
+                <p className="font-medium text-slate-900 dark:text-dark-text-primary text-xs">{course.lastUpdated}</p>
               </div>
             </div>
             <div className="flex gap-2">
@@ -145,7 +145,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview })
               </button>
               <button
                 onClick={() => onPreview(course.id)}
-                className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-full"
+                className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 dark:text-dark-text-primary border border-slate-300 dark:border-gray-600 rounded-full"
               >
                 Preview
               </button>
@@ -175,7 +175,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview })
               />
             </svg>
           </div>
-          <p className="text-lg text-slate-600 mb-2">No courses yet</p>
+          <p className="text-lg text-slate-600 dark:text-dark-text-secondary mb-2">No courses yet</p>
           <p className="text-sm text-slate-500">Create your first course to get started</p>
         </div>
       )}

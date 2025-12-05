@@ -102,15 +102,15 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
       {questions.length === 0 ? (
         <div className="text-center py-16">
           <div className="text-6xl mb-4">📝</div>
-          <p className="text-xl font-semibold text-slate-900 mb-2">No questions yet</p>
-          <p className="text-slate-600 mb-6">Create your first quiz question</p>
+          <p className="text-xl font-semibold text-slate-900 dark:text-dark-text-primary mb-2">No questions yet</p>
+          <p className="text-slate-600 dark:text-dark-text-secondary mb-6">Create your first quiz question</p>
         </div>
       ) : (
         <div className="space-y-4">
           {questions.map((question, index) => (
             <div
               key={question.id}
-              className="bg-white rounded-2xl border-2 border-slate-200 p-6 hover:border-slate-300 transition-all"
+              className="bg-white dark:bg-dark-background-card rounded-2xl border-2 border-slate-200 dark:border-gray-700 p-6 hover:border-slate-300 dark:border-gray-600 transition-all"
             >
               {/* Question Header */}
               <div className="flex items-start gap-4 mb-4">
@@ -124,7 +124,7 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
                       onChange={(e) =>
                         updateQuestion(question.id, { type: e.target.value as QuestionType })
                       }
-                      className="px-3 py-1.5 bg-slate-100 rounded-lg text-sm font-medium text-slate-700 border-none"
+                      className="px-3 py-1.5 bg-slate-100 dark:bg-gray-800 rounded-lg text-sm font-medium text-slate-700 dark:text-dark-text-primary border-none"
                     >
                       <option value="multiple-choice">Multiple choice</option>
                       <option value="true-false">True / False</option>
@@ -138,7 +138,7 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
                     value={question.question}
                     onChange={(e) => updateQuestion(question.id, { question: e.target.value })}
                     placeholder="Enter your question here..."
-                    className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 mb-4"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 mb-4"
                   />
 
                   {/* Options */}
@@ -156,7 +156,7 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
                           value={option.text}
                           onChange={(e) => updateOption(question.id, option.id, e.target.value)}
                           placeholder={`Option ${question.options.indexOf(option) + 1}`}
-                          className="flex-1 px-4 py-2.5 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                          className="flex-1 px-4 py-2.5 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                         />
                       </div>
                     ))}
@@ -168,7 +168,7 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
                     onChange={(e) => updateQuestion(question.id, { explanation: e.target.value })}
                     placeholder="Explanation (shown after answer)"
                     rows={2}
-                    className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none text-sm"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none text-sm"
                   />
                 </div>
 

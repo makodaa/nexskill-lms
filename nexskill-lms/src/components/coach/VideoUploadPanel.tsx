@@ -43,7 +43,7 @@ const VideoUploadPanel: React.FC<VideoUploadPanelProps> = ({ currentVideo, onCha
 
   return (
     <div>
-      <h3 className="text-lg font-bold text-slate-900 mb-4">Lesson video</h3>
+      <h3 className="text-lg font-bold text-slate-900 dark:text-dark-text-primary mb-4">Lesson video</h3>
       
       {!currentVideo ? (
         <div
@@ -56,7 +56,7 @@ const VideoUploadPanel: React.FC<VideoUploadPanelProps> = ({ currentVideo, onCha
           className={`relative border-2 border-dashed rounded-2xl p-8 transition-all ${
             isDragging
               ? 'border-[#5E7BFF] bg-blue-50'
-              : 'border-slate-300 hover:border-slate-400'
+              : 'border-slate-300 dark:border-gray-600 hover:border-slate-400'
           }`}
         >
           <input
@@ -67,7 +67,7 @@ const VideoUploadPanel: React.FC<VideoUploadPanelProps> = ({ currentVideo, onCha
           />
           <div className="text-center">
             <div className="text-4xl mb-4">🎬</div>
-            <p className="text-lg font-semibold text-slate-900 mb-2">
+            <p className="text-lg font-semibold text-slate-900 dark:text-dark-text-primary mb-2">
               Drag & drop or click to upload
             </p>
             <p className="text-sm text-slate-600">
@@ -76,13 +76,13 @@ const VideoUploadPanel: React.FC<VideoUploadPanelProps> = ({ currentVideo, onCha
           </div>
         </div>
       ) : (
-        <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
+        <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl p-6 border border-slate-200">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl flex items-center justify-center">
               <span className="text-3xl">🎬</span>
             </div>
             <div className="flex-1">
-              <p className="font-semibold text-slate-900 mb-1">{currentVideo.filename}</p>
+              <p className="font-semibold text-slate-900 dark:text-dark-text-primary mb-1">{currentVideo.filename}</p>
               <div className="flex items-center gap-4 text-sm text-slate-600">
                 <span>Duration: {currentVideo.duration}</span>
                 {currentVideo.resolution && <span>Resolution: {currentVideo.resolution}</span>}
@@ -106,7 +106,7 @@ const VideoUploadPanel: React.FC<VideoUploadPanelProps> = ({ currentVideo, onCha
             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] rounded-full" style={{ width: '100%' }} />
             </div>
-            <p className="text-xs text-slate-600 mt-2">Upload complete</p>
+            <p className="text-xs text-slate-600 dark:text-dark-text-secondary mt-2">Upload complete</p>
           </div>
         </div>
       )}

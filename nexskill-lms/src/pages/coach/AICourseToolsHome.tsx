@@ -78,7 +78,7 @@ const AICourseToolsHome: React.FC = () => {
               className={`flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-200 ${
                 activeTool === tab.id
                   ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white shadow-lg'
-                  : 'bg-white text-[#5F6473] hover:bg-[#F5F7FF] hover:text-[#304DB5] border border-[#EDF0FB]'
+                  : 'bg-white text-[#5F6473] hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800 hover:text-[#304DB5] border border-[#EDF0FB] dark:border-gray-700'
               }`}
             >
               <span className="text-lg">{tab.icon}</span>
@@ -88,7 +88,7 @@ const AICourseToolsHome: React.FC = () => {
         </div>
 
         {/* Tool Panel Container */}
-        <div className="bg-white rounded-3xl shadow-xl p-8">
+        <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-xl p-8">
           {activeTool === 'outline' && <AICourseOutlineTool />}
           {activeTool === 'lesson' && <AILessonCreatorTool />}
           {activeTool === 'quiz' && <AIQuizGeneratorTool />}
