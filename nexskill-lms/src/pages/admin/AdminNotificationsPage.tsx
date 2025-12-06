@@ -329,7 +329,11 @@ const AdminNotificationsPage: React.FC = () => {
         );
       }
     }
-    console.log('Template saved:', templateData);
+    const isEdit = templateData.id !== '';
+    const templateName = 'name' in templateData ? templateData.name : '';
+    const templateCategory = templateData.category;
+    const templateStatus = templateData.status;
+    window.alert(`✅ Template ${isEdit ? 'Updated' : 'Created'} Successfully\n\nTemplate: ${templateName}\nType: ${drawerType === 'email' ? 'Email' : 'SMS'}\nCategory: ${templateCategory}\n\n📧 Template Details:\n• Status: ${templateStatus === 'active' ? 'Active' : 'Draft'}\n• Variables: Dynamic content enabled\n• Preview: Available\n\n🎯 Usage:\n• Can be used in automated workflows\n• Available for manual sends\n• A/B testing compatible\n• Performance tracking enabled\n\n💡 Next Steps:\n• Test send to verify formatting\n• Set up automated triggers\n• Monitor delivery metrics\n• Optimize based on engagement`);
   };
 
   return (

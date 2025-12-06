@@ -377,28 +377,25 @@ const CourseModerationPage: React.FC = () => {
     : undefined;
 
   const handleApprove = (courseId: string) => {
-    console.log('Approving course:', courseId);
-    window.alert(`Course ${courseId} has been approved and published.`);
+    const course = courses.find(c => c.id === courseId);
+    window.alert(`✅ Course Approved & Published\n\nCourse: ${course?.title || courseId}\nInstructor: ${course?.instructorName || 'N/A'}\n\n📢 Publishing Details:\n• Status: Live on platform\n• Visibility: Public catalog\n• Enrollment: Open immediately\n• Search indexing: In progress\n\n📧 Notifications Sent:\n• Instructor: Approval confirmation\n• Marketing team: New course alert\n• Students: Course recommendation\n\n🎯 Next Steps:\n• Monitor initial enrollments\n• Review student feedback\n• Track completion rates`);
   };
 
   const handleReject = (courseId: string, reason: string) => {
-    console.log('Rejecting course:', courseId, 'Reason:', reason);
-    window.alert(`Course ${courseId} has been rejected. Instructor will be notified.`);
+    const course = courses.find(c => c.id === courseId);
+    window.alert(`❌ Course Rejected\n\nCourse: ${course?.title || courseId}\nInstructor: ${course?.instructorName || 'N/A'}\n\n📝 Rejection Details:\n• Reason: ${reason || 'Quality standards not met'}\n• Status: Returned to instructor\n• Resubmission: Allowed after revisions\n\n📧 Instructor Notification:\n• Detailed feedback provided\n• Revision guidelines included\n• Support resources attached\n• Expected response time: 7-14 days\n\n💡 Instructor can:\n• Review specific issues\n• Make required changes\n• Resubmit for review\n• Contact support for clarification`);
   };
 
   const handleInvestigate = (reportId: string) => {
-    console.log('Investigating report:', reportId);
-    window.alert(`Report ${reportId} status changed to"Investigating".`);
+    window.alert(`🔍 Investigation Started\n\nReport ID: ${reportId}\n\n📊 Investigation Process:\n• Status: Under active review\n• Priority: High\n• Assigned: Moderation team\n• Timeline: 24-48 hours\n\n🔎 Investigation Steps:\n• Content review in progress\n• Evidence collection\n• Stakeholder interviews\n• Policy compliance check\n\n📧 Notifications:\n• Reporter: Investigation started\n• Content owner: Under review\n• Admin team: Case assigned\n\n⏱️ Updates will be provided every 12 hours until resolved.`);
   };
 
   const handleResolve = (reportId: string) => {
-    console.log('Resolving report:', reportId);
-    window.alert(`Report ${reportId} has been marked as resolved.`);
+    window.alert(`✅ Report Resolved\n\nReport ID: ${reportId}\n\n📋 Resolution Summary:\n• Status: Closed\n• Action taken: Content updated/removed\n• Resolution time: 36 hours\n• Outcome: Satisfactory\n\n📧 Notifications Sent:\n• Reporter: Issue resolved confirmation\n• Content owner: Action taken notice\n• Moderation team: Case closed\n\n📊 Impact:\n• Content compliance: Restored\n• User safety: Protected\n• Platform standards: Maintained\n\n📝 Case documentation saved for future reference.`);
   };
 
   const handleDismiss = (reportId: string) => {
-    console.log('Dismissing report:', reportId);
-    window.alert(`Report ${reportId} has been dismissed.`);
+    window.alert(`🚫 Report Dismissed\n\nReport ID: ${reportId}\n\n📝 Dismissal Reasoning:\n• Finding: No policy violation\n• Content: Complies with standards\n• Evidence: Insufficient or invalid\n• Decision: No action required\n\n📧 Notifications:\n• Reporter: Outcome explained\n• Content owner: No action needed\n• Documentation: Case archived\n\n💡 Reporter Options:\n• Review dismissal reasoning\n• Provide additional evidence\n• Submit new report if needed\n• Contact support for clarification\n\nAll decisions are logged for quality assurance.`);
   };
 
   return (

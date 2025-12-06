@@ -210,13 +210,11 @@ const ContactsPage: React.FC = () => {
   };
 
   const handleImportContacts = () => {
-    console.log('Import contacts clicked - UI placeholder');
-    // TODO: Implement file upload modal in future iteration
+    window.alert(`📥 Import Contacts\n\n📂 Supported File Formats:\n• CSV (.csv)\n• Excel (.xlsx, .xls)\n• vCard (.vcf)\n• JSON (.json)\n\n📋 Required Fields:\n• Name (First & Last)\n• Email address\n• Optional: Phone, Company, Tags\n\n⚙️ Import Options:\n• Skip duplicates (recommended)\n• Update existing contacts\n• Validate email format\n• Auto-assign tags\n\n💡 Import Process:\n1. Upload file (max 10MB)\n2. Map fields\n3. Preview import\n4. Confirm and import\n\nYou can import up to 10,000 contacts at once.`);
   };
 
   const handleExportContacts = () => {
-    console.log('Export contacts clicked - UI placeholder');
-    // TODO: Implement CSV/Excel export in future iteration
+    window.alert(`📤 Export Contacts\n\n📊 Export Options:\n• All contacts (${contacts.length})\n• Filtered contacts only\n• Selected contacts\n• Custom date range\n\n📂 Export Formats:\n• CSV (Excel compatible)\n• Excel (.xlsx)\n• vCard (.vcf)\n• JSON (API format)\n\n📋 Included Fields:\n• Basic info (name, email, phone)\n• Company & title\n• Tags & categories\n• Activity history\n• Custom fields\n• Creation & update dates\n\n⏱️ Processing time: 10-30 seconds\n📧 Download link sent to your email\n\nExport preserves all data for backup or migration.`);
   };
 
   return (

@@ -146,7 +146,7 @@ const AdminDashboard: React.FC = () => {
                       onClick={() => {
                         setTimeframe(option);
                         setShowTimeframeDropdown(false);
-                        console.log('Timeframe changed to:', option);
+                        window.alert(`📊 Timeframe Updated\n\nSelected Period: ${option}\n\n📈 Dashboard Analytics:\n• Refreshing all metrics\n• Loading comparison data\n• Updating trend graphs\n• Recalculating KPIs\n\n💡 What's Included:\n• Revenue & enrollment data\n• User engagement metrics\n• Course performance stats\n• Growth comparisons\n\nAll widgets will update with ${option} data.`);
                       }}
                       className={`w-full text-left px-4 py-2 text-sm hover:bg-[#F5F7FF] transition-colors ${
                         timeframe === option
