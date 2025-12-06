@@ -15,9 +15,10 @@ interface ReviewItem {
 interface ContentReviewQueueTableProps {
   compact?: boolean;
   limit?: number;
+  onReviewItem?: (item: ReviewItem) => void;
 }
 
-const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compact = false, limit }) => {
+const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compact = false, limit, onReviewItem }) => {
   const [selectedItem, setSelectedItem] = useState<ReviewItem | null>(null);
   
   const allItems: ReviewItem[] = [
@@ -110,7 +111,11 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
 
   const handleRowClick = (item: ReviewItem) => {
     if (!compact) {
-      setSelectedItem(item);
+      if (onReviewItem) {
+        onReviewItem(item);
+      } else {
+        setSelectedItem(item);
+      }
     }
   };
 

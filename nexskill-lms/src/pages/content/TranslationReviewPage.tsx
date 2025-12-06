@@ -9,9 +9,27 @@ const TranslationReviewPage: React.FC = () => {
     course: 'all',
   });
 
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [reviewFeedback, setReviewFeedback] = useState('');
+
   const languages = ['Filipino', 'Spanish', 'French', 'German', 'Mandarin'];
   const statuses = ['Pending', 'In Review', 'Approved', 'Rejected'];
   const courses = ['JavaScript Mastery', 'UI/UX Design', 'Product Management', 'Data Analytics'];
+
+  const handleApproveTranslation = () => {
+    console.log('Approving translation with feedback:', reviewFeedback);
+    alert('Translation approved!');
+    setShowReviewModal(false);
+    setReviewFeedback('');
+  };
+
+  const handleRejectTranslation = () => {
+    console.log('Rejecting translation with feedback:', reviewFeedback);
+    alert('Translation rejected. Feedback sent to translator.');
+    setShowReviewModal(false);
+    setReviewFeedback('');
+  };
 
   return (
     <ContentEditorLayout>
@@ -26,7 +44,7 @@ const TranslationReviewPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => console.log('Show translation stats')}
+              onClick={() => setShowStatsModal(true)}
               className="px-4 py-2 bg-white border border-gray-200 text-text-primary rounded-xl hover:bg-gray-50 transition-all text-sm font-medium"
             >
               📊 Translation Stats
@@ -200,6 +218,153 @@ const TranslationReviewPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Translation Review Modal */}
+      {showReviewModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-4xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Review Translation</h2>
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Translation Info */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="p-4 bg-blue-50 rounded-xl">
+                  <span className="text-sm text-gray-600">Language</span>
+                  <p className="font-semibold text-gray-900 mt-1">Filipino</p>
+                </div>
+                <div className="p-4 bg-purple-50 rounded-xl">
+                  <span className="text-sm text-gray-600">Course</span>
+                  <p className="font-semibold text-gray-900 mt-1">JavaScript Mastery</p>
+                </div>
+                <div className="p-4 bg-green-50 rounded-xl">
+                  <span className="text-sm text-gray-600">Lesson</span>
+                  <p className="font-semibold text-gray-900 mt-1">Async/Await</p>
+                </div>
+              </div>
+
+              {/* Side-by-side comparison */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <h4 className="font-semibold text-gray-900 mb-3">Original Text</h4>
+                  <p className="text-sm text-gray-700">
+                    JavaScript async/await is syntactic sugar built on top of promises. It allows you to write asynchronous code that looks and behaves like synchronous code, making it easier to read and maintain.
+                  </p>
+                </div>
+                <div className="p-4 bg-blue-50 rounded-xl">
+                  <h4 className="font-semibold text-gray-900 mb-3">Translation</h4>
+                  <p className="text-sm text-gray-700">
+                    Ang JavaScript async/await ay syntactic sugar na itinayo sa ibabaw ng mga pangako. Pinapayagan ka nitong sumulat ng asynchronous code na mukhang at kumikilos tulad ng synchronous code, na ginagawang mas madaling basahin at panatilihin.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feedback */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Review Feedback (Optional)
+                </label>
+                <textarea
+                  rows={4}
+                  value={reviewFeedback}
+                  onChange={(e) => setReviewFeedback(e.target.value)}
+                  placeholder="Provide feedback on the translation quality, accuracy, or suggestions for improvement..."
+                  className="w-full px-4 py-3 bg-gray-50 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={handleRejectTranslation}
+                  className="px-4 py-3 bg-white border-2 border-red-500 text-red-600 font-semibold rounded-lg hover:bg-red-50 transition-all"
+                >
+                  ❌ Reject Translation
+                </button>
+                <button
+                  onClick={handleApproveTranslation}
+                  className="px-4 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
+                >
+                  ✅ Approve Translation
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Translation Stats Modal */}
+      {showStatsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-3xl w-full shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Translation Statistics</h2>
+              <button
+                onClick={() => setShowStatsModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Overall Stats */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="p-4 bg-blue-50 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-blue-600">57</div>
+                  <div className="text-xs text-gray-600 mt-1">Total Translations</div>
+                </div>
+                <div className="p-4 bg-green-50 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-green-600">48</div>
+                  <div className="text-xs text-gray-600 mt-1">Approved</div>
+                </div>
+                <div className="p-4 bg-yellow-50 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-yellow-600">6</div>
+                  <div className="text-xs text-gray-600 mt-1">Pending</div>
+                </div>
+                <div className="p-4 bg-purple-50 rounded-xl text-center">
+                  <div className="text-3xl font-bold text-purple-600">84%</div>
+                  <div className="text-xs text-gray-600 mt-1">Approval Rate</div>
+                </div>
+              </div>
+
+              {/* Per Language Breakdown */}
+              <div className="p-6 bg-gray-50 rounded-xl">
+                <h3 className="font-semibold text-gray-900 mb-4">By Language</h3>
+                <div className="space-y-3">
+                  {[
+                    { lang: 'Filipino', total: 18, approved: 15, color: 'blue' },
+                    { lang: 'Spanish', total: 15, approved: 13, color: 'red' },
+                    { lang: 'French', total: 12, approved: 10, color: 'purple' },
+                    { lang: 'German', total: 8, approved: 7, color: 'green' },
+                    { lang: 'Mandarin', total: 4, approved: 3, color: 'orange' },
+                  ].map((stat) => (
+                    <div key={stat.lang} className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">{stat.lang}</span>
+                      <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-600">{stat.approved}/{stat.total}</span>
+                        <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full bg-${stat.color}-500`}
+                            style={{ width: `${(stat.approved / stat.total) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </ContentEditorLayout>
   );
 };

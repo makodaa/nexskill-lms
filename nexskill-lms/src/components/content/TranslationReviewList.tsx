@@ -11,7 +11,11 @@ interface TranslationItem {
   status: 'Pending' | 'In Review' | 'Approved';
 }
 
-const TranslationReviewList: React.FC = () => {
+interface TranslationReviewListProps {
+  onReviewTranslation?: () => void;
+}
+
+const TranslationReviewList: React.FC<TranslationReviewListProps> = ({ onReviewTranslation }) => {
   const [items] = useState<TranslationItem[]>([
     {
       id: 1,
@@ -106,7 +110,13 @@ const TranslationReviewList: React.FC = () => {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => setSelectedItem(item)}
+                onClick={() => {
+                  if (onReviewTranslation) {
+                    onReviewTranslation();
+                  } else {
+                    setSelectedItem(item);
+                  }
+                }}
                 className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-semibold rounded-lg hover:shadow-md transition-all"
               >
                 Open for Review

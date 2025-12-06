@@ -9,9 +9,37 @@ const ContentReviewQueuePage: React.FC = () => {
     priority: 'all',
   });
 
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [reviewNote, setReviewNote] = useState('');
+
   const courses = ['JavaScript Mastery', 'UI/UX Design', 'Product Management', 'Data Analytics'];
   const types = ['Lesson', 'Resource', 'Quiz', 'Translation'];
   const priorities = ['High', 'Medium', 'Low'];
+
+  const handleReviewItem = (item: any) => {
+    setSelectedItem(item);
+    setShowReviewModal(true);
+  };
+
+  const handleApprove = () => {
+    console.log('Approving item:', selectedItem, 'Note:', reviewNote);
+    alert('Content approved successfully!');
+    setShowReviewModal(false);
+    setReviewNote('');
+  };
+
+  const handleRequestChanges = () => {
+    console.log('Requesting changes for:', selectedItem, 'Note:', reviewNote);
+    alert('Change request sent to coach!');
+    setShowReviewModal(false);
+    setReviewNote('');
+  };
+
+  const handleExportQueue = () => {
+    console.log('Exporting review queue...');
+    alert('Queue exported successfully!');
+  };
 
   return (
     <ContentEditorLayout>
@@ -26,7 +54,7 @@ const ContentReviewQueuePage: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => console.log('Export queue')}
+              onClick={handleExportQueue}
               className="px-4 py-2 bg-white border border-gray-200 text-text-primary rounded-xl hover:bg-gray-50 transition-all text-sm font-medium"
             >
               📥 Export Queue
@@ -135,7 +163,7 @@ const ContentReviewQueuePage: React.FC = () => {
           </div>
 
           {/* Review Queue Table */}
-          <ContentReviewQueueTable />
+          <ContentReviewQueueTable onReviewItem={handleReviewItem} />
 
           {/* Help Section */}
           <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100">
@@ -164,6 +192,86 @@ const ContentReviewQueuePage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      {showReviewModal && selectedItem && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Review Content</h2>
+              <button
+                onClick={() => setShowReviewModal(false)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-6">
+              {/* Item Details */}
+              <div className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border-2 border-blue-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">Content Details</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-sm text-gray-600">Course:</span>
+                    <p className="font-semibold text-gray-900">JavaScript Mastery</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600">Type:</span>
+                    <p className="font-semibold text-gray-900">Lesson</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600">Submitted by:</span>
+                    <p className="font-semibold text-gray-900">John Doe (Coach)</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-gray-600">Priority:</span>
+                    <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">High</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Preview */}
+              <div className="p-4 bg-gray-50 rounded-xl">
+                <h4 className="font-semibold text-gray-900 mb-2">Content Preview</h4>
+                <p className="text-sm text-gray-700">
+                  This lesson covers advanced JavaScript concepts including closures, promises, and async/await patterns...
+                </p>
+              </div>
+
+              {/* Review Notes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Review Notes
+                </label>
+                <textarea
+                  rows={4}
+                  value={reviewNote}
+                  onChange={(e) => setReviewNote(e.target.value)}
+                  placeholder="Add notes about your review (optional for approval, required for change requests)..."
+                  className="w-full px-4 py-3 bg-gray-50 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={handleRequestChanges}
+                  className="px-4 py-3 bg-white border-2 border-orange-500 text-orange-600 font-semibold rounded-lg hover:bg-orange-50 transition-all"
+                >
+                  🔄 Request Changes
+                </button>
+                <button
+                  onClick={handleApprove}
+                  className="px-4 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold rounded-lg hover:shadow-lg transition-all"
+                >
+                  ✅ Approve Content
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </ContentEditorLayout>
   );
 };
