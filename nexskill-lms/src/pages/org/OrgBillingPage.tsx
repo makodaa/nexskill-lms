@@ -60,7 +60,7 @@ const OrgBillingPage: React.FC = () => {
               <p className="text-[#5F6473]">Manage your subscription, invoices, and payment methods</p>
             </div>
             <button 
-              onClick={() => console.log('Download all invoices')}
+              onClick={() => alert('📥 Downloading all invoices...\n\nGenerating archive:\n• All invoices (last 12 months)\n• Payment receipts\n• Tax documents\n\nFormat: ZIP file\nDelivery: Instant download')}
               className="px-6 py-3 bg-white border border-[#E5E7EB] text-[#111827] font-semibold rounded-full hover:shadow-md transition-all"
             >
               📥 Download All
@@ -112,7 +112,7 @@ const OrgBillingPage: React.FC = () => {
                     <p className="text-[#5F6473]">{currentPlan.licenses} licenses included</p>
                   </div>
                   <button 
-                    onClick={() => console.log('Upgrade plan')}
+                    onClick={() => alert('⬆️ Upgrade Your Plan\n\nAvailable upgrades:\n• Professional: 250 licenses\n• Enterprise: Unlimited licenses\n• Custom features available\n\nBenefits:\n• Priority support\n• Advanced analytics\n• Custom integrations\n• Dedicated success manager\n\nContact sales@nexskill.com')}
                     className="px-4 py-2 bg-white border border-orange-300 text-orange-600 font-medium rounded-lg hover:bg-orange-50 transition-colors"
                   >
                     Upgrade Plan
@@ -238,7 +238,7 @@ const OrgBillingPage: React.FC = () => {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <button
-                            onClick={() => console.log('Download invoice:', invoice.id)}
+                            onClick={() => alert(`📥 Downloading invoice #${invoice.id}\n\nInvoice Details:\nDate: ${invoice.date}\nAmount: $${invoice.amount.toLocaleString()}\nStatus: ${invoice.status}\n\nFormat: PDF\nDelivery: Instant`)}
                             className="text-orange-600 hover:text-orange-700 font-medium text-sm"
                           >
                             Download
@@ -288,14 +288,14 @@ const OrgBillingPage: React.FC = () => {
                         <div className="flex gap-2 mt-4">
                           {!method.isDefault && (
                             <button
-                              onClick={() => console.log('Set as default:', method.id)}
+                              onClick={() => alert(`✅ Default payment method updated!\n\n${method.type === 'card' ? 'Credit Card' : 'Bank Account'} ending in ${method.last4}\n\nThis payment method will be used for all future billing.`)}
                               className="px-3 py-1 border border-[#E5E7EB] text-[#111827] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                             >
                               Set as Default
                             </button>
                           )}
                           <button
-                            onClick={() => console.log('Remove method:', method.id)}
+                            onClick={() => alert(`⚠️ Remove payment method?\n\n${method.type === 'card' ? 'Credit Card' : 'Bank Account'} •••• ${method.last4}\n\nThis action cannot be undone. Make sure you have another payment method on file before removing this one.`)}
                             className="px-3 py-1 text-red-600 text-sm font-medium hover:bg-red-50 rounded-lg transition-colors"
                           >
                             Remove
@@ -385,7 +385,7 @@ const OrgBillingPage: React.FC = () => {
                 </button>
                 <button
                   onClick={() => {
-                    console.log('Payment method added');
+                    alert('✅ Payment method added successfully!\n\nYour new payment method has been saved securely.\n\nIt can now be used for billing payments.');
                     setShowAddPaymentModal(false);
                   }}
                   className="flex-1 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all"

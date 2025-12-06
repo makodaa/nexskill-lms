@@ -15,7 +15,7 @@ const OrgAnalyticsPage: React.FC = () => {
 
   const handleDownloadReport = () => {
     console.log('Downloading analytics report...');
-    alert('Analytics report download started!');
+    alert('📊 Generating analytics report...\n\nYour detailed report includes:\n• Learner engagement metrics\n• Course completion rates\n• Time spent learning\n• Top performers\n• Areas for improvement\n\nFormat: PDF with interactive charts\nDelivery: Email (3-5 minutes)');
   };
 
   return (

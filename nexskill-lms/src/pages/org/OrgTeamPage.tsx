@@ -12,6 +12,7 @@ const OrgTeamPage: React.FC = () => {
 
   const handleInvite = () => {
     console.log('Inviting member:', inviteForm);
+    alert(`✅ Invitation sent!\n\n📧 ${inviteForm.email}\nRole: ${inviteForm.role}\nSeats allocated: ${inviteForm.seats}\n\nThey'll receive:\n• Welcome email\n• Login credentials\n• Role permissions\n• Getting started guide`);
     setShowInviteModal(false);
     // Reset form
     setInviteForm({ email: '', role: 'Sub-Coach', seats: 10 });

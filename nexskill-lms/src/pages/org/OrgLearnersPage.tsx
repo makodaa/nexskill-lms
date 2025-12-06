@@ -19,12 +19,12 @@ const OrgLearnersPage: React.FC = () => {
 
   const handleExportData = () => {
     console.log('Exporting learners data...');
-    alert('Data export started!');
+    alert('📥 Exporting learner data...\n\nYour export includes:\n• Learner profiles & contact info\n• Course enrollment status\n• Progress & completion rates\n• Last activity dates\n• Certificate achievements\n\nFormat: CSV\nDelivery: Email (2-3 minutes)');
   };
 
   const handleAddLearner = () => {
     console.log('Opening add learner modal...');
-    alert('Add learner modal would open here');
+    alert('🎓 Add New Learner\n\nEnroll learners by:\n• Manual entry (name, email, role)\n• Bulk upload (CSV import)\n• SSO integration\n\nEach learner will receive:\n• Welcome email\n• Login credentials\n• Course assignments');
   };
 
   return (

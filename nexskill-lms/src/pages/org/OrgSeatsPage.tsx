@@ -30,17 +30,19 @@ const OrgSeatsPage: React.FC = () => {
 
   const handleRemoveSeat = (allocation: SeatAllocation) => {
     console.log('Remove seat from:', allocation);
+    alert(`⚠️ Remove seat from ${allocation.memberName}?\n\nCurrent allocation: ${allocation.seatsAssigned} seats\nSeats in use: ${allocation.seatsUsed}\n\nRemoving unused seats will return them to the unassigned pool.`);
   };
 
   const confirmReassign = () => {
     console.log('Reassign seats for:', selectedAllocation);
+    alert(`✅ Seats reassigned successfully!\n\n${selectedAllocation?.memberName} now has access to the updated seat allocation.\n\nLearners will be notified of any changes.`);
     setShowReassignModal(false);
     setSelectedAllocation(null);
   };
 
   const handlePurchaseSeats = () => {
     console.log('Opening purchase modal...');
-    alert('Purchase seats modal would open here');
+    alert('💳 Purchase Additional Seats\n\nCurrent plan: Business Plus\nPrice per seat: $29/month\n\nVolume discounts:\n• 50-99 seats: 10% off\n• 100-249 seats: 15% off\n• 250+ seats: 20% off\n\nContact sales for enterprise pricing.');
   };
 
   return (

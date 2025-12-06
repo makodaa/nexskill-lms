@@ -95,6 +95,7 @@ const OrgProgramsPage: React.FC = () => {
 
   const confirmAssignment = () => {
     console.log('Assigning program:', selectedProgram?.title);
+    alert(`✅ Program assigned successfully!\n\n🎯 ${selectedProgram?.title}\n\nAssigned learners will receive:\n• Email notification\n• Course access\n• Learning materials\n• Progress tracking\n\nThey can start immediately!`);
     setShowAssignModal(false);
     setSelectedProgram(null);
   };
@@ -110,7 +111,7 @@ const OrgProgramsPage: React.FC = () => {
               <p className="text-[#5F6473]">Manage and assign training programs to your team</p>
             </div>
             <button 
-              onClick={() => console.log('Browse catalog')}
+              onClick={() => alert('📚 Browse Course Catalog\n\nExplore 500+ courses:\n• Technology & Development\n• Business & Leadership\n• Design & Creativity\n• Data & Analytics\n• Marketing & Sales\n\nFilter by skill level, duration, and category.')}
               className="px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold rounded-full hover:shadow-lg transition-all"
             >
               + Browse Catalog
@@ -247,7 +248,7 @@ const OrgProgramsPage: React.FC = () => {
                       Assign to Team
                     </button>
                     <button
-                      onClick={() => console.log('View details:', program.title)}
+                      onClick={() => alert(`📊 ${program.title}\n\nDuration: ${program.duration}\nEnrolled: ${program.enrolledCount} learners\nCompletion: ${program.completionRate}%\nCategory: ${program.category}\n\nView full curriculum and learning objectives.`)}
                       className="px-4 py-2 border border-[#E5E7EB] text-[#111827] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       Details

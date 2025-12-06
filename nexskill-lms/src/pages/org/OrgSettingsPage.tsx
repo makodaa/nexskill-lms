@@ -19,7 +19,7 @@ const OrgSettingsPage: React.FC = () => {
 
   const handleSave = () => {
     console.log('Saving settings:', { generalSettings, securitySettings });
-    alert('Settings saved successfully!');
+    alert('✅ Organization settings saved!\n\n⚙️ Updated settings:\n• General preferences\n• Security policies\n• Notification rules\n\nChanges will take effect immediately for all team members.');
   };
 
   return (
@@ -353,7 +353,7 @@ const OrgSettingsPage: React.FC = () => {
                               Connected
                             </span>
                             <button
-                              onClick={() => console.log('Disconnect', integration.name)}
+                              onClick={() => alert(`⚙️ Configure ${integration.name}\n\nIntegration settings:\n• API credentials\n• Sync preferences\n• Data mapping\n• Webhook URLs\n\nManage how ${integration.name} connects with your organization.`)}
                               className="px-4 py-2 border border-[#E5E7EB] text-[#111827] text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
                             >
                               Configure

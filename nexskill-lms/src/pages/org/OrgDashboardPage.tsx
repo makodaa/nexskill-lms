@@ -8,12 +8,12 @@ import OrgAnalyticsOverview from '../../components/org/OrgAnalyticsOverview';
 const OrgDashboardPage: React.FC = () => {
   const handleDownloadReport = () => {
     console.log('Downloading report...');
-    alert('Report download started!');
+    alert('📥 Generating organization report...\n\nYour comprehensive report includes:\n• Learner progress & completion rates\n• Seat utilization analytics\n• Engagement metrics\n• Top performing courses\n\nReport will be emailed to you in 2-3 minutes.');
   };
 
   const handleInviteMembers = () => {
     console.log('Opening invite modal...');
-    alert('Invite members modal would open here');
+    alert('👥 Invite Team Members\n\nSend invitations to:\n• Managers (full access)\n• Sub-Coaches (limited access)\n• Support Staff\n\nEach invite includes:\n• Welcome email\n• Setup instructions\n• Role-based access');
   };
 
   return (

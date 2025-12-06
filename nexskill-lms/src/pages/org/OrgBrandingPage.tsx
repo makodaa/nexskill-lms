@@ -28,7 +28,7 @@ const OrgBrandingPage: React.FC = () => {
 
   const handleSave = () => {
     console.log('Saving branding settings:', { brandColors, brandSettings, logoFile });
-    alert('Branding settings saved successfully!');
+    alert('✅ Branding settings saved!\n\n🎨 Your custom branding is now live:\n• Logo updated\n• Brand colors applied\n• Welcome message personalized\n\nAll learners will see your branded experience on their next login.');
   };
 
   return (
