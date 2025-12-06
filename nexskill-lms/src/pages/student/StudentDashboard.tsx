@@ -105,7 +105,7 @@ const StudentDashboard: React.FC = () => {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium text-text-secondary dark:text-dark-text-secondary">Progress</h3>
                 <button 
-                  onClick={() => console.log('Change time filter')}
+                  onClick={() => alert('📅 Time Filter Options\n\nView your activity for:\n\u2022 Last 7 days\n\u2022 Last 30 days\n\u2022 Last 90 days\n\u2022 All time')}
                   className="px-3 py-1 bg-[#F5F7FF] dark:bg-gray-800 rounded-full text-xs font-medium text-text-secondary flex items-center gap-1"
                 >
                   {timeFilter}

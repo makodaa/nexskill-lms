@@ -13,6 +13,10 @@ const StudentSettings: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('account');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [showShortcutsModal, setShowShortcutsModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   // State for all settings
   const [interestsGoals, setInterestsGoals] = useState({
@@ -67,8 +71,24 @@ const StudentSettings: React.FC = () => {
       privacySettings,
       accessibilitySettings,
     });
+    alert('✅ Settings saved successfully!\n\nAll your preferences have been updated.');
     setShowSuccessMessage(true);
     setTimeout(() => setShowSuccessMessage(false), 3000);
+  };
+
+  const handleDeleteAccount = () => {
+    if (deleteConfirmText === 'DELETE') {
+      alert('⚠️ Account deletion initiated\n\nYour account and all data will be permanently deleted within 24 hours.');
+      setShowDeleteModal(false);
+      navigate('/auth/login');
+    } else {
+      alert('❌ Please type DELETE to confirm account deletion.');
+    }
+  };
+
+  const handleDownloadData = () => {
+    alert('📥 Data export started\n\nYour data archive will be ready in a few minutes. We\'ll send you a download link via email.');
+    setShowDownloadModal(false);
   };
 
   const tabs = [
@@ -150,7 +170,7 @@ const StudentSettings: React.FC = () => {
                     Once you delete your account, there is no going back. Please be certain.
                   </p>
                   <button
-                    onClick={() => console.log('Delete account requested')}
+                    onClick={() => setShowDeleteModal(true)}
                     className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-xl transition-colors"
                   >
                     Delete Account
@@ -331,7 +351,7 @@ const StudentSettings: React.FC = () => {
                     
                     <div className="pt-4 border-t border-gray-200">
                       <button
-                        onClick={() => console.log('Download data')}
+                        onClick={() => setShowDownloadModal(true)}
                         className="w-full px-4 py-2.5 text-sm font-medium text-brand-primary hover:bg-blue-50 border border-brand-primary rounded-xl transition-colors"
                       >
                         📥 Download My Data
@@ -435,7 +455,7 @@ const StudentSettings: React.FC = () => {
 
                     <div className="pt-4 border-t border-gray-200">
                       <button
-                        onClick={() => console.log('View keyboard shortcuts')}
+                        onClick={() => setShowShortcutsModal(true)}
                         className="w-full px-4 py-2.5 text-sm font-medium text-brand-primary hover:bg-blue-50 border border-brand-primary rounded-xl transition-colors"
                       >
                         ⌨️ View Keyboard Shortcuts
@@ -466,6 +486,173 @@ const StudentSettings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-dark-background-card rounded-2xl w-full max-w-md">
+            <div className="p-6 border-b border-[#EDF0FB] dark:border-gray-700">
+              <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">Delete Account</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                <p className="text-sm text-red-800 mb-2">
+                  <span className="font-semibold">⚠️ Warning:</span> This action cannot be undone!
+                </p>
+                <p className="text-xs text-red-700">
+                  All your courses, progress, certificates, and personal data will be permanently deleted.
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text-primary dark:text-dark-text-primary mb-2">
+                  Type <span className="font-mono font-bold">DELETE</span> to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmText}
+                  onChange={(e) => setDeleteConfirmText(e.target.value)}
+                  className="w-full px-4 py-2 border border-[#EDF0FB] dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-800 dark:text-dark-text-primary"
+                  placeholder="Type DELETE"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t border-[#EDF0FB] dark:border-gray-700 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmText('');
+                }}
+                className="px-6 py-2 text-text-secondary font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'DELETE'}
+                className="px-6 py-2 bg-red-600 text-white font-medium rounded-xl hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Delete Permanently
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Download Data Modal */}
+      {showDownloadModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-dark-background-card rounded-2xl w-full max-w-md">
+            <div className="p-6 border-b border-[#EDF0FB] dark:border-gray-700">
+              <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">Download Your Data</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-sm text-blue-800 mb-2">
+                  📦 Your data export will include:
+                </p>
+                <ul className="text-xs text-blue-700 space-y-1 ml-4 list-disc">
+                  <li>Profile information and settings</li>
+                  <li>Course enrollment history</li>
+                  <li>Progress and achievements</li>
+                  <li>Certificates earned</li>
+                  <li>Discussion posts and comments</li>
+                </ul>
+              </div>
+              <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                The export will be sent to <span className="font-semibold">{accountSettings.email}</span> within a few minutes.
+              </p>
+            </div>
+            <div className="p-6 border-t border-[#EDF0FB] dark:border-gray-700 flex justify-end gap-3">
+              <button
+                onClick={() => setShowDownloadModal(false)}
+                className="px-6 py-2 text-text-secondary font-medium rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDownloadData}
+                className="px-6 py-2 bg-brand-primary text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+              >
+                Request Export
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Keyboard Shortcuts Modal */}
+      {showShortcutsModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-dark-background-card rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-[#EDF0FB] dark:border-gray-700">
+              <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">Keyboard Shortcuts</h2>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">Navigation</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Go to Dashboard</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">G + D</kbd>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Go to Courses</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">G + C</kbd>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Search</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">Ctrl + K</kbd>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">Video Player</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Play/Pause</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">Space</kbd>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Skip Forward 10s</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">→</kbd>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Skip Backward 10s</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">←</kbd>
+                    </div>
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Toggle Fullscreen</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">F</kbd>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">General</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Toggle AI Coach</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">Ctrl + /</kbd>
+                    </div>
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Show Shortcuts</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">?</kbd>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="p-6 border-t border-[#EDF0FB] dark:border-gray-700 flex justify-end">
+              <button
+                onClick={() => setShowShortcutsModal(false)}
+                className="px-6 py-2 bg-brand-primary text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </StudentAppLayout>
   );
 };

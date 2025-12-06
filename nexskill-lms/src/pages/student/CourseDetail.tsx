@@ -206,11 +206,13 @@ const CourseDetail: React.FC = () => {
 
   const handleEnroll = () => {
     console.log('Enrolling in course:', course.id);
+    alert(`✅ Successfully enrolled in ${course.title}!\n\n🎉 Welcome to the course! You can now access all lessons and materials.`);
     setIsEnrolled(true);
   };
 
   const handleAddToWishlist = () => {
     console.log('Added to wishlist:', course.id);
+    alert(`❤️ Added to wishlist!\n\n${course.title} has been saved to your wishlist.`);
   };
 
   return (

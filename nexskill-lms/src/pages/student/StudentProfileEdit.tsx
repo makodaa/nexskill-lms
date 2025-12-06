@@ -26,6 +26,7 @@ const StudentProfileEdit: React.FC = () => {
   const handleSave = () => {
     // Simulate save
     console.log('Saving profile:', { ...formData, ...interestsGoals });
+    alert('✅ Profile updated successfully!\n\n🎉 Your changes have been saved.');
     setShowSuccessMessage(true);
     setTimeout(() => {
       navigate('/student/profile');

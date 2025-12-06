@@ -110,7 +110,7 @@ const DiscussionBoard: React.FC = () => {
 
   const handleNewPost = (content: string) => {
     console.log('New post:', content);
-    // In a real app, this would create a new thread
+    alert('✅ Discussion posted!\\n\\n🎉 Your post has been published to the community.');    // In a real app, this would create a new thread
   };
 
   const handleThreadClick = (threadId: string) => {

@@ -138,13 +138,13 @@ const LiveClasses: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => console.log('Browse all classes')}
+              onClick={() => alert('📅 Browse Schedule\n\nViewing the full schedule of upcoming live classes.')}
               className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               📅 Browse Schedule
             </button>
             <button
-              onClick={() => console.log('Filter classes')}
+              onClick={() => alert('🔍 Filter Options\n\nFilter by: Category, Date Range, Instructor, Duration.')}
               className="px-4 py-2 text-sm font-medium text-brand-primary hover:bg-blue-50 border border-brand-primary rounded-lg transition-colors"
             >
               🔍 Filter
@@ -260,14 +260,14 @@ const LiveClasses: React.FC = () => {
                           </button>
                         ) : (
                           <button
-                            onClick={() => console.log('Add to calendar:', liveClass.id)}
+                            onClick={() => alert(`📅 Added to calendar!\n\n${liveClass.title}\n${liveClass.date} at ${liveClass.time}\n\nYou'll receive a reminder 15 minutes before the class starts.`)}
                             className="px-6 py-2.5 bg-white border-2 border-brand-primary text-brand-primary text-sm font-semibold rounded-full hover:bg-blue-50 transition-all"
                           >
                             📅 Add to Calendar
                           </button>
                         )}
                         <button
-                          onClick={() => console.log('View details:', liveClass.id)}
+                          onClick={() => alert(`📚 Class Details\n\n${liveClass.title}\nInstructor: ${liveClass.instructor}\nDuration: ${liveClass.duration}\nParticipants: ${liveClass.participants}/${liveClass.maxParticipants}\nCategory: ${liveClass.category}`)}
                           className="px-6 py-2.5 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
                         >
                           View Details
@@ -307,13 +307,13 @@ const LiveClasses: React.FC = () => {
                       </p>
                       <div className="flex items-center gap-3">
                         <button
-                          onClick={() => console.log('Watch recording:', liveClass.id)}
+                          onClick={() => alert(`📹 Opening video player...\n\n${liveClass.title}\nRecorded on ${liveClass.date}\nDuration: ${liveClass.duration}`)}
                           className="px-6 py-2 bg-brand-primary text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors"
                         >
                           📹 Watch Recording
                         </button>
                         <button
-                          onClick={() => console.log('Download resources:', liveClass.id)}
+                          onClick={() => alert(`📥 Downloading resources...\n\nSlides, code samples, and supplementary materials for ${liveClass.title}`)}
                           className="px-6 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
                         >
                           📥 Download Resources
@@ -333,7 +333,7 @@ const LiveClasses: React.FC = () => {
                 <div
                   key={recording.id}
                   className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 overflow-hidden hover:shadow-md transition-all cursor-pointer"
-                  onClick={() => console.log('Watch recording:', recording.id)}
+                  onClick={() => alert(`📹 Opening ${recording.title}\\n\\nRecorded session with ${recording.instructor}\\nDuration: ${recording.duration}\\n${recording.views} views`)}
                 >
                   <div className={`h-40 bg-gradient-to-br ${recording.thumbnail} flex items-center justify-center`}>
                     <div className="text-white text-5xl">▶️</div>
@@ -355,7 +355,7 @@ const LiveClasses: React.FC = () => {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        console.log('Play recording:', recording.id);
+                        alert(`▶️ Starting playback...\\n\\n${recording.title}\\nInstructor: ${recording.instructor}`);
                       }}
                       className="w-full mt-3 px-4 py-2 bg-brand-primary text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
                     >

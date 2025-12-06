@@ -23,6 +23,7 @@ const QuizStart: React.FC = () => {
 
   const handleReviewLesson = () => {
     console.log('Review lesson clicked');
+    alert('📚 Opening lesson review\n\nReview the key concepts before starting the quiz.');
     navigate(`/student/courses/${courseId}`);
   };
 

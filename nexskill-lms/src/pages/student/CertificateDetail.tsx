@@ -95,6 +95,7 @@ const CertificateDetail: React.FC = () => {
 
   const handleDownload = () => {
     console.log('Download certificate:', certificate.id);
+    alert('📥 Downloading certificate...\n\nYour certificate is being prepared in PDF format.\n\n🎉 Share your achievement on LinkedIn!');
     // Simulate download
     setDownloadStatus('downloading');
     setTimeout(() => {

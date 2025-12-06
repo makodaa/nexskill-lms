@@ -59,6 +59,7 @@ const MembershipManage: React.FC = () => {
 
   const handleConfirmChange = () => {
     console.log(`Plan change confirmed: ${currentPlan.id} → ${targetPlan.id}`);
+    alert(`✅ Plan upgrade confirmed!\n\nSwitching to ${targetPlan.name} plan\nNew price: $${targetPlan.price}/${targetPlan.billingCycle}\n\nYour new benefits will be available immediately!`);
     navigate('/student/membership/confirmation', {
       state: {
         type: 'change',
@@ -76,6 +77,7 @@ const MembershipManage: React.FC = () => {
 
   const handleCancelConfirmed = () => {
     console.log('Membership cancellation confirmed');
+    alert('⚠️ Membership cancelled\n\nYour Pro membership will remain active until the end of your current billing cycle.\n\nWe\'re sorry to see you go!');
     navigate('/student/membership/confirmation', {
       state: {
         type: 'cancel',
@@ -140,13 +142,13 @@ const MembershipManage: React.FC = () => {
               </p>
               <div className="flex flex-wrap gap-3">
                 <button
-                  onClick={() => console.log('Contact support')}
+                  onClick={() => alert('📞 Contact Support\n\nEmail: support@nexskill.com\nPhone: 1-800-NEXSKILL\nLive Chat: Available 24/7\n\nOur team will respond within 2 hours.')}
                   className="px-5 py-2 bg-white text-[#304DB5] font-medium rounded-full border-2 border-[#304DB5] hover:bg-blue-50 transition-all text-sm"
                 >
                   Contact support
                 </button>
                 <button
-                  onClick={() => console.log('View FAQ')}
+                  onClick={() => alert('❓ Frequently Asked Questions\n\n• How do I change my plan?\n• What payment methods are accepted?\n• Can I cancel anytime?\n• Do you offer refunds?\n\nVisit our help center for more answers.')}
                   className="px-5 py-2 text-slate-700 font-medium rounded-full border border-slate-300 hover:bg-white transition-all text-sm"
                 >
                   View FAQ

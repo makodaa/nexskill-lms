@@ -70,6 +70,11 @@ const MembershipPlans: React.FC = () => {
 
   const handleSelectPlan = (planId: string) => {
     console.log('Selected plan:', planId);
+    const selectedPlan = membershipPlans.find(p => p.id === planId);
+    if (selectedPlan) {
+      alert(`✅ ${selectedPlan.name} Plan Selected!\n\nPrice: $${selectedPlan.price}/${selectedPlan.billingCycle}\n\nProceeding to checkout...`);
+      navigate('/student/membership/manage', { state: { targetPlanId: planId } });
+    }
   };
 
   return (
@@ -129,7 +134,7 @@ const MembershipPlans: React.FC = () => {
             Our team can help you find the perfect plan for your learning goals.
           </p>
           <button
-            onClick={() => console.log('Contact sales')}
+            onClick={() => alert('📞 Contact our team\n\nOur sales team will reach out within 24 hours to discuss your needs.\n\nEmail: sales@nexskill.com\nPhone: 1-800-NEXSKILL')}
             className="px-8 py-3 bg-white text-[#304DB5] font-semibold rounded-full hover:shadow-lg transition-all"
           >
             Talk to our team

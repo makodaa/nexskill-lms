@@ -123,10 +123,13 @@ const ThreadView: React.FC = () => {
 
   const handleReact = (type: string) => {
     console.log('Reacted with:', type);
+    const emoji = type === 'like' ? '❤️' : type === 'agree' ? '👍' : type === 'helpful' ? '💡' : '🚀';
+    alert(`${emoji} Reaction added!`);
   };
 
   const handleReply = (commentId: string, content: string) => {
     console.log('Reply to', commentId, ':', content);
+    alert('✅ Reply posted!\n\nYour comment has been added to the discussion.');
     // In a real app, this would add the reply to the comments
   };
 
@@ -143,6 +146,8 @@ const ThreadView: React.FC = () => {
 
   const handleReport = (reason: string, details?: string) => {
     console.log('Reported content:', { reason, details, threadId });
+    alert('⚠️ Content reported\n\nThank you for helping keep our community safe. Our moderation team will review this report.');
+    setIsReportModalOpen(false);
     // In a real app, this would submit the report to the backend
   };
 
