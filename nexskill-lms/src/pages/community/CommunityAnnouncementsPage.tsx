@@ -12,6 +12,7 @@ const CommunityAnnouncementsPage: React.FC = () => {
 
   const handlePublish = () => {
     console.log('Publishing announcement:', formData);
+    alert(`📢 Announcement published successfully!\n\nTitle: ${formData.title}\nTarget: ${formData.target}\nThe announcement will be visible to ${formData.target === 'all' ? 'all communities' : formData.target}.`);
     setShowForm(false);
     setFormData({ title: '', target: 'all', content: '' });
   };

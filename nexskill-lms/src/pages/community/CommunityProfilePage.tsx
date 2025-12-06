@@ -18,6 +18,7 @@ const CommunityProfilePage: React.FC = () => {
 
   const handleSaveProfile = () => {
     console.log('Saving profile:', profile);
+    alert(`✅ Profile updated successfully!\n\nName: ${profile.name}\nEmail: ${profile.email}`);
     setIsEditing(false);
   };
 

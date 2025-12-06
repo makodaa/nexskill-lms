@@ -3,6 +3,19 @@ import CommunityManagerLayout from '../../layouts/CommunityManagerLayout';
 import EngagementMetricsPanel from '../../components/community/EngagementMetricsPanel';
 
 const CommunityEngagementPage: React.FC = () => {
+  const [showExportModal, setShowExportModal] = React.useState(false);
+  const [exportOptions, setExportOptions] = React.useState({
+    format: 'pdf',
+    period: 'last-30-days',
+    includeCharts: true,
+  });
+
+  const handleExportReport = () => {
+    console.log('Exporting report:', exportOptions);
+    alert(`📥 Engagement report exported!\n\nFormat: ${exportOptions.format.toUpperCase()}\nPeriod: ${exportOptions.period}\nCharts included: ${exportOptions.includeCharts ? 'Yes' : 'No'}`);
+    setShowExportModal(false);
+  };
+
   return (
     <CommunityManagerLayout>
       {/* Header */}
@@ -16,7 +29,7 @@ const CommunityEngagementPage: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => console.log('Export engagement report')}
+              onClick={() => setShowExportModal(true)}
               className="px-4 py-2 bg-white border border-gray-200 text-text-primary rounded-xl hover:bg-gray-50 transition-all text-sm font-medium"
             >
               📥 Export Report
@@ -166,6 +179,96 @@ const CommunityEngagementPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Export Report Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full">
+            <div className="p-6 border-b border-[#EDF0FB]">
+              <h3 className="text-xl font-bold text-text-primary">Export Engagement Report</h3>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2">
+                  Report Format
+                </label>
+                <select
+                  value={exportOptions.format}
+                  onChange={(e) => setExportOptions({ ...exportOptions, format: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="pdf">PDF - Portable Document Format</option>
+                  <option value="xlsx">XLSX - Excel Spreadsheet</option>
+                  <option value="csv">CSV - Comma Separated Values</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text-secondary mb-2">
+                  Time Period
+                </label>
+                <select
+                  value={exportOptions.period}
+                  onChange={(e) => setExportOptions({ ...exportOptions, period: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                >
+                  <option value="last-7-days">Last 7 Days</option>
+                  <option value="last-30-days">Last 30 Days</option>
+                  <option value="last-90-days">Last 90 Days</option>
+                  <option value="this-month">This Month</option>
+                  <option value="last-month">Last Month</option>
+                  <option value="this-year">This Year</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="includeCharts"
+                  checked={exportOptions.includeCharts}
+                  onChange={(e) => setExportOptions({ ...exportOptions, includeCharts: e.target.checked })}
+                  className="w-4 h-4 text-green-500 border-gray-300 rounded focus:ring-green-500"
+                />
+                <label htmlFor="includeCharts" className="text-sm text-text-secondary">
+                  Include charts and visualizations
+                </label>
+              </div>
+
+              <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                <div className="flex items-start gap-2">
+                  <span className="text-lg">📊</span>
+                  <div>
+                    <p className="text-xs text-green-700 font-medium mb-1">Report will include:</p>
+                    <ul className="text-xs text-green-600 space-y-1">
+                      <li>• Daily/weekly engagement metrics</li>
+                      <li>• Community activity breakdown</li>
+                      <li>• Top contributors and moderators</li>
+                      <li>• Response time analytics</li>
+                      <li>• Member satisfaction scores</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-[#EDF0FB] flex justify-end gap-3">
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="px-6 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 rounded-xl transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleExportReport}
+                className="px-6 py-2 text-sm font-medium text-white bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-xl transition-all"
+              >
+                📥 Generate Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </CommunityManagerLayout>
   );
 };
