@@ -157,14 +157,14 @@ const LiveClasses: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-8">
         <div className="max-w-6xl mx-auto">
           {/* Tabs */}
-          <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-slate-700 mb-6">
             <div className="flex">
               <button
                 onClick={() => setActiveTab('upcoming')}
                 className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${
                   activeTab === 'upcoming'
-                    ? 'text-brand-primary border-b-2 border-brand-primary bg-blue-50'
-                    : 'text-text-secondary hover:bg-gray-50'
+                    ? 'text-brand-primary dark:text-blue-400 border-b-2 border-brand-primary dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-text-secondary dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
                 }`}
               >
                 🎥 Upcoming ({upcomingClasses.length})
@@ -173,8 +173,8 @@ const LiveClasses: React.FC = () => {
                 onClick={() => setActiveTab('completed')}
                 className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${
                   activeTab === 'completed'
-                    ? 'text-brand-primary border-b-2 border-brand-primary bg-blue-50'
-                    : 'text-text-secondary hover:bg-gray-50'
+                    ? 'text-brand-primary dark:text-blue-400 border-b-2 border-brand-primary dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-text-secondary dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
                 }`}
               >
                 ✅ Completed ({completedClasses.length})
@@ -183,8 +183,8 @@ const LiveClasses: React.FC = () => {
                 onClick={() => setActiveTab('recorded')}
                 className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${
                   activeTab === 'recorded'
-                    ? 'text-brand-primary border-b-2 border-brand-primary bg-blue-50'
-                    : 'text-text-secondary hover:bg-gray-50'
+                    ? 'text-brand-primary dark:text-blue-400 border-b-2 border-brand-primary dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-text-secondary dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
                 }`}
               >
                 📹 Recorded ({recordedClasses.length})
@@ -198,7 +198,7 @@ const LiveClasses: React.FC = () => {
               {upcomingClasses.map((liveClass) => (
                 <div
                   key={liveClass.id}
-                  className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 p-6 hover:shadow-md transition-all"
+                  className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-slate-700 p-6 hover:shadow-md transition-all"
                 >
                   <div className="flex gap-6">
                     {/* Thumbnail */}
@@ -212,12 +212,12 @@ const LiveClasses: React.FC = () => {
                         <div>
                           <div className="flex items-center gap-2 mb-2">
                             {liveClass.status === 'starting-soon' && (
-                              <span className="px-2 py-1 bg-red-100 text-red-600 text-xs font-semibold rounded-full flex items-center gap-1">
-                                <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+                              <span className="px-2 py-1 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xs font-semibold rounded-full flex items-center gap-1">
+                                <span className="w-2 h-2 bg-red-600 dark:bg-red-400 rounded-full animate-pulse"></span>
                                 Starting Soon
                               </span>
                             )}
-                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-400 text-xs font-medium rounded-full">
                               {liveClass.category}
                             </span>
                           </div>
@@ -240,7 +240,7 @@ const LiveClasses: React.FC = () => {
                           </div>
                           <div className="flex items-center gap-2 text-sm text-text-secondary dark:text-dark-text-secondary">
                             <span>👥 {liveClass.participants}/{liveClass.maxParticipants} registered</span>
-                            <div className="w-32 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="w-32 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-brand-primary rounded-full"
                                 style={{ width: `${(liveClass.participants / liveClass.maxParticipants) * 100}%` }}
@@ -286,7 +286,7 @@ const LiveClasses: React.FC = () => {
               {completedClasses.map((liveClass) => (
                 <div
                   key={liveClass.id}
-                  className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 p-6 hover:shadow-md transition-all"
+                  className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-slate-700 p-6 hover:shadow-md transition-all"
                 >
                   <div className="flex gap-6">
                     <div className={`w-48 h-32 rounded-xl bg-gradient-to-br ${liveClass.thumbnail} flex-shrink-0 flex items-center justify-center`}>
@@ -332,17 +332,17 @@ const LiveClasses: React.FC = () => {
               {recordedClasses.map((recording) => (
                 <div
                   key={recording.id}
-                  className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 overflow-hidden hover:shadow-md transition-all cursor-pointer"
+                  className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-slate-700 overflow-hidden hover:shadow-md transition-all cursor-pointer"
                   onClick={() => alert(`📹 Opening ${recording.title}\\n\\nRecorded session with ${recording.instructor}\\nDuration: ${recording.duration}\\n${recording.views} views`)}
                 >
                   <div className={`h-40 bg-gradient-to-br ${recording.thumbnail} flex items-center justify-center`}>
                     <div className="text-white text-5xl">▶️</div>
                   </div>
                   <div className="p-4">
-                    <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 text-xs font-medium rounded-full">
                       {recording.category}
                     </span>
-                    <h3 className="text-base font-bold text-text-primary mt-2 mb-1">
+                    <h3 className="text-base font-bold text-text-primary dark:text-white mt-2 mb-1">
                       {recording.title}
                     </h3>
                     <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-3">

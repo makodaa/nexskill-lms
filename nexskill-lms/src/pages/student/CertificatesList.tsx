@@ -102,32 +102,32 @@ const CertificatesList: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-3">Certificates & achievements</h1>
-          <p className="text-lg text-slate-600">Review, download, and share your accomplishments</p>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3">Certificates & achievements</h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400">Review, download, and share your accomplishments</p>
         </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-            <div className="text-3xl font-bold text-[#304DB5] mb-1">{allCertificates.length}</div>
-            <div className="text-sm text-slate-600">Total certificates</div>
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <div className="text-3xl font-bold text-[#304DB5] dark:text-blue-400 mb-1">{allCertificates.length}</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Total certificates</div>
           </div>
-          <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-            <div className="text-3xl font-bold text-[#304DB5] mb-1">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <div className="text-3xl font-bold text-[#304DB5] dark:text-blue-400 mb-1">
               {allCertificates.filter((c) => c.certificateType === 'Course completion').length}
             </div>
-            <div className="text-sm text-slate-600">Course completions</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Course completions</div>
           </div>
-          <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-            <div className="text-3xl font-bold text-[#304DB5] mb-1">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <div className="text-3xl font-bold text-[#304DB5] dark:text-blue-400 mb-1">
               {allCertificates.filter((c) => c.certificateType === 'Specialization').length}
             </div>
-            <div className="text-sm text-slate-600">Specializations</div>
+            <div className="text-sm text-slate-600 dark:text-slate-400">Specializations</div>
           </div>
         </div>
 
         {/* Filters and Sort */}
-        <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             {/* Filter Pills */}
             <div className="flex flex-wrap gap-2">
@@ -138,7 +138,7 @@ const CertificatesList: React.FC = () => {
                   className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
                     filter === option
                       ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
                   }`}
                 >
                   {option}
@@ -148,11 +148,11 @@ const CertificatesList: React.FC = () => {
 
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-slate-700">Sort by:</label>
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Sort by:</label>
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortType)}
-                className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 text-sm font-medium"
+                className="px-4 py-2 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-600 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 text-sm font-medium text-slate-900 dark:text-white"
               >
                 <option value="Newest">Newest</option>
                 <option value="Oldest">Oldest</option>
@@ -164,7 +164,7 @@ const CertificatesList: React.FC = () => {
 
         {/* Results Count */}
         <div className="mb-4">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
             Showing {sortedCertificates.length} of {allCertificates.length} certificates
           </p>
         </div>
@@ -177,8 +177,8 @@ const CertificatesList: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
-            <div className="text-slate-400 mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-12 text-center">
+            <div className="text-slate-400 dark:text-slate-500 mb-4">
               <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -188,8 +188,8 @@ const CertificatesList: React.FC = () => {
                 />
               </svg>
             </div>
-            <p className="text-lg text-slate-600 mb-2">No certificates found</p>
-            <p className="text-sm text-slate-500">Try adjusting your filters</p>
+            <p className="text-lg text-slate-600 dark:text-slate-300 mb-2">No certificates found</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Try adjusting your filters</p>
           </div>
         )}
       </div>

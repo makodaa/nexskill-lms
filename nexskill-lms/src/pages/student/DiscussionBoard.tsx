@@ -119,12 +119,12 @@ const DiscussionBoard: React.FC = () => {
 
   return (
     <StudentAppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] py-8 px-6">
+      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-6 transition-colors">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">Community discussions</h1>
-            <p className="text-slate-600">Ask questions, share insights, and learn with others.</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">Community discussions</h1>
+            <p className="text-slate-600 dark:text-slate-400">Ask questions, share insights, and learn with others.</p>
           </div>
 
           {/* Filter chips */}
@@ -136,7 +136,7 @@ const DiscussionBoard: React.FC = () => {
                 className={`px-5 py-2 rounded-full font-medium text-sm transition-all ${
                   activeFilter === filter.id
                     ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white shadow-md'
-                    : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-600'
                 }`}
               >
                 {filter.label}
@@ -155,31 +155,31 @@ const DiscussionBoard: React.FC = () => {
               <button
                 key={thread.id}
                 onClick={() => handleThreadClick(thread.id)}
-                className="w-full bg-white dark:bg-dark-background-card rounded-2xl shadow-sm hover:shadow-md border border-slate-200 p-6 transition-all text-left"
+                className="w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm hover:shadow-md border border-slate-200 dark:border-slate-700 p-6 transition-all text-left"
               >
                 {/* Thread header */}
                 <div className="mb-3">
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2 hover:text-[#304DB5] transition-colors">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 hover:text-[#304DB5] dark:hover:text-blue-400 transition-colors">
                     {thread.title}
                   </h3>
-                  <p className="text-slate-600 text-sm line-clamp-2">{thread.excerpt}</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm line-clamp-2">{thread.excerpt}</p>
                 </div>
 
                 {/* Thread metadata */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4 flex-wrap">
-                    <span className="px-3 py-1 bg-blue-100 text-[#304DB5] text-xs font-medium rounded-full">
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-[#304DB5] dark:text-blue-400 text-xs font-medium rounded-full">
                       {thread.courseTag}
                     </span>
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center text-white text-xs font-semibold">
                         {thread.authorName.charAt(0)}
                       </div>
-                      <span className="text-sm text-slate-600">{thread.authorName}</span>
+                      <span className="text-sm text-slate-600 dark:text-slate-400">{thread.authorName}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-sm text-slate-500">
+                  <div className="flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1">
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path

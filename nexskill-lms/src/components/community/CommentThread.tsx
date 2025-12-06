@@ -31,7 +31,7 @@ const CommentThread: React.FC<CommentThreadProps> = ({ comments, onReply }) => {
 
   const renderComment = (comment: Comment, isNested = false) => (
     <div key={comment.id} className={isNested ? 'ml-12 mt-4' : ''}>
-      <div className="bg-white rounded-2xl border border-slate-200 p-5">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 transition-colors">
         {/* Comment header */}
         <div className="flex items-start gap-3 mb-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center text-white font-semibold flex-shrink-0">
@@ -39,16 +39,16 @@ const CommentThread: React.FC<CommentThreadProps> = ({ comments, onReply }) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-slate-900">{comment.authorName}</span>
-              <span className="text-xs text-slate-500">•</span>
-              <span className="text-xs text-slate-500">{comment.createdAt}</span>
+              <span className="font-semibold text-slate-900 dark:text-white">{comment.authorName}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">•</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{comment.createdAt}</span>
             </div>
-            <p className="text-slate-700 leading-relaxed">{comment.body}</p>
+            <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{comment.body}</p>
           </div>
         </div>
 
         {/* Reactions and actions */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
           <ReactionBar
             reactions={comment.reactions}
             onReact={(type) => handleReact(comment.id, type)}

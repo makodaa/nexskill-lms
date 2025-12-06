@@ -63,7 +63,7 @@ const CourseFilterBar: React.FC<CourseFilterBarProps> = ({
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 selectedLevel === level
                   ? 'bg-brand-primary text-white shadow-button-primary'
-                  : 'bg-[#F5F7FF] text-text-secondary hover:bg-brand-primary-soft/30 hover:text-brand-primary'
+                  : 'bg-[#F5F7FF] dark:bg-slate-700 text-text-secondary dark:text-slate-300 hover:bg-brand-primary-soft/30 dark:hover:bg-slate-600 hover:text-brand-primary dark:hover:text-blue-400'
               }`}
             >
               {level}
@@ -76,7 +76,7 @@ const CourseFilterBar: React.FC<CourseFilterBarProps> = ({
           <select
             value={sortOption}
             onChange={(e) => onSortChange(e.target.value)}
-            className="pl-4 pr-10 py-3 bg-[#F5F7FF] rounded-full text-sm font-medium text-text-secondary appearance-none focus:outline-none focus:ring-2 focus:ring-brand-primary-light cursor-pointer hover:bg-brand-primary-soft/30 transition-all"
+            className="pl-4 pr-10 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm font-medium text-text-secondary dark:text-slate-300 appearance-none focus:outline-none focus:ring-2 focus:ring-brand-primary-light cursor-pointer hover:bg-brand-primary-soft/30 dark:hover:bg-slate-600 transition-all"
           >
             {sortOptions.map((option) => (
               <option key={option} value={option}>
@@ -85,7 +85,7 @@ const CourseFilterBar: React.FC<CourseFilterBarProps> = ({
             ))}
           </select>
           <svg
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted pointer-events-none"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted dark:text-slate-400 pointer-events-none"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"

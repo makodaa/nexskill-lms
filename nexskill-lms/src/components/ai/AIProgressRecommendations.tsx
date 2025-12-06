@@ -56,11 +56,11 @@ const AIProgressRecommendations: React.FC<AIProgressRecommendationsProps> = ({ p
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-5">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-5 transition-colors">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-900">Progress recommendations</h3>
-        <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Progress recommendations</h3>
+        <svg className="w-5 h-5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -75,11 +75,11 @@ const AIProgressRecommendations: React.FC<AIProgressRecommendationsProps> = ({ p
         {recommendations.map((rec) => (
           <div
             key={rec.id}
-            className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
+            className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-700/50 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
           >
             <div className="flex-shrink-0 text-2xl">{rec.icon}</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-slate-700 leading-relaxed mb-2">{rec.text}</p>
+              <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed mb-2">{rec.text}</p>
               <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${rec.tagColor}`}>
                 {rec.tag}
               </span>

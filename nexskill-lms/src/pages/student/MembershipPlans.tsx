@@ -82,8 +82,8 @@ const MembershipPlans: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-3">Membership plans</h1>
-          <p className="text-lg text-slate-600">Choose the plan that matches your learning goals</p>
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-3">Membership plans</h1>
+          <p className="text-lg text-slate-600 dark:text-slate-400">Choose the plan that matches your learning goals</p>
         </div>
 
         {/* Current Plan Banner */}
@@ -97,8 +97,8 @@ const MembershipPlans: React.FC = () => {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#304DB5] mb-1">Current Plan</p>
-                  <p className="text-xl font-bold text-slate-900">
+                  <p className="text-sm font-semibold text-[#304DB5] dark:text-blue-400 mb-1">Current Plan</p>
+                  <p className="text-xl font-bold text-slate-900 dark:text-white">
                     {currentPlan.name} · ${currentPlan.price}/{currentPlan.billingCycle}
                   </p>
                 </div>

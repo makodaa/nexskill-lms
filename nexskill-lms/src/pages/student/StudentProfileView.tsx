@@ -36,9 +36,9 @@ const StudentProfileView: React.FC = () => {
           {/* Left column - Bio and Interests */}
           <div className="lg:col-span-2 space-y-6">
             {/* Bio */}
-            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-3">About me</h2>
-              <p className="text-slate-700 leading-relaxed">{dummyProfile.bio}</p>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-3">About me</h2>
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{dummyProfile.bio}</p>
             </div>
 
             {/* Interests & Goals */}
@@ -53,45 +53,45 @@ const StudentProfileView: React.FC = () => {
           {/* Right column - Metrics and Quick Actions */}
           <div className="space-y-6">
             {/* Learning Stats */}
-            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Learning stats</h2>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Learning stats</h2>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
+                <div className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
                       <span className="text-lg">📚</span>
                     </div>
                     <div>
-                      <div className="text-sm text-slate-600">Courses completed</div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Courses completed</div>
+                      <div className="text-xl font-bold text-slate-900 dark:text-white">
                         {dummyProfile.completedCourses}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+                <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
                       <span className="text-lg">🏆</span>
                     </div>
                     <div>
-                      <div className="text-sm text-slate-600">Certificates earned</div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Certificates earned</div>
+                      <div className="text-xl font-bold text-slate-900 dark:text-white">
                         {dummyProfile.certificates}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
+                <div className="flex items-center justify-between p-3 bg-purple-50 dark:bg-purple-900/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/50 flex items-center justify-center">
                       <span className="text-lg">⏱️</span>
                     </div>
                     <div>
-                      <div className="text-sm text-slate-600">Hours learned</div>
-                      <div className="text-xl font-bold text-slate-900">
+                      <div className="text-sm text-slate-600 dark:text-slate-400">Hours learned</div>
+                      <div className="text-xl font-bold text-slate-900 dark:text-white">
                         {dummyProfile.hoursLearned}
                       </div>
                     </div>
@@ -101,8 +101,8 @@ const StudentProfileView: React.FC = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">Quick actions</h2>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Quick actions</h2>
               <div className="space-y-3">
                 <button
                   onClick={() => navigate('/student/profile/edit')}

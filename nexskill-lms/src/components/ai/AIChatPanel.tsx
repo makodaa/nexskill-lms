@@ -101,16 +101,16 @@ const AIChatPanel: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-6 flex flex-col h-[580px]">
+    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl p-6 flex flex-col h-[580px] transition-colors">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-200">
+      <div className="flex items-center justify-between mb-4 pb-4 border-b border-slate-200 dark:border-slate-700">
         <div>
-          <h2 className="text-xl font-bold text-slate-900">Chat with your AI coach</h2>
-          <p className="text-sm text-slate-600">Get personalized guidance anytime</p>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Chat with your AI coach</h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400">Get personalized guidance anytime</p>
         </div>
-        <div className="flex items-center gap-2 px-3 py-1 bg-green-100 rounded-full">
+        <div className="flex items-center gap-2 px-3 py-1 bg-green-100 dark:bg-green-900/40 rounded-full">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-xs font-medium text-green-700">Online</span>
+          <span className="text-xs font-medium text-green-700 dark:text-green-400">Online</span>
         </div>
       </div>
 
@@ -122,20 +122,20 @@ const AIChatPanel: React.FC = () => {
             className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div className={`max-w-[75%] ${message.sender === 'user' ? 'order-2' : 'order-1'}`}>
-              <div className="text-xs font-medium text-slate-600 mb-1 px-1">
+              <div className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 px-1">
                 {message.sender === 'user' ? 'You' : 'AI Coach'}
               </div>
               <div
                 className={`rounded-2xl px-4 py-3 ${
                   message.sender === 'user'
                     ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white rounded-br-sm'
-                    : 'bg-slate-100 text-slate-900 rounded-bl-sm'
+                    : 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white rounded-bl-sm'
                 }`}
               >
                 <p className="text-sm leading-relaxed">{message.text}</p>
               </div>
               <div
-                className={`text-xs text-slate-500 mt-1 px-1 ${
+                className={`text-xs text-slate-500 dark:text-slate-400 mt-1 px-1 ${
                   message.sender === 'user' ? 'text-right' : 'text-left'
                 }`}
               >
@@ -155,7 +155,7 @@ const AIChatPanel: React.FC = () => {
           onChange={(e) => setCurrentInput(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Ask anything about your courses or progress…"
-          className="flex-1 px-5 py-3 bg-slate-100 rounded-full border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 text-slate-900 placeholder:text-slate-400"
+          className="flex-1 px-5 py-3 bg-slate-100 dark:bg-slate-900 rounded-full border border-slate-200 dark:border-slate-600 focus:border-[#304DB5] dark:focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors"
         />
         <button
           onClick={handleSend}
@@ -163,7 +163,7 @@ const AIChatPanel: React.FC = () => {
           className={`px-6 py-3 rounded-full font-semibold transition-all ${
             currentInput.trim()
               ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
           }`}
         >
           Send

@@ -23,12 +23,12 @@ const studentProgress = {
 const AICoachHome: React.FC = () => {
   return (
     <StudentAppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] py-8 px-6">
+      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-6 transition-colors">
         <div className="max-w-7xl mx-auto">
           {/* Page header */}
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-slate-900 mb-2">AI Student Coach</h1>
-            <p className="text-slate-600">Personalized guidance based on your learning activity.</p>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">AI Student Coach</h1>
+            <p className="text-slate-600 dark:text-slate-400">Personalized guidance based on your learning activity.</p>
           </div>
 
           {/* Top row: Chat panel + Recommendations/Milestones */}

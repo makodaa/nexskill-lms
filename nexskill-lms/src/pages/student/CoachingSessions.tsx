@@ -76,13 +76,13 @@ const CoachingSessions: React.FC = () => {
 
   return (
     <StudentAppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] pb-16">
+      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 pb-16 transition-colors">
         <div className="max-w-5xl mx-auto px-6 py-8">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">My sessions</h1>
-              <p className="text-lg text-slate-600">Manage and review your coaching sessions</p>
+              <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-2">My sessions</h1>
+              <p className="text-lg text-slate-600 dark:text-slate-400">Manage and review your coaching sessions</p>
             </div>
             <button
               onClick={() => navigate('/student/coaching')}
@@ -94,29 +94,29 @@ const CoachingSessions: React.FC = () => {
 
           {/* Stats cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="text-3xl font-bold text-[#304DB5] mb-1">{upcomingSessions.length}</div>
-              <div className="text-sm text-slate-600">Upcoming sessions</div>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              <div className="text-3xl font-bold text-[#304DB5] dark:text-blue-400 mb-1">{upcomingSessions.length}</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Upcoming sessions</div>
             </div>
-            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="text-3xl font-bold text-[#304DB5] mb-1">{pastSessions.length}</div>
-              <div className="text-sm text-slate-600">Completed sessions</div>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              <div className="text-3xl font-bold text-[#304DB5] dark:text-blue-400 mb-1">{pastSessions.length}</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Completed sessions</div>
             </div>
-            <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 p-6">
-              <div className="text-3xl font-bold text-[#304DB5] mb-1">$15</div>
-              <div className="text-sm text-slate-600">Available credits</div>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+              <div className="text-3xl font-bold text-[#304DB5] dark:text-blue-400 mb-1">$15</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">Available credits</div>
             </div>
           </div>
 
           {/* Tab navigation */}
-          <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-slate-200 mb-6">
-            <div className="flex border-b border-slate-200">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mb-6">
+            <div className="flex border-b border-slate-200 dark:border-slate-700">
               <button
                 onClick={() => setActiveTab('upcoming')}
                 className={`flex-1 px-6 py-4 font-semibold transition-all ${
                   activeTab === 'upcoming'
-                    ? 'text-[#304DB5] border-b-2 border-[#304DB5]'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'text-[#304DB5] dark:text-blue-400 border-b-2 border-[#304DB5] dark:border-blue-400'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Upcoming ({upcomingSessions.length})

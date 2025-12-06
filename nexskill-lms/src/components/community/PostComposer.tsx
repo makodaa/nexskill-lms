@@ -30,13 +30,13 @@ const PostComposer: React.FC<PostComposerProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-5 transition-colors">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center text-white font-semibold">
           U
         </div>
-        <span className="text-sm font-medium text-slate-700">
+        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
           {mode === 'newThread' ? 'Start a discussion' : 'Reply to thread'}
         </span>
       </div>
@@ -47,7 +47,7 @@ const PostComposer: React.FC<PostComposerProps> = ({
         onChange={(e) => setContent(e.target.value)}
         placeholder={placeholder}
         rows={mode === 'newThread' ? 4 : 3}
-        className="w-full px-4 py-3 bg-slate-50 rounded-2xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 resize-none text-slate-900 placeholder:text-slate-400"
+        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-600 focus:border-[#304DB5] dark:focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 resize-none text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 transition-colors"
       />
 
       {/* Footer */}
@@ -55,10 +55,10 @@ const PostComposer: React.FC<PostComposerProps> = ({
         {/* Course tags (static for now) */}
         {mode === 'newThread' && (
           <div className="flex gap-2">
-            <span className="px-3 py-1 bg-blue-100 text-[#304DB5] text-xs font-medium rounded-full">
+            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-[#304DB5] dark:text-blue-400 text-xs font-medium rounded-full">
               UI Design
             </span>
-            <span className="px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-400 text-xs font-medium rounded-full">
               React
             </span>
           </div>
@@ -70,7 +70,7 @@ const PostComposer: React.FC<PostComposerProps> = ({
           {onCancel && (
             <button
               onClick={handleCancel}
-              className="px-5 py-2 rounded-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all font-medium"
+              className="px-5 py-2 rounded-full text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all font-medium"
             >
               Cancel
             </button>
@@ -81,7 +81,7 @@ const PostComposer: React.FC<PostComposerProps> = ({
             className={`px-6 py-2 rounded-full font-semibold transition-all ${
               content.trim()
                 ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
             }`}
           >
             Post

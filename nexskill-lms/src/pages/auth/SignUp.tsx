@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentAuthLayout from '../../layouts/StudentAuthLayout';
 
+type AccountType = 'STUDENT' | 'COACH';
+
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
+  const [accountType, setAccountType] = useState<AccountType>('STUDENT');
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -59,15 +62,17 @@ const SignUp: React.FC = () => {
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
+      // Store account type for later use (e.g., in context or passed to verification)
+      console.log('Creating account as:', accountType);
       // Dummy signup - navigate to email verification
-      navigate('/email-verification');
+      navigate('/email-verification', { state: { accountType } });
     }
   };
 
   const handleSocialSignUp = (provider: string) => {
-    // Dummy social signup - navigate directly to dashboard
-    console.log(`Signing up with ${provider}`);
-    navigate('/student/dashboard');
+    // Dummy social signup - navigate based on account type
+    console.log(`Signing up with ${provider} as ${accountType}`);
+    navigate(accountType === 'COACH' ? '/coach/dashboard' : '/student/dashboard');
   };
 
   return (
@@ -75,15 +80,66 @@ const SignUp: React.FC = () => {
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-text-primary mb-2">Create your account</h1>
-          <p className="text-text-secondary text-sm">Start your learning journey today</p>
+          <h1 className="text-3xl font-bold text-text-primary dark:text-white mb-2">Create your account</h1>
+          <p className="text-text-secondary dark:text-slate-400 text-sm">Start your learning journey today</p>
+        </div>
+
+        {/* Account Type Selector */}
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-text-primary dark:text-white mb-3 text-center">
+            I want to join as a
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="button"
+              onClick={() => setAccountType('STUDENT')}
+              className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
+                accountType === 'STUDENT'
+                  ? 'border-brand-primary bg-brand-primary-soft dark:bg-blue-900/30 shadow-md'
+                  : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-brand-primary-light dark:hover:border-blue-500'
+              }`}
+            >
+              <div className="text-3xl">🎓</div>
+              <span className={`font-semibold ${
+                accountType === 'STUDENT' 
+                  ? 'text-brand-primary dark:text-blue-400' 
+                  : 'text-text-primary dark:text-white'
+              }`}>
+                Student
+              </span>
+              <span className="text-xs text-text-secondary dark:text-slate-400 text-center">
+                Learn new skills & grow
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAccountType('COACH')}
+              className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
+                accountType === 'COACH'
+                  ? 'border-brand-primary bg-brand-primary-soft dark:bg-blue-900/30 shadow-md'
+                  : 'border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-brand-primary-light dark:hover:border-blue-500'
+              }`}
+            >
+              <div className="text-3xl">👨‍🏫</div>
+              <span className={`font-semibold ${
+                accountType === 'COACH' 
+                  ? 'text-brand-primary dark:text-blue-400' 
+                  : 'text-text-primary dark:text-white'
+              }`}>
+                Coach
+              </span>
+              <span className="text-xs text-text-secondary dark:text-slate-400 text-center">
+                Teach & share expertise
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Sign Up Form */}
         <form onSubmit={handleSignUp} className="space-y-5">
           {/* Full Name Input */}
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="fullName" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
               Full Name
             </label>
             <input
@@ -93,7 +149,7 @@ const SignUp: React.FC = () => {
               value={formData.fullName}
               onChange={handleInputChange}
               placeholder="Enter your full name"
-              className={`w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
+              className={`w-full px-5 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm text-text-primary dark:text-white placeholder-text-muted dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
                 errors.fullName ? 'ring-2 ring-red-400' : ''
               }`}
             />
@@ -104,7 +160,7 @@ const SignUp: React.FC = () => {
 
           {/* Email Input */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
               Email
             </label>
             <input
@@ -114,7 +170,7 @@ const SignUp: React.FC = () => {
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Enter your email"
-              className={`w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
+              className={`w-full px-5 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm text-text-primary dark:text-white placeholder-text-muted dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
                 errors.email ? 'ring-2 ring-red-400' : ''
               }`}
             />
@@ -125,7 +181,7 @@ const SignUp: React.FC = () => {
 
           {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
               Password
             </label>
             <input
@@ -135,7 +191,7 @@ const SignUp: React.FC = () => {
               value={formData.password}
               onChange={handleInputChange}
               placeholder="Create a password"
-              className={`w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
+              className={`w-full px-5 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm text-text-primary dark:text-white placeholder-text-muted dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
                 errors.password ? 'ring-2 ring-red-400' : ''
               }`}
             />
@@ -146,7 +202,7 @@ const SignUp: React.FC = () => {
 
           {/* Confirm Password Input */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary mb-2">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
               Confirm Password
             </label>
             <input
@@ -156,7 +212,7 @@ const SignUp: React.FC = () => {
               value={formData.confirmPassword}
               onChange={handleInputChange}
               placeholder="Confirm your password"
-              className={`w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
+              className={`w-full px-5 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm text-text-primary dark:text-white placeholder-text-muted dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
                 errors.confirmPassword ? 'ring-2 ring-red-400' : ''
               }`}
             />
@@ -175,13 +231,13 @@ const SignUp: React.FC = () => {
                 onChange={handleInputChange}
                 className="w-4 h-4 mt-0.5 rounded border-gray-300 text-brand-primary focus:ring-brand-primary-light"
               />
-              <span className="text-sm text-text-secondary">
+              <span className="text-sm text-text-secondary dark:text-slate-400">
                 I agree to the{' '}
-                <a href="#" className="text-brand-primary hover:text-brand-primary-light">
+                <a href="#" className="text-brand-primary dark:text-blue-400 hover:text-brand-primary-light">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="#" className="text-brand-primary hover:text-brand-primary-light">
+                <a href="#" className="text-brand-primary dark:text-blue-400 hover:text-brand-primary-light">
                   Privacy Policy
                 </a>
               </span>
@@ -202,9 +258,9 @@ const SignUp: React.FC = () => {
 
         {/* Divider */}
         <div className="flex items-center gap-4 my-6">
-          <div className="flex-1 h-px bg-gray-200"></div>
-          <span className="text-xs text-text-muted">or sign up with</span>
-          <div className="flex-1 h-px bg-gray-200"></div>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-slate-600"></div>
+          <span className="text-xs text-text-muted dark:text-slate-400">or sign up with</span>
+          <div className="flex-1 h-px bg-gray-200 dark:bg-slate-600"></div>
         </div>
 
         {/* Social Sign Up Buttons */}
@@ -212,7 +268,7 @@ const SignUp: React.FC = () => {
           <button
             type="button"
             onClick={() => handleSocialSignUp('Google')}
-            className="py-3 px-4 bg-[#F5F7FF] rounded-full font-medium text-sm text-text-secondary hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+            className="py-3 px-4 bg-[#F5F7FF] dark:bg-slate-700 rounded-full font-medium text-sm text-text-secondary dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -224,7 +280,7 @@ const SignUp: React.FC = () => {
           <button
             type="button"
             onClick={() => handleSocialSignUp('Microsoft')}
-            className="py-3 px-4 bg-[#F5F7FF] rounded-full font-medium text-sm text-text-secondary hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+            className="py-3 px-4 bg-[#F5F7FF] dark:bg-slate-700 rounded-full font-medium text-sm text-text-secondary dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#f25022" d="M1 1h10v10H1z"/>
@@ -236,7 +292,7 @@ const SignUp: React.FC = () => {
           <button
             type="button"
             onClick={() => handleSocialSignUp('Apple')}
-            className="py-3 px-4 bg-[#F5F7FF] rounded-full font-medium text-sm text-text-secondary hover:bg-gray-100 transition-colors flex items-center justify-center gap-2"
+            className="py-3 px-4 bg-[#F5F7FF] dark:bg-slate-700 rounded-full font-medium text-sm text-text-secondary dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
@@ -245,11 +301,11 @@ const SignUp: React.FC = () => {
         </div>
 
         {/* Login Link */}
-        <p className="text-center text-sm text-text-secondary">
+        <p className="text-center text-sm text-text-secondary dark:text-slate-400">
           Already have an account?{' '}
           <Link 
             to="/login" 
-            className="text-brand-primary font-medium hover:text-brand-primary-light transition-colors"
+            className="text-brand-primary dark:text-blue-400 font-medium hover:text-brand-primary-light transition-colors"
           >
             Sign in
           </Link>

@@ -153,12 +153,12 @@ const ThreadView: React.FC = () => {
 
   return (
     <StudentAppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] py-8 px-6">
+      <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-6 transition-colors">
         <div className="max-w-4xl mx-auto">
           {/* Back link */}
           <button
             onClick={() => navigate('/student/community')}
-            className="flex items-center gap-2 text-slate-600 hover:text-[#304DB5] mb-6 transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-[#304DB5] dark:hover:text-blue-400 mb-6 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -169,40 +169,40 @@ const ThreadView: React.FC = () => {
           {/* Thread metadata */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-3">
-              <span className="px-3 py-1 bg-blue-100 text-[#304DB5] text-xs font-medium rounded-full">
+              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/40 text-[#304DB5] dark:text-blue-400 text-xs font-medium rounded-full">
                 {dummyThread.courseTag}
               </span>
-              <span className="text-sm text-slate-600">
+              <span className="text-sm text-slate-600 dark:text-slate-400">
                 by {dummyThread.authorName} • {dummyThread.createdAt} • {comments.length} replies
               </span>
             </div>
-            <h1 className="text-3xl font-bold text-slate-900">{dummyThread.title}</h1>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">{dummyThread.title}</h1>
           </div>
 
           {/* Original post */}
-          <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-md p-8 mb-6">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-md p-8 mb-6">
             {/* Author info */}
             <div className="flex items-start gap-4 mb-6">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
                 {dummyThread.authorName.charAt(0)}
               </div>
               <div className="flex-1">
-                <div className="font-semibold text-slate-900">{dummyThread.authorName}</div>
-                <div className="text-sm text-slate-500">{dummyThread.createdAt}</div>
+                <div className="font-semibold text-slate-900 dark:text-white">{dummyThread.authorName}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">{dummyThread.createdAt}</div>
               </div>
             </div>
 
             {/* Post body */}
-            <div className="prose prose-slate max-w-none mb-6">
+            <div className="prose prose-slate dark:prose-invert max-w-none mb-6">
               {dummyThread.body.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="text-slate-700 leading-relaxed mb-4 last:mb-0">
+                <p key={index} className="text-slate-700 dark:text-slate-300 leading-relaxed mb-4 last:mb-0">
                   {paragraph}
                 </p>
               ))}
             </div>
 
             {/* Reactions and actions */}
-            <div className="flex items-center justify-between pt-6 border-t border-slate-200">
+            <div className="flex items-center justify-between pt-6 border-t border-slate-200 dark:border-slate-700">
               <ReactionBar reactions={dummyThread.reactions} onReact={handleReact} />
               <button
                 onClick={() => setIsReportModalOpen(true)}
@@ -223,7 +223,7 @@ const ThreadView: React.FC = () => {
 
           {/* Comments section */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
               {comments.length} {comments.length === 1 ? 'Reply' : 'Replies'}
             </h2>
             <CommentThread comments={comments} onReply={handleReply} />
@@ -231,7 +231,7 @@ const ThreadView: React.FC = () => {
 
           {/* Reply composer */}
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Add your reply</h3>
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Add your reply</h3>
             <PostComposer mode="reply" onSubmit={handleNewComment} placeholder="Share your thoughts..." />
           </div>
         </div>
