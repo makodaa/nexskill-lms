@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
 import BrandLogo from '../components/brand/BrandLogo';
+import { LogOut } from 'lucide-react';
 
 interface StudentAppLayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,13 @@ interface StudentAppLayoutProps {
 
 const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    sessionStorage.clear();
+    navigate('/login');
+  };
 
   const navItems = [
     { path: '/student/dashboard', label: 'Dashboard', icon: '📊' },
@@ -70,6 +78,14 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
                 <p className="text-xs text-text-muted dark:text-dark-text-muted">Premium</p>
               </div>
             </div>
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="mt-4 w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-sm font-medium">Logout</span>
+            </button>
           </div>
         </aside>
 

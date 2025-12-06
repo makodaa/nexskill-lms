@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
 import BrandLogo from '../components/brand/BrandLogo';
+import { LogOut } from 'lucide-react';
 
 interface OrgOwnerAppLayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,13 @@ interface OrgOwnerAppLayoutProps {
 
 const OrgOwnerAppLayout: React.FC<OrgOwnerAppLayoutProps> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    sessionStorage.clear();
+    navigate('/login');
+  };
 
   const navItems = [
     { path: '/org/dashboard', label: 'Dashboard', icon: '📊' },
@@ -70,6 +78,17 @@ const OrgOwnerAppLayout: React.FC<OrgOwnerAppLayoutProps> = ({ children }) => {
                 <span className="text-sm font-bold text-orange-800">142/200</span>
               </div>
             </div>
+          </div>
+
+          {/* Logout Button */}
+          <div className="pt-6 mt-6 border-t border-[#EDF0FB]">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-sm font-medium">Logout</span>
+            </button>
           </div>
         </aside>
 

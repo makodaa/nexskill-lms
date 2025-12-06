@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
 import BrandLogo from '../components/brand/BrandLogo';
+import { LogOut } from 'lucide-react';
 
 interface CommunityManagerAppLayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,13 @@ interface CommunityManagerAppLayoutProps {
 
 const CommunityManagerAppLayout: React.FC<CommunityManagerAppLayoutProps> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    sessionStorage.clear();
+    navigate('/login');
+  };
 
   const navItems = [
     { path: '/community/dashboard', label: 'Dashboard', icon: '📊' },
@@ -66,6 +74,17 @@ const CommunityManagerAppLayout: React.FC<CommunityManagerAppLayoutProps> = ({ c
             </div>
             <button className="w-full px-3 py-2 bg-white text-green-600 text-xs font-medium rounded-lg hover:bg-green-50 transition-colors border border-green-200">
               Review Now
+            </button>
+          </div>
+
+          {/* Logout Button */}
+          <div className="pt-6 mt-6 border-t border-[#EDF0FB]">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-sm font-medium">Logout</span>
             </button>
           </div>
         </aside>

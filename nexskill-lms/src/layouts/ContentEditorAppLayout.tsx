@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
 import BrandLogo from '../components/brand/BrandLogo';
+import { LogOut } from 'lucide-react';
 
 interface ContentEditorAppLayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,13 @@ interface ContentEditorAppLayoutProps {
 
 const ContentEditorAppLayout: React.FC<ContentEditorAppLayoutProps> = ({ children }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    sessionStorage.clear();
+    navigate('/login');
+  };
 
   const navItems = [
     { path: '/content/dashboard', label: 'Dashboard', icon: '📊' },
@@ -68,6 +76,17 @@ const ContentEditorAppLayout: React.FC<ContentEditorAppLayoutProps> = ({ childre
                 🎬 Upload Media
               </button>
             </div>
+          </div>
+
+          {/* Logout Button */}
+          <div className="pt-6 mt-6 border-t border-[#EDF0FB]">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 hover:bg-red-50 transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="text-sm font-medium">Logout</span>
+            </button>
           </div>
         </aside>
 
