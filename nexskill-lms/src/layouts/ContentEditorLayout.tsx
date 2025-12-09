@@ -50,7 +50,6 @@ const ContentEditorLayout: React.FC<ContentEditorLayoutProps> = ({ children }) =
                     : 'text-text-secondary hover:bg-[#FFF9F0] hover:text-text-primary'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm">{item.label}</span>
               </Link>
             ))}

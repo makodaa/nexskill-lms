@@ -20,16 +20,16 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
   };
 
   const navItems = [
-    { path: '/coach/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/coach/courses', label: 'Courses', icon: '📚' },
-    { path: '/coach/ai-tools', label: 'AI Tools', icon: '🤖' },
-    { path: '/coach/quizzes', label: 'Quizzes & Assessments', icon: '📝' },
-    { path: '/coach/coaching-tools', label: 'Coaching Tools', icon: '👥' },
-    { path: '/coach/students', label: 'Students', icon: '🎓' },
-    { path: '/coach/subcoach-management', label: 'Sub-Coaches', icon: '👨‍🏫' },
-    { path: '/coach/earnings', label: 'Earnings', icon: '💰' },
-    { path: '/coach/messages', label: 'Messages', icon: '💬' },
-    { path: '/coach/profile', label: 'Settings', icon: '⚙️' },
+    { path: '/coach/dashboard', label: 'Dashboard'},
+    { path: '/coach/courses', label: 'Courses'},
+    { path: '/coach/ai-tools', label: 'AI Tools'},
+    { path: '/coach/quizzes', label: 'Quizzes & Assessments'},
+    { path: '/coach/coaching-tools', label: 'Coaching Tools'},
+    { path: '/coach/students', label: 'Students'},
+    { path: '/coach/subcoach-management', label: 'Sub-Coaches'},
+    { path: '/coach/earnings', label: 'Earnings'},
+    { path: '/coach/messages', label: 'Messages'},
+    { path: '/coach/profile', label: 'Settings'},
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -62,7 +62,6 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
                     : 'text-text-secondary dark:text-dark-text-secondary hover:bg-[#F5F7FF] dark:hover:bg-gray-800 hover:text-brand-primary dark:hover:text-blue-400'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm">{item.label}</span>
               </Link>
             ))}

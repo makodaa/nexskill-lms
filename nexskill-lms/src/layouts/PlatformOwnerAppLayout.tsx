@@ -21,12 +21,12 @@ const PlatformOwnerAppLayout: React.FC<PlatformOwnerAppLayoutProps> = ({ childre
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/owner/dashboard', icon: '👑' },
-    { label: 'Users & Roles', path: '/owner/users', icon: '👥' },
-    { label: 'Billing & Payouts', path: '/owner/billing', icon: '💰' },
-    { label: 'Security & Compliance', path: '/owner/security', icon: '🔒' },
-    { label: 'System Settings', path: '/owner/settings', icon: '⚙️' },
-    { label: 'AI Governance', path: '/owner/ai-governance', icon: '🤖' },
+    { label: 'Dashboard', path: '/owner/dashboard'},
+    { label: 'Users & Roles', path: '/owner/users'},
+    { label: 'Billing & Payouts', path: '/owner/billing'},
+    { label: 'Security & Compliance', path: '/owner/security'},
+    { label: 'System Settings', path: '/owner/settings'},
+    { label: 'AI Governance', path: '/owner/ai-governance'},
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -59,7 +59,6 @@ const PlatformOwnerAppLayout: React.FC<PlatformOwnerAppLayoutProps> = ({ childre
                     : 'text-text-secondary hover:bg-[#F5F7FF] hover:text-brand-primary'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm">{item.label}</span>
               </Link>
             ))}

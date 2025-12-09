@@ -54,7 +54,6 @@ const OrgOwnerLayout: React.FC<OrgOwnerLayoutProps> = ({ children }) => {
                     : 'text-text-secondary hover:bg-[#FFF5F0] hover:text-text-primary'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm">{item.label}</span>
               </Link>
             ))}

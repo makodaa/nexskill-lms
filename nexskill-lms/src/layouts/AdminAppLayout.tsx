@@ -19,18 +19,18 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/admin/dashboard', icon: '📊' },
-    { label: 'Users', path: '/admin/users', icon: '👥' },
-    { label: 'Coaches', path: '/admin/coaches', icon: '🎓' },
-    { label: 'Courses', path: '/admin/courses/moderation', icon: '📚' },
-    { label: 'Funnels', path: '/admin/funnels', icon: '🎯' },
-    { label: 'Finance', path: '/admin/finance', icon: '💰' },
-    { label: 'Contacts', path: '/admin/contacts', icon: '👤' },
-    { label: 'CRM & Marketing', path: '/admin/crm-marketing', icon: '📢' },
-    { label: 'Notifications', path: '/admin/notifications', icon: '🔔' },
-    { label: 'Analytics', path: '/admin/analytics', icon: '📈' },
-    { label: 'Security', path: '/admin/security', icon: '🔒' },
-    { label: 'Settings', path: '/admin/settings', icon: '⚙️' },
+    { label: 'Dashboard', path: '/admin/dashboard'},
+    { label: 'Users', path: '/admin/users'},
+    { label: 'Coaches', path: '/admin/coaches'},
+    { label: 'Courses', path: '/admin/courses/moderation'},
+    { label: 'Funnels', path: '/admin/funnels'},
+    { label: 'Finance', path: '/admin/finance'},
+    { label: 'Contacts', path: '/admin/contacts'},
+    { label: 'CRM & Marketing', path: '/admin/crm-marketing'},
+    { label: 'Notifications', path: '/admin/notifications'},
+    { label: 'Analytics', path: '/admin/analytics'},
+    { label: 'Security', path: '/admin/security'},
+    { label: 'Settings', path: '/admin/settings'},
   ];
 
   const isActive = (path: string) => {
@@ -74,7 +74,6 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
                     : 'text-text-secondary hover:bg-[#F0F4FF] hover:text-text-primary'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             ))}

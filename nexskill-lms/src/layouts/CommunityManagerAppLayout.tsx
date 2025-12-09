@@ -19,14 +19,14 @@ const CommunityManagerAppLayout: React.FC<CommunityManagerAppLayoutProps> = ({ c
   };
 
   const navItems = [
-    { path: '/community/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/community/discussions', label: 'Discussions', icon: '💬' },
-    { path: '/community/moderation', label: 'Moderation', icon: '🛡️' },
-    { path: '/community/reported-content', label: 'Reported Content', icon: '⚠️' },
-    { path: '/community/members', label: 'Members', icon: '👥' },
-    { path: '/community/engagement', label: 'Engagement', icon: '📈' },
-    { path: '/community/guidelines', label: 'Guidelines', icon: '📋' },
-    { path: '/community/settings', label: 'Settings', icon: '⚙️' },
+    { path: '/community/dashboard', label: 'Dashboard'},
+    { path: '/community/discussions', label: 'Discussions'},
+    { path: '/community/moderation', label: 'Moderation'},
+    { path: '/community/reported-content', label: 'Reported Content'},
+    { path: '/community/members', label: 'Members'},
+    { path: '/community/engagement', label: 'Engagement'},
+    { path: '/community/guidelines', label: 'Guidelines'},
+    { path: '/community/settings', label: 'Settings'},
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -59,7 +59,6 @@ const CommunityManagerAppLayout: React.FC<CommunityManagerAppLayoutProps> = ({ c
                     : 'text-text-secondary hover:bg-[#F0FFF4] hover:text-text-primary'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             ))}

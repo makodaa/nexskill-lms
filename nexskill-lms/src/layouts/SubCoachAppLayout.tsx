@@ -61,7 +61,6 @@ const SubCoachAppLayout: React.FC<SubCoachAppLayoutProps> = ({ children }) => {
                     : 'text-text-secondary hover:bg-teal-50 hover:text-teal-700'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm">{item.label}</span>
               </Link>
             ))}

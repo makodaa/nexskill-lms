@@ -11,13 +11,13 @@ const CommunityManagerLayout: React.FC<CommunityManagerLayoutProps> = ({ childre
   const location = useLocation();
 
   const navItems = [
-    { path: '/community/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/community/overview', label: 'Overview', icon: '🏘️' },
-    { path: '/community/groups', label: 'Groups', icon: '👥' },
-    { path: '/community/approvals', label: 'Approvals', icon: '🛡️' },
-    { path: '/community/announcements', label: 'Announcements', icon: '📢' },
-    { path: '/community/engagement', label: 'Engagement', icon: '📈' },
-    { path: '/community/profile', label: 'Profile', icon: '👤' },
+    { path: '/community/dashboard', label: 'Dashboard'},
+    { path: '/community/overview', label: 'Overview'},
+    { path: '/community/groups', label: 'Groups'},
+    { path: '/community/approvals', label: 'Approvals'},
+    { path: '/community/announcements', label: 'Announcements'},
+    { path: '/community/engagement', label: 'Engagement'},
+    { path: '/community/profile', label: 'Profile'},
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -50,7 +50,7 @@ const CommunityManagerLayout: React.FC<CommunityManagerLayoutProps> = ({ childre
                     : 'text-text-secondary hover:bg-[#F0FFF9] hover:text-text-primary'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
+                
                 <span className="text-sm">{item.label}</span>
               </Link>
             ))}

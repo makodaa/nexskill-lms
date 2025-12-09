@@ -61,7 +61,6 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
                     : 'text-text-secondary dark:text-dark-text-secondary hover:bg-[#F5F7FF] dark:hover:bg-gray-800 hover:text-brand-primary dark:hover:text-blue-400'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm">{item.label}</span>
               </Link>
             ))}

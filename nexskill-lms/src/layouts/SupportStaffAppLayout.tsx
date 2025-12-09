@@ -58,7 +58,6 @@ const SupportStaffAppLayout: React.FC<SupportStaffAppLayoutProps> = ({ children 
                     : 'text-text-secondary hover:bg-[#EFF6FF] hover:text-text-primary'
                 }`}
               >
-                <span className="text-lg">{item.icon}</span>
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             ))}
