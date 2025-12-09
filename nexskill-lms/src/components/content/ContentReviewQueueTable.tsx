@@ -10,6 +10,8 @@ interface ReviewItem {
   submittedAt: string;
   priority: 'High' | 'Medium' | 'Low';
   status: 'Pending' | 'In Progress' | 'Completed';
+  content?: string;
+  editorNotes?: string;
 }
 
 interface ContentReviewQueueTableProps {
@@ -20,8 +22,9 @@ interface ContentReviewQueueTableProps {
 
 const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compact = false, limit, onReviewItem }) => {
   const [selectedItem, setSelectedItem] = useState<ReviewItem | null>(null);
-  
-  const allItems: ReviewItem[] = [
+  const [editedContent, setEditedContent] = useState('');
+  const [editorNotes, setEditorNotes] = useState('');
+  const [items, setItems] = useState<ReviewItem[]>([
     {
       id: 1,
       type: 'Lesson',
@@ -31,7 +34,8 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
       requestedBy: 'Coach Sarah',
       submittedAt: '2 hours ago',
       priority: 'High',
-      status: 'Pending'
+      status: 'Pending',
+      content: 'React Hooks are a new addition in React 16.8. They let you use state and other React features without writing a class. This lesson covers useState for managing component state and useEffect for handling side effects like data fetching, subscriptions, or manually changing the DOM.'
     },
     {
       id: 2,
@@ -42,7 +46,8 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
       requestedBy: 'Coach Michael',
       submittedAt: '5 hours ago',
       priority: 'Medium',
-      status: 'In Progress'
+      status: 'In Progress',
+      content: 'A comprehensive Figma template that includes pre-built components, design tokens, and layout grids. Students can use this as a starting point for their design projects.'
     },
     {
       id: 3,
@@ -53,7 +58,8 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
       requestedBy: 'Sub-Coach Emily',
       submittedAt: '1 day ago',
       priority: 'High',
-      status: 'Pending'
+      status: 'Pending',
+      content: 'This module introduces the core concepts of product management including product lifecycle, stakeholder management, and roadmap planning. Translation needed for Spanish localization.'
     },
     {
       id: 4,
@@ -64,7 +70,8 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
       requestedBy: 'Coach David',
       submittedAt: '2 days ago',
       priority: 'Low',
-      status: 'Pending'
+      status: 'Pending',
+      content: 'A 20-question quiz covering Python fundamentals including variables, data types, loops, and functions. Review questions for accuracy and clarity.'
     },
     {
       id: 5,
@@ -75,11 +82,13 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
       requestedBy: 'Coach Sarah',
       submittedAt: '3 days ago',
       priority: 'Medium',
-      status: 'Completed'
+      status: 'Completed',
+      content: 'Learn advanced SQL concepts including JOINs, subqueries, CTEs, and window functions. This lesson includes practical examples with real-world datasets.',
+      editorNotes: 'All content reviewed and approved. Minor typos fixed.'
     },
-  ];
+  ]);
 
-  const items = limit ? allItems.slice(0, limit) : allItems;
+  const displayItems = limit ? items.slice(0, limit) : items;
 
   const getPriorityBadge = (priority: string) => {
     const styles = {
@@ -115,8 +124,41 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
         onReviewItem(item);
       } else {
         setSelectedItem(item);
+        setEditedContent(item.content || '');
+        setEditorNotes(item.editorNotes || '');
       }
     }
+  };
+
+  const handleSaveDraft = () => {
+    if (selectedItem) {
+      setItems(items.map(item => 
+        item.id === selectedItem.id 
+          ? { ...item, content: editedContent, editorNotes, status: 'In Progress' as const, submittedAt: 'Just now' }
+          : item
+      ));
+      setSelectedItem(null);
+    }
+  };
+
+  const handleMarkComplete = () => {
+    if (selectedItem) {
+      setItems(items.map(item => 
+        item.id === selectedItem.id 
+          ? { ...item, content: editedContent, editorNotes, status: 'Completed' as const, submittedAt: 'Just now' }
+          : item
+      ));
+      setSelectedItem(null);
+    }
+  };
+
+  const handleStartReview = (item: ReviewItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setItems(items.map(i => 
+      i.id === item.id 
+        ? { ...i, status: 'In Progress' as const }
+        : i
+    ));
   };
 
   return (
@@ -148,10 +190,15 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
                 <th className="px-6 py-4 text-left text-xs font-semibold text-text-secondary uppercase tracking-wider">
                   Status
                 </th>
+                {!compact && (
+                  <th className="px-6 py-4 text-right text-xs font-semibold text-text-secondary uppercase tracking-wider">
+                    Actions
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {items.map((item) => (
+              {displayItems.map((item) => (
                 <tr
                   key={item.id}
                   onClick={() => handleRowClick(item)}
@@ -189,6 +236,29 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
                       {item.status}
                     </span>
                   </td>
+                  {!compact && (
+                    <td className="px-6 py-4">
+                      <div className="flex items-center justify-end gap-2">
+                        {item.status === 'Pending' && (
+                          <button
+                            onClick={(e) => handleStartReview(item, e)}
+                            className="px-3 py-1 text-xs font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          >
+                            Start Review
+                          </button>
+                        )}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRowClick(item);
+                          }}
+                          className="px-3 py-1 text-xs font-medium text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                        >
+                          {item.status === 'Completed' ? 'View' : 'Edit'}
+                        </button>
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -199,9 +269,15 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
       {/* Detail Panel */}
       {selectedItem && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl max-h-[80vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl p-8 max-w-3xl w-full shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-text-primary">Review Details</h2>
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">{getTypeIcon(selectedItem.type)}</span>
+                <div>
+                  <h2 className="text-xl font-bold text-text-primary">{selectedItem.title}</h2>
+                  <p className="text-sm text-text-muted">{selectedItem.course} • {selectedItem.module}</p>
+                </div>
+              </div>
               <button
                 onClick={() => setSelectedItem(null)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
@@ -211,57 +287,125 @@ const ContentReviewQueueTable: React.FC<ContentReviewQueueTableProps> = ({ compa
             </div>
 
             <div className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">Type</label>
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{getTypeIcon(selectedItem.type)}</span>
-                  <span className="text-lg font-semibold">{selectedItem.type}</span>
+              {/* Meta Info */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <span className="text-sm text-text-muted">Priority</span>
+                  <div className="mt-1">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getPriorityBadge(selectedItem.priority)}`}>
+                      {selectedItem.priority}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <span className="text-sm text-text-muted">Status</span>
+                  <div className="mt-1">
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(selectedItem.status)}`}>
+                      {selectedItem.status}
+                    </span>
+                  </div>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl">
+                  <span className="text-sm text-text-muted">Requested By</span>
+                  <p className="font-semibold text-text-primary mt-1">{selectedItem.requestedBy}</p>
                 </div>
               </div>
 
+              {/* Content Editor */}
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">Title</label>
-                <input
-                  type="text"
-                  defaultValue={selectedItem.title}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">Content / Description</label>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  Content / Description
+                  {selectedItem.status === 'Completed' && (
+                    <span className="ml-2 text-xs text-green-600 font-normal">(Read-only - Already reviewed)</span>
+                  )}
+                </label>
                 <textarea
-                  rows={6}
-                  defaultValue="This is dummy content for the lesson. In a real scenario, this would contain the actual lesson text that needs to be reviewed and edited."
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  rows={8}
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  disabled={selectedItem.status === 'Completed'}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-gray-50 disabled:text-text-muted font-mono text-sm"
+                  placeholder="Content to review..."
                 />
               </div>
 
+              {/* Editor Notes */}
               <div>
-                <label className="block text-sm font-medium text-text-primary mb-2">Editor Notes</label>
+                <label className="block text-sm font-medium text-text-primary mb-2">
+                  Editor Notes
+                  <span className="ml-2 text-xs text-text-muted font-normal">(Your review comments)</span>
+                </label>
                 <textarea
                   rows={3}
-                  placeholder="Add your review notes here..."
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  value={editorNotes}
+                  onChange={(e) => setEditorNotes(e.target.value)}
+                  disabled={selectedItem.status === 'Completed'}
+                  placeholder="Add your review notes, suggestions, or feedback here..."
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-gray-50 disabled:text-text-muted"
                 />
               </div>
 
-              <div className="flex gap-3 pt-4">
+              {/* Quick Fixes */}
+              {selectedItem.status !== 'Completed' && (
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                  <label className="block text-sm font-semibold text-blue-800 mb-3">Quick Fixes</label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => setEditedContent(editedContent.replace(/  +/g, ' '))}
+                      className="px-3 py-1.5 bg-white text-blue-700 text-xs font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
+                    >
+                      Remove Extra Spaces
+                    </button>
+                    <button
+                      onClick={() => setEditedContent(editedContent.trim())}
+                      className="px-3 py-1.5 bg-white text-blue-700 text-xs font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
+                    >
+                      Trim Whitespace
+                    </button>
+                    <button
+                      onClick={() => setEditedContent(editedContent.charAt(0).toUpperCase() + editedContent.slice(1))}
+                      className="px-3 py-1.5 bg-white text-blue-700 text-xs font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
+                    >
+                      Capitalize First Letter
+                    </button>
+                    <button
+                      onClick={() => {
+                        const wordCount = editedContent.split(/\s+/).filter(Boolean).length;
+                        const charCount = editedContent.length;
+                        alert(`Word Count: ${wordCount}\nCharacter Count: ${charCount}`);
+                      }}
+                      className="px-3 py-1.5 bg-white text-blue-700 text-xs font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
+                    >
+                      📊 Word Count
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4 border-t border-gray-200">
                 <button
                   onClick={() => setSelectedItem(null)}
-                  className="flex-1 px-4 py-3 border border-gray-200 text-text-primary rounded-xl hover:bg-gray-50 transition-all font-medium"
+                  className="px-4 py-3 border border-gray-200 text-text-primary rounded-xl hover:bg-gray-50 transition-all font-medium"
                 >
-                  Cancel
+                  Close
                 </button>
-                <button
-                  onClick={() => {
-                    console.log('Save draft edits for:', selectedItem);
-                    setSelectedItem(null);
-                  }}
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
-                >
-                  Save Draft Edits
-                </button>
+                {selectedItem.status !== 'Completed' && (
+                  <>
+                    <button
+                      onClick={handleSaveDraft}
+                      className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
+                    >
+                      💾 Save Draft
+                    </button>
+                    <button
+                      onClick={handleMarkComplete}
+                      className="flex-1 px-4 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:shadow-lg transition-all font-semibold"
+                    >
+                      ✅ Mark Complete
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
