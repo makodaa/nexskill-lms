@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import CoachAppLayout from '../../layouts/CoachAppLayout';
-import { Search, Plus, Edit, Copy, Trash2, BarChart3, Users, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Search, Plus, Edit, Copy, Trash2, BarChart3, Users, Clock, CheckCircle, AlertCircle, FileText, Upload } from 'lucide-react';
 
 interface Quiz {
   id: string;
@@ -16,6 +16,21 @@ interface Quiz {
   createdDate: string;
   lastModified: string;
   totalAttempts: number;
+  hasFileUpload?: boolean;
+  pendingGrading?: number;
+}
+
+interface PendingSubmission {
+  id: string;
+  studentName: string;
+  studentAvatar: string;
+  quizTitle: string;
+  questionTitle: string;
+  submittedAt: string;
+  fileName: string;
+  fileSize: string;
+  tentativeScore?: number;
+  maxPoints: number;
 }
 
 const CoachQuizzesPage: React.FC = () => {
@@ -116,6 +131,72 @@ const CoachQuizzesPage: React.FC = () => {
       lastModified: '2023-12-01',
       totalAttempts: 269,
     },
+    {
+      id: 'quiz-7',
+      title: 'Capstone Project Assessment',
+      course: 'JavaScript Mastery',
+      questions: 5,
+      passingScore: 70,
+      timeLimit: undefined,
+      attempts: 34,
+      avgScore: 0,
+      completionRate: 85,
+      status: 'published',
+      createdDate: '2024-01-20',
+      lastModified: '2024-01-28',
+      totalAttempts: 40,
+      hasFileUpload: true,
+      pendingGrading: 8,
+    },
+  ]);
+
+  // Pending file upload submissions
+  const [pendingSubmissions] = useState<PendingSubmission[]>([
+    {
+      id: 'sub-1',
+      studentName: 'Alex Martinez',
+      studentAvatar: 'AM',
+      quizTitle: 'Capstone Project Assessment',
+      questionTitle: 'Submit your final project code',
+      submittedAt: '2 hours ago',
+      fileName: 'capstone-project-final.zip',
+      fileSize: '4.2 MB',
+      maxPoints: 25,
+    },
+    {
+      id: 'sub-2',
+      studentName: 'Sarah Johnson',
+      studentAvatar: 'SJ',
+      quizTitle: 'Capstone Project Assessment',
+      questionTitle: 'Submit your final project code',
+      submittedAt: '5 hours ago',
+      fileName: 'js-mastery-project.zip',
+      fileSize: '3.8 MB',
+      maxPoints: 25,
+    },
+    {
+      id: 'sub-3',
+      studentName: 'Michael Chen',
+      studentAvatar: 'MC',
+      quizTitle: 'Capstone Project Assessment',
+      questionTitle: 'Submit project documentation',
+      submittedAt: '1 day ago',
+      fileName: 'documentation.pdf',
+      fileSize: '1.2 MB',
+      tentativeScore: 18,
+      maxPoints: 20,
+    },
+    {
+      id: 'sub-4',
+      studentName: 'Emma Wilson',
+      studentAvatar: 'EW',
+      quizTitle: 'Capstone Project Assessment',
+      questionTitle: 'Submit your final project code',
+      submittedAt: '1 day ago',
+      fileName: 'final-submission.zip',
+      fileSize: '5.1 MB',
+      maxPoints: 25,
+    },
   ]);
 
   const handleCreateQuiz = () => {
@@ -174,6 +255,24 @@ const CoachQuizzesPage: React.FC = () => {
     window.alert(`📦 Quiz Archived\n\nQuiz: ${quiz.title}\n\n✅ Archived Successfully:\n• Removed from active quizzes\n• Student data: Preserved\n• Can be restored anytime\n• No new attempts allowed\n\n💾 Data Retention:\n• All ${quiz.totalAttempts} attempts saved\n• Analytics still available\n• Scores maintained\n\n🔄 To Restore:\n• Change status back to published\n• Students can resume access\n\n💡 Archive old quizzes to keep your dashboard organized while preserving historical data.`);
   };
 
+  const handleGradeSubmission = (submission: PendingSubmission) => {
+    const score = prompt(`Grade submission for ${submission.studentName}\n\nQuestion: ${submission.questionTitle}\nFile: ${submission.fileName}\n\nEnter score (max ${submission.maxPoints} points):`);
+    if (score !== null) {
+      const numScore = parseInt(score);
+      if (!isNaN(numScore) && numScore >= 0 && numScore <= submission.maxPoints) {
+        window.alert(`✅ Submission Graded\n\nStudent: ${submission.studentName}\nQuestion: ${submission.questionTitle}\nScore: ${numScore}/${submission.maxPoints}\n\n📊 Score Updated:\n• Student notified via email\n• Quiz score recalculated\n• "Tentative" badge removed for this question\n\n💡 The student's overall quiz score will be updated to reflect this grade.`);
+      } else {
+        window.alert(`❌ Invalid Score\n\nPlease enter a number between 0 and ${submission.maxPoints}.`);
+      }
+    }
+  };
+
+  const handleDownloadSubmission = (submission: PendingSubmission) => {
+    window.alert(`📥 Downloading File\n\nStudent: ${submission.studentName}\nFile: ${submission.fileName}\nSize: ${submission.fileSize}\n\n✅ Download started...\n\n💡 After reviewing the file, click "Grade" to assign a score.`);
+  };
+
+  const totalPendingGrading = pendingSubmissions.filter(s => s.tentativeScore === undefined).length;
+
   const filteredQuizzes = quizzes.filter(quiz => {
     const matchesSearch =
       quiz.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -214,7 +313,7 @@ const CoachQuizzesPage: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-5 gap-4">
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-2xl p-4">
               <div className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Total Quizzes</div>
               <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{totalQuizzes}</div>
@@ -231,8 +330,101 @@ const CoachQuizzesPage: React.FC = () => {
               <div className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Avg Completion</div>
               <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">{avgCompletionRate}%</div>
             </div>
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-2xl p-4 relative">
+              <div className="text-sm text-slate-600 dark:text-dark-text-secondary mb-1">Pending Grading</div>
+              <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">{totalPendingGrading}</div>
+              {totalPendingGrading > 0 && (
+                <span className="absolute top-2 right-2 w-3 h-3 bg-amber-500 rounded-full animate-pulse" />
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Pending File Upload Grading Section */}
+        {pendingSubmissions.length > 0 && (
+          <div className="px-8 py-6 bg-amber-50 dark:bg-amber-900/10 border-b border-amber-200 dark:border-amber-800">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center">
+                  <Upload className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-dark-text-primary">
+                    File Uploads Awaiting Review
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-dark-text-secondary">
+                    {totalPendingGrading} submissions need grading • Scores marked as "Tentative" until reviewed
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => window.alert('📋 Opening full grading queue...\n\nThis will show all pending file submissions across all quizzes with filtering and bulk grading options.')}
+                className="text-sm text-amber-700 hover:text-amber-800 font-medium"
+              >
+                View All →
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              {pendingSubmissions.slice(0, 4).map((submission) => (
+                <div
+                  key={submission.id}
+                  className="bg-white dark:bg-dark-background-card rounded-xl p-4 border border-amber-200 dark:border-amber-800"
+                >
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-400 flex items-center justify-center text-white text-xs font-bold">
+                      {submission.studentAvatar}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-slate-900 dark:text-dark-text-primary truncate">
+                        {submission.studentName}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-dark-text-muted">
+                        {submission.submittedAt}
+                      </p>
+                    </div>
+                    {submission.tentativeScore !== undefined ? (
+                      <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                        Graded
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full animate-pulse">
+                        Pending
+                      </span>
+                    )}
+                  </div>
+                  
+                  <p className="text-xs text-slate-600 dark:text-dark-text-secondary mb-2 line-clamp-1">
+                    {submission.questionTitle}
+                  </p>
+                  
+                  <div className="flex items-center gap-2 mb-3 p-2 bg-slate-50 dark:bg-gray-800 rounded-lg">
+                    <FileText className="w-4 h-4 text-slate-400" />
+                    <span className="text-xs text-slate-600 dark:text-dark-text-secondary truncate flex-1">
+                      {submission.fileName}
+                    </span>
+                    <span className="text-xs text-slate-400">{submission.fileSize}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleDownloadSubmission(submission)}
+                      className="flex-1 px-3 py-1.5 bg-slate-100 dark:bg-gray-700 text-slate-700 dark:text-dark-text-primary text-xs font-medium rounded-lg hover:bg-slate-200 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      Download
+                    </button>
+                    <button
+                      onClick={() => handleGradeSubmission(submission)}
+                      className="flex-1 px-3 py-1.5 bg-amber-500 text-white text-xs font-medium rounded-lg hover:bg-amber-600 transition-colors"
+                    >
+                      Grade ({submission.maxPoints} pts)
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Filters & Search */}
         <div className="px-8 py-6 bg-slate-50 dark:bg-dark-background border-b border-slate-200 dark:border-gray-700">
@@ -276,17 +468,30 @@ const CoachQuizzesPage: React.FC = () => {
                     </h3>
                     <p className="text-sm text-slate-600 dark:text-dark-text-secondary">{quiz.course}</p>
                   </div>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      quiz.status === 'published'
-                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                        : quiz.status === 'draft'
-                        ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
-                    }`}
-                  >
-                    {quiz.status}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {quiz.hasFileUpload && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 rounded-full text-xs font-medium flex items-center gap-1">
+                        <Upload className="w-3 h-3" />
+                        File Upload
+                      </span>
+                    )}
+                    {quiz.pendingGrading && quiz.pendingGrading > 0 && (
+                      <span className="px-2 py-1 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-full text-xs font-medium animate-pulse">
+                        {quiz.pendingGrading} pending
+                      </span>
+                    )}
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        quiz.status === 'published'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : quiz.status === 'draft'
+                          ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                          : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+                      }`}
+                    >
+                      {quiz.status}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Details */}

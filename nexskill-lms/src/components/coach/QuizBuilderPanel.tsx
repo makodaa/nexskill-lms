@@ -1,11 +1,18 @@
 import React from 'react';
 
-type QuestionType = 'multiple-choice' | 'true-false' | 'image-choice';
+type QuestionType = 'multiple-choice' | 'true-false' | 'image-choice' | 'file-upload';
 
 interface Option {
   id: string;
   text: string;
   isCorrect: boolean;
+}
+
+interface FileUploadConfig {
+  allowedTypes: string[];
+  maxFileSizeMB: number;
+  rubric: string;
+  maxPoints: number;
 }
 
 interface Question {
@@ -14,6 +21,7 @@ interface Question {
   question: string;
   options: Option[];
   explanation: string;
+  fileUploadConfig?: FileUploadConfig;
 }
 
 interface QuizBuilderPanelProps {
@@ -79,9 +87,27 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
         return '⊤⊥';
       case 'image-choice':
         return '🖼️';
+      case 'file-upload':
+        return '📎';
       default:
         return '?';
     }
+  };
+
+  const handleTypeChange = (questionId: string, newType: QuestionType) => {
+    const updates: Partial<Question> = { type: newType };
+    
+    // Add default file upload config when switching to file-upload type
+    if (newType === 'file-upload') {
+      updates.fileUploadConfig = {
+        allowedTypes: ['pdf', 'doc', 'docx', 'txt', 'jpg', 'png'],
+        maxFileSizeMB: 10,
+        rubric: '',
+        maxPoints: 10,
+      };
+    }
+    
+    updateQuestion(questionId, updates);
   };
 
   return (
@@ -121,16 +147,20 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
                   <div className="flex items-center gap-2 mb-3">
                     <select
                       value={question.type}
-                      onChange={(e) =>
-                        updateQuestion(question.id, { type: e.target.value as QuestionType })
-                      }
+                      onChange={(e) => handleTypeChange(question.id, e.target.value as QuestionType)}
                       className="px-3 py-1.5 bg-slate-100 dark:bg-gray-800 rounded-lg text-sm font-medium text-slate-700 dark:text-dark-text-primary border-none"
                     >
                       <option value="multiple-choice">Multiple choice</option>
                       <option value="true-false">True / False</option>
                       <option value="image-choice">Image choice</option>
+                      <option value="file-upload">📎 File Upload (Manual Grading)</option>
                     </select>
                     <span className="text-lg">{getTypeIcon(question.type)}</span>
+                    {question.type === 'file-upload' && (
+                      <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">
+                        Requires Manual Grading
+                      </span>
+                    )}
                   </div>
 
                   <input
@@ -141,26 +171,138 @@ const QuizBuilderPanel: React.FC<QuizBuilderPanelProps> = ({ questions, onChange
                     className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 mb-4"
                   />
 
-                  {/* Options */}
-                  <div className="space-y-2 mb-4">
-                    {question.options.map((option) => (
-                      <div key={option.id} className="flex items-center gap-3">
-                        <input
-                          type="radio"
-                          checked={option.isCorrect}
-                          onChange={() => setCorrectAnswer(question.id, option.id)}
-                          className="w-5 h-5 text-[#304DB5] cursor-pointer"
-                        />
-                        <input
-                          type="text"
-                          value={option.text}
-                          onChange={(e) => updateOption(question.id, option.id, e.target.value)}
-                          placeholder={`Option ${question.options.indexOf(option) + 1}`}
-                          className="flex-1 px-4 py-2.5 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                  {/* File Upload Configuration */}
+                  {question.type === 'file-upload' && (
+                    <div className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
+                      <div className="flex items-start gap-2 mb-3">
+                        <span className="text-amber-600 text-lg">⚠️</span>
+                        <div>
+                          <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                            Manual Grading Required
+                          </p>
+                          <p className="text-xs text-amber-600 dark:text-amber-400">
+                            File upload answers cannot be auto-graded. Quiz scores will be marked as "Tentative" until you review and grade submissions.
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-700 dark:text-dark-text-secondary mb-1">
+                            Max Points
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="100"
+                            value={question.fileUploadConfig?.maxPoints || 10}
+                            onChange={(e) => updateQuestion(question.id, {
+                              fileUploadConfig: {
+                                ...question.fileUploadConfig!,
+                                maxPoints: parseInt(e.target.value) || 10,
+                              }
+                            })}
+                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-slate-700 dark:text-dark-text-secondary mb-1">
+                            Max File Size (MB)
+                          </label>
+                          <input
+                            type="number"
+                            min="1"
+                            max="50"
+                            value={question.fileUploadConfig?.maxFileSizeMB || 10}
+                            onChange={(e) => updateQuestion(question.id, {
+                              fileUploadConfig: {
+                                ...question.fileUploadConfig!,
+                                maxFileSizeMB: parseInt(e.target.value) || 10,
+                              }
+                            })}
+                            className="w-full px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none text-sm"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="mb-3">
+                        <label className="block text-xs font-medium text-slate-700 dark:text-dark-text-secondary mb-1">
+                          Allowed File Types
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {['pdf', 'doc', 'docx', 'txt', 'jpg', 'png', 'zip'].map((fileType) => {
+                            const isSelected = question.fileUploadConfig?.allowedTypes?.includes(fileType);
+                            return (
+                              <button
+                                key={fileType}
+                                type="button"
+                                onClick={() => {
+                                  const currentTypes = question.fileUploadConfig?.allowedTypes || [];
+                                  const newTypes = isSelected
+                                    ? currentTypes.filter(t => t !== fileType)
+                                    : [...currentTypes, fileType];
+                                  updateQuestion(question.id, {
+                                    fileUploadConfig: {
+                                      ...question.fileUploadConfig!,
+                                      allowedTypes: newTypes,
+                                    }
+                                  });
+                                }}
+                                className={`px-2 py-1 text-xs font-medium rounded-lg transition-colors ${
+                                  isSelected
+                                    ? 'bg-blue-100 text-blue-700 border border-blue-300'
+                                    : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
+                                }`}
+                              >
+                                .{fileType}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-dark-text-secondary mb-1">
+                          Grading Rubric / Instructions
+                        </label>
+                        <textarea
+                          value={question.fileUploadConfig?.rubric || ''}
+                          onChange={(e) => updateQuestion(question.id, {
+                            fileUploadConfig: {
+                              ...question.fileUploadConfig!,
+                              rubric: e.target.value,
+                            }
+                          })}
+                          placeholder="Describe what you're looking for in the submission (e.g., 'Code should be clean, well-commented, and follow best practices...')"
+                          rows={3}
+                          className="w-full px-3 py-2 bg-white dark:bg-gray-800 rounded-lg border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none text-sm resize-none"
                         />
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  )}
+
+                  {/* Options - Only show for non-file-upload types */}
+                  {question.type !== 'file-upload' && (
+                    <div className="space-y-2 mb-4">
+                      {question.options.map((option) => (
+                        <div key={option.id} className="flex items-center gap-3">
+                          <input
+                            type="radio"
+                            checked={option.isCorrect}
+                            onChange={() => setCorrectAnswer(question.id, option.id)}
+                            className="w-5 h-5 text-[#304DB5] cursor-pointer"
+                          />
+                          <input
+                            type="text"
+                            value={option.text}
+                            onChange={(e) => updateOption(question.id, option.id, e.target.value)}
+                            placeholder={`Option ${question.options.indexOf(option) + 1}`}
+                            className="flex-1 px-4 py-2.5 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Explanation */}
                   <textarea
