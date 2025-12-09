@@ -363,6 +363,140 @@ const SystemSettingsPage: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Live Classes - Google Meet */}
+              <div className="bg-white rounded-2xl p-6 border border-[#EDF0FB]">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-text-primary">Live Classes</h3>
+                    <p className="text-xs text-text-muted mt-1">Video conferencing for live classes and webinars</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-xl border border-[#EDF0FB] bg-gradient-to-r from-blue-50 to-green-50">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                        <svg viewBox="0 0 24 24" className="w-8 h-8" fill="none">
+                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#00897B"/>
+                          <path d="M8 12.5v-1c0-.55.45-1 1-1h6c.55 0 1 .45 1 1v1c0 .55-.45 1-1 1H9c-.55 0-1-.45-1-1z" fill="#fff"/>
+                          <path d="M16.5 9.5l2.5-1.5v8l-2.5-1.5" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-text-primary">Google Meet</p>
+                        <p className="text-xs text-green-600 font-medium">Connected • Primary provider for live classes</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">Active</span>
+                      <button
+                        onClick={() => handleConfigureIntegration('Google Meet')}
+                        className="text-sm text-brand-primary hover:text-brand-primary-dark font-medium"
+                      >
+                        Configure
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Google Meet Settings Panel */}
+                  <div className="mt-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <h4 className="text-sm font-semibold text-text-primary mb-4">Google Meet Configuration</h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-medium text-text-primary mb-2">
+                          Google Cloud Project ID
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="my-project-id"
+                          defaultValue="nexskill-lms-prod"
+                          className="w-full px-4 py-2.5 border border-[#EDF0FB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-text-primary mb-2">
+                          OAuth Client ID
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="xxxx.apps.googleusercontent.com"
+                          defaultValue="847291638273-xxxxxxxxxxxxxxxx.apps.googleusercontent.com"
+                          className="w-full px-4 py-2.5 border border-[#EDF0FB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-text-primary mb-2">
+                          OAuth Client Secret
+                        </label>
+                        <input
+                          type="password"
+                          defaultValue="GOCSPX-xxxxxxxxxxxxxxxxxxxx"
+                          className="w-full px-4 py-2.5 border border-[#EDF0FB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary bg-white"
+                        />
+                      </div>
+                      <div className="pt-2 border-t border-slate-200">
+                        <h5 className="text-xs font-semibold text-text-primary mb-3">Meeting Settings</h5>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs font-medium text-text-primary">Auto-record meetings</p>
+                              <p className="text-xs text-text-muted">Automatically record all live classes</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" defaultChecked className="sr-only peer" />
+                              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-primary-soft rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
+                            </label>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs font-medium text-text-primary">Require authentication</p>
+                              <p className="text-xs text-text-muted">Only logged-in users can join</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" defaultChecked className="sr-only peer" />
+                              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-primary-soft rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
+                            </label>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs font-medium text-text-primary">Enable chat</p>
+                              <p className="text-xs text-text-muted">Allow participants to send messages</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" defaultChecked className="sr-only peer" />
+                              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-primary-soft rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
+                            </label>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-xs font-medium text-text-primary">Enable captions</p>
+                              <p className="text-xs text-text-muted">Auto-generate captions for accessibility</p>
+                            </div>
+                            <label className="relative inline-flex items-center cursor-pointer">
+                              <input type="checkbox" className="sr-only peer" />
+                              <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-primary-soft rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-primary"></div>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 pt-3">
+                        <button
+                          onClick={() => alert('✅ Google Meet settings saved successfully!')}
+                          className="px-4 py-2 bg-brand-primary text-white rounded-lg text-xs font-medium hover:bg-brand-primary-dark transition-colors"
+                        >
+                          Save Settings
+                        </button>
+                        <button
+                          onClick={() => alert('🔄 Testing connection to Google Meet API...\n\n✅ Connection successful!')}
+                          className="px-4 py-2 bg-white border border-slate-200 text-text-primary rounded-lg text-xs font-medium hover:bg-slate-50 transition-colors"
+                        >
+                          Test Connection
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
