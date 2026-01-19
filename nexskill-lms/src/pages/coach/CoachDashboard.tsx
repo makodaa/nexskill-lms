@@ -1,6 +1,6 @@
 import React from 'react';
 import CoachAppLayout from '../../layouts/CoachAppLayout';
-import { useAuth } from '../../context/AuthContext';
+import { useUser } from '../../context/UserContext';
 
 // Dummy data
 const revenueData = {
@@ -100,7 +100,7 @@ const aiShortcuts = [
 ];
 
 const CoachDashboard: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { profile: currentUser } = useUser();
 
   const handleCourseClick = (courseName: string) => {
     window.alert(`📚 ${courseName}\n\n🎯 Quick Actions:\n• View course analytics\n• Edit course content\n• Manage students (24 enrolled)\n• View student feedback (4.8/5)\n• Update pricing or settings\n\n📊 Recent Activity:\n• 3 new enrollments today\n• 12 lessons completed\n• 5 student questions pending\n\nClick on course card to access full details.`);

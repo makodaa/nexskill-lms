@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useUser } from '../context/UserContext';
 import GlobalTopBarControls from '../components/system/GlobalTopBarControls';
 import BrandLogo from '../components/brand/BrandLogo';
 import { LogOut } from 'lucide-react';
@@ -12,11 +13,11 @@ interface SubCoachAppLayoutProps {
 const SubCoachAppLayout: React.FC<SubCoachAppLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { signOut } = useAuth();
+  const { profile: currentUser } = useUser();
 
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    sessionStorage.clear();
+  const handleLogout = async () => {
+    await signOut();
     navigate('/login');
   };
 

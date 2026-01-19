@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentAppLayout from '../../layouts/StudentAppLayout';
-import { useAuth } from '../../context/AuthContext';
+import { useUser } from '../../context/UserContext';
 // test changes
 // Dummy data
 const courses = [
@@ -57,7 +57,7 @@ const liveClasses = [
 
 const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { profile: currentUser } = useUser();
   const [showAICoach, setShowAICoach] = useState(true);
   const [timeFilter] = useState('This week');
 
