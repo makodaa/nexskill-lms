@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentAuthLayout from '../../layouts/StudentAuthLayout';
 import { useAuth } from '../../context/AuthContext';
-import { allRoles, labelByRole, roleIcons, defaultLandingRouteByRole, type UserRole } from '../../types/roles';
+import { useUser } from '../../context/UserContext';
+import { allRoles, labelByRole, roleIcons, type UserRole } from '../../types/roles';
 
+// Dummy credentials for each role
+/*
 // Dummy credentials for each role
 const dummyCredentials: Record<UserRole, { name: string; email: string; password: string }> = {
   STUDENT: {
@@ -52,20 +55,24 @@ const dummyCredentials: Record<UserRole, { name: string; email: string; password
     password: 'demo1234',
   },
 };
+*/
 
 const Login: React.FC = () => {
-  const { loginMock } = useAuth();
+  const { signIn } = useAuth();
+  const { getDefaultRoute } = useUser();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: dummyCredentials.STUDENT.name,
-    email: dummyCredentials.STUDENT.email,
-    password: dummyCredentials.STUDENT.password,
+    email: '',
+    password: '',
     rememberMe: false,
   });
   const [selectedRole, setSelectedRole] = useState<UserRole>('STUDENT');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto-fill credentials when role changes
+  // Auto-fill credentials when role changes - DISABLED for now
+  /*
   useEffect(() => {
     const credentials = dummyCredentials[selectedRole];
     setFormData(prev => ({
@@ -75,6 +82,7 @@ const Login: React.FC = () => {
       password: credentials.password,
     }));
   }, [selectedRole]);
+  */
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -84,29 +92,34 @@ const Login: React.FC = () => {
     }));
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
     
-    // Use the display name or fallback to role name
-    const displayName = formData.name.trim() || labelByRole[selectedRole];
-    
-    // Mock login with selected role - no validation required
-    loginMock(displayName, selectedRole);
-    
-    // Navigate to the appropriate dashboard based on role
-    const defaultRoute = defaultLandingRouteByRole[selectedRole];
-    navigate(defaultRoute);
+    try {
+      const { error: signInError } = await signIn(formData.email, formData.password);
+      
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+      
+      // Navigate to the appropriate dashboard based on role (determined by user profile)
+      navigate(getDefaultRoute());
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleSocialLogin = (provider: string) => {
-    // Mock social login with selected role
-    console.log(`Logging in with ${provider} as ${selectedRole}`);
-    const displayName = `${provider} User`;
-    loginMock(displayName, selectedRole);
-    
-    // Navigate to the appropriate dashboard based on role
-    const defaultRoute = defaultLandingRouteByRole[selectedRole];
-    navigate(defaultRoute);
+  const handleSocialLogin = async (provider: string) => {
+    // Social login would be handled via Supabase as well
+    console.log(`Logging in with ${provider}`);
+    // For now, this is a placeholder as social login requires project configuration
+    setError(`Social login with ${provider} is not yet configured.`);
   };
 
   return (
@@ -148,35 +161,25 @@ const Login: React.FC = () => {
 
         {/* Login Form */}
         <form onSubmit={handleLogin} className="space-y-5" noValidate>
-          {/* Display Name Input */}
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
-              Display Name
-            </label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              placeholder="Enter your display name"
-              className="w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all"
-            />
-          </div>
-
+          {error && (
+            <div className="p-3 bg-red-100 border border-red-200 text-red-700 text-sm rounded-lg">
+              {error}
+            </div>
+          )}
           {/* Email Input */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-text-primary mb-2">
               Email
             </label>
             <input
-              type="text"
+              type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleInputChange}
               placeholder="Enter your email"
               className="w-full px-5 py-3 bg-[#F5F7FF] rounded-full text-sm text-text-primary placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all"
+              required
             />
           </div>
 
@@ -238,9 +241,12 @@ const Login: React.FC = () => {
           {/* Sign In Button */}
           <button
             type="submit"
-            className="w-full py-3 px-6 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+            disabled={isSubmitting}
+            className={`w-full py-3 px-6 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all ${
+              isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
-            Sign in
+            {isSubmitting ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 

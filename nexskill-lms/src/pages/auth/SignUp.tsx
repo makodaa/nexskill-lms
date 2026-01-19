@@ -1,20 +1,28 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentAuthLayout from '../../layouts/StudentAuthLayout';
+import { useAuth } from '../../context/AuthContext';
+import { useUser } from '../../context/UserContext';
 
 type AccountType = 'STUDENT' | 'COACH';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
+  const { signUp } = useAuth();
+  const { getDefaultRoute } = useUser();
   const [accountType, setAccountType] = useState<AccountType>('STUDENT');
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
     agreeToTerms: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -32,9 +40,17 @@ const SignUp: React.FC = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+    
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    }
 
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = 'Name is required';
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+    }
+
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username is required';
     }
 
     if (!formData.email.trim()) {
@@ -61,20 +77,42 @@ const SignUp: React.FC = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignUp = (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     if (validateForm()) {
-      // Store account type for later use (e.g., in context or passed to verification)
-      console.log('Creating account as:', accountType);
-      // Dummy signup - navigate to email verification
-      navigate('/email-verification', { state: { accountType } });
+      setIsSubmitting(true);
+      try {
+        const { error } = await signUp(
+          formData.email,
+          formData.password,
+          formData.firstName,
+          formData.lastName,
+          formData.username,
+          accountType
+        );
+
+        if (error) {
+          setSubmitError(error.message);
+          return;
+        }
+
+        // Navigate to the appropriate dashboard based on role (determined by user profile)
+        // Note: For email verification enabled flows, you might want to navigate to a verification page instead
+        navigate(getDefaultRoute());
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'An unexpected error occurred during signup';
+        setSubmitError(message);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
   const handleSocialSignUp = (provider: string) => {
     // Dummy social signup - navigate based on account type
     console.log(`Signing up with ${provider} as ${accountType}`);
-    navigate(accountType === 'COACH' ? '/coach/dashboard' : '/student/dashboard');
+    setSubmitError(`Social signup with ${provider} is not yet configured.`);
   };
 
   return (
@@ -139,24 +177,74 @@ const SignUp: React.FC = () => {
 
         {/* Sign Up Form */}
         <form onSubmit={handleSignUp} className="space-y-5">
-          {/* Full Name Input */}
+          {submitError && (
+            <div className="p-3 bg-red-100 border border-red-200 text-red-700 text-sm rounded-lg">
+              {submitError}
+            </div>
+          )}
+          
+          <div className="grid grid-cols-2 gap-4">
+            {/* First Name Input */}
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                First Name
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={formData.firstName}
+                onChange={handleInputChange}
+                placeholder="First name"
+                className={`w-full px-5 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm text-text-primary dark:text-white placeholder-text-muted dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
+                  errors.firstName ? 'ring-2 ring-red-400' : ''
+                }`}
+              />
+              {errors.firstName && (
+                <p className="mt-1 text-xs text-red-500 ml-2">{errors.firstName}</p>
+              )}
+            </div>
+
+            {/* Last Name Input */}
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+                Last Name
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={formData.lastName}
+                onChange={handleInputChange}
+                placeholder="Last name"
+                className={`w-full px-5 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm text-text-primary dark:text-white placeholder-text-muted dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
+                  errors.lastName ? 'ring-2 ring-red-400' : ''
+                }`}
+              />
+              {errors.lastName && (
+                <p className="mt-1 text-xs text-red-500 ml-2">{errors.lastName}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Username Input */}
           <div>
-            <label htmlFor="fullName" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
-              Full Name
+            <label htmlFor="username" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
+              Username
             </label>
             <input
               type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
+              id="username"
+              name="username"
+              value={formData.username}
               onChange={handleInputChange}
-              placeholder="Enter your full name"
+              placeholder="Pick a unique username"
               className={`w-full px-5 py-3 bg-[#F5F7FF] dark:bg-slate-700 rounded-full text-sm text-text-primary dark:text-white placeholder-text-muted dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-primary-light transition-all ${
-                errors.fullName ? 'ring-2 ring-red-400' : ''
+                errors.username ? 'ring-2 ring-red-400' : ''
               }`}
             />
-            {errors.fullName && (
-              <p className="mt-1 text-xs text-red-500">{errors.fullName}</p>
+            {errors.username && (
+              <p className="mt-1 text-xs text-red-500 ml-2">{errors.username}</p>
             )}
           </div>
 
@@ -290,9 +378,12 @@ const SignUp: React.FC = () => {
           {/* Sign Up Button */}
           <button
             type="submit"
-            className="w-full py-3 px-6 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+            disabled={isSubmitting}
+            className={`w-full py-3 px-6 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all ${
+              isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
-            Create account
+            {isSubmitting ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 
