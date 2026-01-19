@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useUser } from '../../context/UserContext';
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -10,18 +12,39 @@ const AdminLogin: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const { signIn } = useAuth();
+  const { getDefaultRoute } = useUser();
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    if (!formData.email.trim() || !formData.password.trim()) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
     setIsLoading(true);
 
-    // Simulate login
-    console.log('Admin login attempt:', { ...formData, rememberMe });
+    try {
+      const { error: signInError } = await signIn(formData.email, formData.password);
+      
+      if (signInError) {
+        setError(signInError.message);
+        setIsLoading(false);
+        return;
+      }
 
-    setTimeout(() => {
+      // Small delay to ensure profile is fetched
+      setTimeout(() => {
+        navigate(getDefaultRoute());
+      }, 100);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(message);
       setIsLoading(false);
-      console.log('Admin login successful (simulated)');
-      navigate('/admin/dashboard');
-    }, 1000);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,7 +82,12 @@ const AdminLogin: React.FC = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            {error && (
+              <div className="p-3 bg-red-100 border border-red-200 text-red-700 text-sm rounded-lg">
+                {error}
+              </div>
+            )}
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold text-[#111827] mb-2">

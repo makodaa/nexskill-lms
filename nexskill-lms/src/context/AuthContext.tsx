@@ -103,7 +103,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             email,
             password,
         });
-        if (error) throw error;
         return { data, error };
     };
 
