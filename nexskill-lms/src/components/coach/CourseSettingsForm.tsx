@@ -15,9 +15,10 @@ interface CourseSettings {
 interface CourseSettingsFormProps {
   settings: CourseSettings;
   onChange: (updatedSettings: CourseSettings) => void;
+  onSave: () => Promise<void>;
 }
 
-const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onChange }) => {
+const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onChange, onSave }) => {
   const [isSaving, setIsSaving] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -25,12 +26,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
     onChange({ ...settings, [name]: value });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    console.log('Saving settings:', settings);
-    setTimeout(() => {
-      setIsSaving(false);
-    }, 1000);
+    await onSave();
+    setIsSaving(false);
   };
 
   return (
@@ -40,11 +39,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className={`px-6 py-2 font-semibold rounded-full transition-all ${
-            isSaving
-              ? 'bg-green-100 text-green-700 cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
-          }`}
+          className={`px-6 py-2 font-semibold rounded-full transition-all ${isSaving
+            ? 'bg-green-100 text-green-700 cursor-not-allowed'
+            : 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
+            }`}
         >
           {isSaving ? '✓ Saved' : 'Save changes'}
         </button>
@@ -197,11 +195,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 key={vis}
                 type="button"
                 onClick={() => onChange({ ...settings, visibility: vis })}
-                className={`p-4 rounded-xl border-2 transition-all text-left ${
-                  settings.visibility === vis
-                    ? 'border-[#5E7BFF] bg-blue-50'
-                    : 'border-slate-200 dark:border-gray-700 hover:border-slate-300'
-                }`}
+                className={`p-4 rounded-xl border-2 transition-all text-left ${settings.visibility === vis
+                  ? 'border-[#5E7BFF] bg-blue-50'
+                  : 'border-slate-200 dark:border-gray-700 hover:border-slate-300'
+                  }`}
               >
                 <p className="font-semibold text-slate-900 dark:text-dark-text-primary capitalize mb-1">{vis}</p>
                 <p className="text-xs text-slate-600">
