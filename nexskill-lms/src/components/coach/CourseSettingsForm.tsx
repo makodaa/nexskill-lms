@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 
 interface CourseSettings {
   title: string;
@@ -20,6 +21,23 @@ interface CourseSettingsFormProps {
 
 const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onChange, onSave }) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching categories:', error);
+      } else if (data) {
+        setCategories(data);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -95,9 +113,11 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                   className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                 >
                   <option value="">Select</option>
-                  <option value="Web Development">Web Development</option>
-                  <option value="Design">Design</option>
-                  <option value="Business">Business</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

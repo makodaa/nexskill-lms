@@ -32,6 +32,7 @@ Successfully integrated Supabase for the Coach Course Management module. Replace
 
 ### 4. Bug Fixes
 -   **Curriculum Editor**: Fixed an issue where the lesson editor modal would close unexpectedly or reject input while typing. This was caused by improper state synchronization between the modal and the live preview logic.
+-   **Course Settings**: Fixed the "Category" dropdown in the course settings form. It now dynamically fetches all available categories from Supabase instead of showing a hardcoded list, ensuring the saved category is correctly displayed and selectable.
 
 ## Technical Details
 -   **Files Modified**:
