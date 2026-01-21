@@ -11,6 +11,7 @@ interface Lesson {
 interface Module {
   id: string;
   title: string;
+  description?: string;
   lessons: Lesson[];
 }
 
@@ -66,6 +67,33 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
       module.id === moduleId ? { ...module, title: newTitle } : module
     );
     onChange(updatedCurriculum);
+  };
+
+  const handleModuleDescriptionChange = (moduleId: string, newDescription: string) => {
+    const updatedCurriculum = curriculum.map((module) =>
+      module.id === moduleId ? { ...module, description: newDescription } : module
+    );
+    onChange(updatedCurriculum);
+  };
+
+  const handleDeleteModule = (moduleId: string) => {
+    if (window.confirm('Are you sure you want to delete this module?')) {
+      const updatedCurriculum = curriculum.filter((module) => module.id !== moduleId);
+      onChange(updatedCurriculum);
+    }
+  };
+
+  const handleMoveModule = (moduleId: string, direction: 'up' | 'down') => {
+    const updatedCurriculum = [...curriculum];
+    const index = updatedCurriculum.findIndex((m) => m.id === moduleId);
+    
+    if (direction === 'up' && index > 0) {
+      [updatedCurriculum[index], updatedCurriculum[index - 1]] = [updatedCurriculum[index - 1], updatedCurriculum[index]];
+      onChange(updatedCurriculum);
+    } else if (direction === 'down' && index < updatedCurriculum.length - 1) {
+      [updatedCurriculum[index], updatedCurriculum[index + 1]] = [updatedCurriculum[index + 1], updatedCurriculum[index]];
+      onChange(updatedCurriculum);
+    }
   };
 
   const handleDeleteLesson = (moduleId: string, lessonId: string) => {
@@ -130,33 +158,87 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
           <div key={module.id} className="border border-slate-200 dark:border-gray-700 rounded-xl overflow-hidden">
             {/* Module Header */}
             <div className="bg-slate-50 dark:bg-gray-800 p-4">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => toggleModule(module.id)}
-                  className="text-slate-600 dark:text-dark-text-secondary hover:text-slate-900 dark:text-dark-text-primary transition-colors"
-                >
-                  <svg
-                    className={`w-5 h-5 transition-transform ${expandedModules.has(module.id) ? 'rotate-90' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => toggleModule(module.id)}
+                    className="text-slate-600 dark:text-dark-text-secondary hover:text-slate-900 dark:text-dark-text-primary transition-colors"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-                <span className="text-sm font-medium text-slate-600">Module {moduleIndex + 1}</span>
-                <input
-                  type="text"
-                  value={module.title}
-                  onChange={(e) => handleModuleTitleChange(module.id, e.target.value)}
-                  className="flex-1 px-3 py-1.5 bg-white dark:bg-dark-background-card rounded-lg border border-slate-200 dark:border-gray-700 font-semibold text-slate-900 dark:text-dark-text-primary focus:border-[#304DB5] focus:outline-none"
-                />
-                <button
-                  onClick={() => handleAddLesson(module.id)}
-                  className="px-4 py-2 text-sm font-medium text-[#304DB5] hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  + Add lesson
-                </button>
+                    <svg
+                      className={`w-5 h-5 transition-transform ${expandedModules.has(module.id) ? 'rotate-90' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                  <span className="text-sm font-medium text-slate-600">Module {moduleIndex + 1}</span>
+                  <input
+                    type="text"
+                    value={module.title}
+                    onChange={(e) => handleModuleTitleChange(module.id, e.target.value)}
+                    className="flex-1 px-3 py-1.5 bg-white dark:bg-dark-background-card rounded-lg border border-slate-200 dark:border-gray-700 font-semibold text-slate-900 dark:text-dark-text-primary focus:border-[#304DB5] focus:outline-none"
+                    placeholder="Module Title"
+                  />
+                  
+                  {/* Module Actions */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      onClick={() => handleMoveModule(module.id, 'up')}
+                      disabled={moduleIndex === 0}
+                      className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-dark-text-secondary disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 rounded"
+                      title="Move Up"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleMoveModule(module.id, 'down')}
+                      disabled={moduleIndex === curriculum.length - 1}
+                      className="p-1.5 text-slate-400 hover:text-slate-600 dark:text-dark-text-secondary disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 rounded"
+                      title="Move Down"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    <div className="w-px h-4 bg-slate-300 mx-1"></div>
+                    <button
+                      onClick={() => handleDeleteModule(module.id)}
+                      className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                      title="Delete Module"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                
+                {expandedModules.has(module.id) && (
+                   <div className="pl-8 pr-12">
+                     <textarea
+                       value={module.description || ''}
+                       onChange={(e) => handleModuleDescriptionChange(module.id, e.target.value)}
+                       className="w-full px-3 py-2 bg-white dark:bg-dark-background-card rounded-lg border border-slate-200 dark:border-gray-700 text-sm text-slate-600 dark:text-dark-text-secondary focus:border-[#304DB5] focus:outline-none resize-none"
+                       placeholder="Add a description for this module..."
+                       rows={2}
+                     />
+                     <div className="mt-2 flex justify-end">
+                        <button
+                          onClick={() => handleAddLesson(module.id)}
+                          className="px-4 py-2 text-sm font-medium text-[#304DB5] hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                          </svg>
+                          Add lesson
+                        </button>
+                     </div>
+                   </div>
+                )}
               </div>
             </div>
 
