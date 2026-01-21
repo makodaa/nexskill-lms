@@ -39,6 +39,7 @@ import LiveClasses from "./pages/student/LiveClasses";
 import CoachDashboard from "./pages/coach/CoachDashboard";
 import CourseList from "./pages/coach/CourseList";
 import CourseCreate from "./pages/coach/CourseCreate";
+import DemoCreateLesson from "./pages/coach/DemoCreateLesson";
 import CourseBuilder from "./pages/coach/CourseBuilder";
 import AICourseToolsHome from "./pages/coach/AICourseToolsHome";
 import CourseStudents from "./pages/coach/CourseStudents";
@@ -263,6 +264,10 @@ function App() {
                                 <Route
                                     path="/coach/courses/new"
                                     element={<CourseCreate />}
+                                />
+                                <Route
+                                    path="/coach/demo-lesson"
+                                    element={<DemoCreateLesson />}
                                 />
                                 <Route
                                     path="/coach/courses/:courseId/edit"
