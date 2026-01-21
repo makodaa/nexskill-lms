@@ -9,8 +9,8 @@ interface CourseSettings {
   language: string;
   shortDescription: string;
   longDescription: string;
-  tags: string;
   visibility: 'public' | 'unlisted' | 'private';
+  topics: number[]; // Array of Topic IDs
 }
 
 interface CourseSettingsFormProps {
@@ -23,20 +23,31 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
   const [isSaving, setIsSaving] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
 
+  const [availableTopics, setAvailableTopics] = useState<any[]>([]);
+  const [topicSearch, setTopicSearch] = useState('');
+  const [showTopicDropdown, setShowTopicDropdown] = useState(false);
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      const { data, error } = await supabase
+    const fetchMetadata = async () => {
+      // Fetch Categories
+      const { data: catData, error: catError } = await supabase
         .from('categories')
         .select('id, name')
         .order('name');
 
-      if (error) {
-        console.error('Error fetching categories:', error);
-      } else if (data) {
-        setCategories(data);
-      }
+      if (catError) console.error('Error fetching categories:', catError);
+      else if (catData) setCategories(catData);
+
+      // Fetch Topics
+      const { data: topicData, error: topicError } = await supabase
+        .from('topics')
+        .select('id, name')
+        .order('name');
+
+      if (topicError) console.error('Error fetching topics:', topicError);
+      else if (topicData) setAvailableTopics(topicData);
     };
-    fetchCategories();
+    fetchMetadata();
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -189,19 +200,84 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
               />
             </div>
 
-            <div>
-              <label htmlFor="tags" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
-                Tags
+            {/* Topics Selection (Autocomplete) */}
+            <div className="relative">
+              <label className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
+                Topics
               </label>
-              <input
-                type="text"
-                id="tags"
-                name="tags"
-                value={settings.tags}
-                onChange={handleInputChange}
-                placeholder="javascript, react, frontend (comma-separated)"
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
-              />
+
+              {/* Selected Topics (Tags Display) */}
+              <div className="flex flex-wrap gap-2 mb-3">
+                {settings.topics?.map((topicId) => {
+                  const topic = availableTopics.find((t) => t.id === topicId);
+                  if (!topic) return null;
+                  return (
+                    <span
+                      key={topic.id}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium bg-[#304DB5]/10 text-[#304DB5] border border-[#304DB5]/20"
+                    >
+                      {topic.name}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newTopics = settings.topics?.filter((id) => id !== topic.id) || [];
+                          onChange({ ...settings, topics: newTopics });
+                        }}
+                        className="hover:bg-[#304DB5]/20 rounded-full p-0.5 transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+
+              {/* Autocomplete Input */}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={topicSearch}
+                  onChange={(e) => {
+                    setTopicSearch(e.target.value);
+                    setShowTopicDropdown(true);
+                  }}
+                  onFocus={() => setShowTopicDropdown(true)}
+                  onBlur={() => setTimeout(() => setShowTopicDropdown(false), 200)} // Delay to allow click
+                  placeholder="Search and select topics..."
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                />
+
+                {/* Dropdown Results */}
+                {showTopicDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-slate-200 dark:border-gray-700 max-h-60 overflow-y-auto">
+                    {availableTopics
+                      .filter((topic) =>
+                        topic.name.toLowerCase().includes(topicSearch.toLowerCase()) &&
+                        !settings.topics?.includes(topic.id)
+                      )
+                      .map((topic) => (
+                        <button
+                          key={topic.id}
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()} // Prevent blur before click
+                          onClick={() => {
+                            const currentTopics = settings.topics || [];
+                            onChange({ ...settings, topics: [...currentTopics, topic.id] });
+                            setTopicSearch('');
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-slate-50 dark:hover:bg-gray-700 text-slate-700 dark:text-gray-200"
+                        >
+                          {topic.name}
+                        </button>
+                      ))}
+                    {availableTopics.filter(t => t.name.toLowerCase().includes(topicSearch.toLowerCase()) && !settings.topics?.includes(t.id)).length === 0 && (
+                      <div className="px-4 py-2 text-slate-500 text-sm">No new topics found</div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

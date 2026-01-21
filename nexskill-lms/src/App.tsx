@@ -133,8 +133,8 @@ function App() {
         <UiPreferencesProvider>
             <AuthProvider>
                 <UserProvider>
-                    <ErrorBoundary>
-                        <BrowserRouter>
+                    <BrowserRouter>
+                        <ErrorBoundary>
                             <Routes>
                                 {/* Redirect root to login */}
                                 <Route
@@ -614,12 +614,12 @@ function App() {
                                 {/* Catch-all route for 404 */}
                                 <Route path="*" element={<Error404Page />} />
                             </Routes>
-                        </BrowserRouter>
-                    </ErrorBoundary>
+                        </ErrorBoundary>
+                    </BrowserRouter>
                     <CookieConsentBanner />
                 </UserProvider>
             </AuthProvider>
-        </UiPreferencesProvider>
+        </UiPreferencesProvider >
     );
 }
 

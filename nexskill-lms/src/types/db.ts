@@ -7,13 +7,17 @@ export interface Category {
     created_at?: string;
 }
 
+export interface Topic {
+    id: number;
+    name: string;
+}
+
 export interface Course {
     id: string;
     title: string;
     subtitle?: string;
     short_description?: string;
     long_description?: string;
-    tags?: string;
     language?: string;
     visibility?: 'public' | 'unlisted' | 'private';
     level: CourseLevel;
