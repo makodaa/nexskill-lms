@@ -26,13 +26,17 @@ Today's session focused on refactoring the Course Tags system into a robust **To
 - **App.tsx Crash**: Resolved a "useNavigate() may be used only in the context of a <Router>" error.
   - **Fix**: Moved `<ErrorBoundary>` *inside* `<BrowserRouter>` in `App.tsx` so that error pages can access router hooks.
 
-## � Modified Files
+### 4. Course Defaults
+- **Private by Default**: Updated `CourseCreate.tsx` to set new courses as `visibility: 'private'` (Draft) upon creation.
+
+## 📂 Modified Files
 - `src/types/db.ts`: Updated interfaces (Removed `tags`, added `Topic`).
 - `src/components/coach/CourseSettingsForm.tsx`: implemented Autocomplete UI & blur fix.
 - `src/pages/coach/CourseBuilder.tsx`: Added topic persistence logic.
+- `src/pages/coach/CourseCreate.tsx`: Set default visibility to private.
 - `src/App.tsx`: Fixed ErrorBoundary nesting.
 - `seedTopics.js`: (Temporary) Script to seed topics.
 
-## �📝 Notes
+## 📝 Notes
 - Code has been pushed to the feature branch.
 - Pull Request created.
