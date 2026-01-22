@@ -23,7 +23,7 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
     { path: '/student/courses', label: 'My Courses', icon: '📚' },
     { path: '/student/community', label: 'Community', icon: '💬' },
     { path: '/student/coaching', label: 'Coaching', icon: '👨‍🏫' },
-    { path: '/student/ai-coach', label: 'AI Coach', icon: '🤖' },    
+    { path: '/student/ai-coach', label: 'AI Coach', icon: '🤖' },
     { path: '/student/live-classes', label: 'Live Classes', icon: '🎥' },
     { path: '/student/certificates', label: 'Certificates', icon: '🏆' },
     { path: '/student/membership', label: 'Membership', icon: '💎' },
@@ -56,11 +56,10 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive(item.path)
-                    ? 'bg-brand-primary-soft dark:bg-blue-900/30 text-brand-primary dark:text-blue-400 font-medium'
-                    : 'text-text-secondary dark:text-dark-text-secondary hover:bg-[#F5F7FF] dark:hover:bg-gray-800 hover:text-brand-primary dark:hover:text-blue-400'
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(item.path)
+                  ? 'bg-brand-primary-soft dark:bg-blue-900/30 text-brand-primary dark:text-blue-400 font-medium'
+                  : 'text-text-secondary dark:text-dark-text-secondary hover:bg-[#F5F7FF] dark:hover:bg-gray-800 hover:text-brand-primary dark:hover:text-blue-400'
+                  }`}
               >
                 <span className="text-sm">{item.label}</span>
               </Link>
@@ -95,8 +94,8 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
           <div className="flex items-center justify-end px-8 pt-6 pb-4 border-b border-[#EDF0FB] dark:border-gray-700">
             <GlobalTopBarControls />
           </div>
-          
-          <div className="flex-1 overflow-auto">
+
+          <div className="flex-1 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {children}
           </div>
         </main>

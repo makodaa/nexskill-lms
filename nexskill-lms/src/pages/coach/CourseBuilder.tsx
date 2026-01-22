@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import CoachAppLayout from '../../layouts/CoachAppLayout';
 import CourseBuilderSidebar from '../../components/coach/CourseBuilderSidebar';
@@ -10,6 +10,7 @@ import CoursePricingForm from '../../components/coach/CoursePricingForm';
 import CoursePublishWorkflow from '../../components/coach/CoursePublishWorkflow';
 import CoursePreviewPane from '../../components/coach/CoursePreviewPane';
 import LessonEditorPanel from '../../components/coach/LessonEditorPanel';
+import { supabase } from '../../lib/supabaseClient';
 
 type SectionKey = 'settings' | 'curriculum' | 'lessons' | 'quizzes' | 'drip' | 'pricing' | 'publish' | 'preview';
 
@@ -86,13 +87,48 @@ const CourseBuilder: React.FC = () => {
     title: initialData?.title || '',
     subtitle: initialData?.subtitle || '',
     category: initialData?.category || '',
-    level: initialData?.level || 'beginner',
+    level: initialData?.level || 'Beginner',
     language: initialData?.language || 'English',
     shortDescription: '',
     longDescription: '',
     tags: '',
     visibility: 'public',
   });
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      if (!courseId) return;
+
+      const { data, error } = await supabase
+        .from('courses')
+        .select(`
+          *,
+          category:categories(name)
+        `)
+        .eq('id', courseId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching course:', error);
+      } else if (data) {
+        setSettings((prev) => ({
+          ...prev,
+          title: data.title,
+          subtitle: data.subtitle || '',
+          shortDescription: data.short_description || '',
+          longDescription: data.long_description || '',
+          tags: data.tags || '',
+          visibility: data.visibility || 'public',
+          language: data.language || 'English',
+          level: data.level,
+          category: data.category?.name || '', // Assuming relationship or manual join
+        }));
+        // Update other states if needed
+      }
+    };
+
+    fetchCourse();
+  }, [courseId]);
 
   // Curriculum state
   const [curriculum, setCurriculum] = useState<Module[]>([
@@ -141,13 +177,14 @@ const CourseBuilder: React.FC = () => {
       curriculum.map((mod) =>
         mod.id === editingLesson.moduleId
           ? {
-              ...mod,
-              lessons: mod.lessons.map((l) => (l.id === updatedLesson.id ? updatedLesson : l)),
-            }
+            ...mod,
+            lessons: mod.lessons.map((l) => (l.id === updatedLesson.id ? updatedLesson : l)),
+          }
           : mod
       )
     );
-    setEditingLesson(null);
+    // Keep the editingLesson state in sync so the input field updates
+    setEditingLesson({ ...editingLesson, lesson: updatedLesson });
   };
 
   const handlePublish = () => {
@@ -160,10 +197,50 @@ const CourseBuilder: React.FC = () => {
     window.alert(`📝 Course Unpublished\n\nCourse ID: ${courseId}\nStatus: Draft\n\n⚠️ Impact of Unpublishing:\n• Course removed from catalog\n• New enrollments: Disabled\n• Existing students: Still have access\n• Course page: Private\n• Search visibility: Hidden\n\n✅ Current Students:\n• Can continue learning\n• Access to all materials maintained\n• Progress preserved\n\n🔄 To Re-publish:\n• Review and update content\n• Check settings and pricing\n• Click 'Publish' when ready\n\n💡 Use draft mode to make major updates without affecting student experience.`);
   };
 
+  const handleSaveSettings = async () => {
+    if (!courseId) return;
+
+    try {
+      // Find category ID based on name - this assumes categories are unique by name
+      // Ideally we should store category_id in state, but for now we look it up or handle it
+      let categoryId = null;
+      if (settings.category) {
+        const { data: catData } = await supabase
+          .from('categories')
+          .select('id')
+          .eq('name', settings.category)
+          .single();
+        if (catData) categoryId = catData.id;
+      }
+
+      const { error } = await supabase
+        .from('courses')
+        .update({
+          title: settings.title,
+          subtitle: settings.subtitle,
+          short_description: settings.shortDescription,
+          long_description: settings.longDescription,
+          tags: settings.tags,
+          visibility: settings.visibility,
+          language: settings.language,
+          category_id: categoryId,
+          level: settings.level,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      window.alert('Failed to save settings');
+    }
+  };
+
   const renderSection = () => {
     switch (activeSection) {
       case 'settings':
-        return <CourseSettingsForm settings={settings} onChange={setSettings} />;
+        return <CourseSettingsForm settings={settings} onChange={setSettings} onSave={handleSaveSettings} />;
       case 'curriculum':
         return (
           <CurriculumEditor

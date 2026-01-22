@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabaseClient';
 
 interface CourseSettings {
   title: string;
@@ -15,22 +16,38 @@ interface CourseSettings {
 interface CourseSettingsFormProps {
   settings: CourseSettings;
   onChange: (updatedSettings: CourseSettings) => void;
+  onSave: () => Promise<void>;
 }
 
-const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onChange }) => {
+const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onChange, onSave }) => {
   const [isSaving, setIsSaving] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name');
+
+      if (error) {
+        console.error('Error fetching categories:', error);
+      } else if (data) {
+        setCategories(data);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     onChange({ ...settings, [name]: value });
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setIsSaving(true);
-    console.log('Saving settings:', settings);
-    setTimeout(() => {
-      setIsSaving(false);
-    }, 1000);
+    await onSave();
+    setIsSaving(false);
   };
 
   return (
@@ -40,11 +57,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
         <button
           onClick={handleSave}
           disabled={isSaving}
-          className={`px-6 py-2 font-semibold rounded-full transition-all ${
-            isSaving
-              ? 'bg-green-100 text-green-700 cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
-          }`}
+          className={`px-6 py-2 font-semibold rounded-full transition-all ${isSaving
+            ? 'bg-green-100 text-green-700 cursor-not-allowed'
+            : 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
+            }`}
         >
           {isSaving ? '✓ Saved' : 'Save changes'}
         </button>
@@ -97,9 +113,11 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                   className="w-full px-4 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
                 >
                   <option value="">Select</option>
-                  <option value="Web Development">Web Development</option>
-                  <option value="Design">Design</option>
-                  <option value="Business">Business</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.name}>
+                      {cat.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -197,11 +215,10 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 key={vis}
                 type="button"
                 onClick={() => onChange({ ...settings, visibility: vis })}
-                className={`p-4 rounded-xl border-2 transition-all text-left ${
-                  settings.visibility === vis
-                    ? 'border-[#5E7BFF] bg-blue-50'
-                    : 'border-slate-200 dark:border-gray-700 hover:border-slate-300'
-                }`}
+                className={`p-4 rounded-xl border-2 transition-all text-left ${settings.visibility === vis
+                  ? 'border-[#5E7BFF] bg-blue-50'
+                  : 'border-slate-200 dark:border-gray-700 hover:border-slate-300'
+                  }`}
               >
                 <p className="font-semibold text-slate-900 dark:text-dark-text-primary capitalize mb-1">{vis}</p>
                 <p className="text-xs text-slate-600">

@@ -95,6 +95,13 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    // Basic validation
+    if (!formData.email.trim() || !formData.password.trim()) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -102,15 +109,20 @@ const Login: React.FC = () => {
       
       if (signInError) {
         setError(signInError.message);
+        setIsSubmitting(false);
         return;
       }
       
-      // Navigate to the appropriate dashboard based on role (determined by user profile)
-      navigate(getDefaultRoute());
+      // Navigate to the appropriate dashboard based on role
+      // The profile might still be fetching in UserContext, so we use a small delay 
+      // or rely on the fact that getDefaultRoute() will handle the null profile case
+      // by returning "/login" which we are already on, but ideally we wait for profile.
+      setTimeout(() => {
+        navigate(getDefaultRoute());
+      }, 100);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred';
       setError(message);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -154,8 +166,8 @@ const Login: React.FC = () => {
               </option>
             ))}
           </select>
-          <p className="mt-2 text-xs text-text-muted">
-            💡 Demo credentials are auto-filled. Just select a role and click Sign In!
+          <p className="mt-2 text-xs text-text-muted italic">
+            Please use your registered credentials to sign in.
           </p>
         </div>
 
