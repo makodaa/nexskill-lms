@@ -21,6 +21,7 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
 
   const navItems = [
     { path: '/coach/dashboard', label: 'Dashboard' },
+    { path: '/coach/demo-lesson', label: 'Lessons' },
     { path: '/coach/courses', label: 'Courses' },
     { path: '/coach/ai-tools', label: 'AI Tools' },
     { path: '/coach/quizzes', label: 'Quizzes & Assessments' },
@@ -29,8 +30,7 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
     { path: '/coach/subcoach-management', label: 'Sub-Coaches' },
     { path: '/coach/earnings', label: 'Earnings' },
     { path: '/coach/messages', label: 'Messages' },
-    { path: '/coach/profile', label: 'Profile' },
-    { path: '/coach/settings', label: 'Settings' },
+    { path: '/coach/profile', label: 'Settings' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
