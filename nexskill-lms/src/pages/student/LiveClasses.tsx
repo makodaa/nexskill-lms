@@ -138,7 +138,7 @@ const LiveClasses: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => alert('📅 Browse Schedule\n\nViewing the full schedule of upcoming live classes.')}
+              onClick={() => navigate('/student/browse-schedule')}
               className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               📅 Browse Schedule

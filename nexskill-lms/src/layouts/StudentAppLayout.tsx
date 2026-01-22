@@ -27,6 +27,7 @@ const StudentAppLayout: React.FC<StudentAppLayoutProps> = ({ children }) => {
     { path: '/student/live-classes', label: 'Live Classes', icon: '🎥' },
     { path: '/student/certificates', label: 'Certificates', icon: '🏆' },
     { path: '/student/membership', label: 'Membership', icon: '💎' },
+    { path: '/student/messages', label: 'Messages', icon: '✉️' },
     { path: '/student/profile', label: 'Profile', icon: '👤' },
     { path: '/student/settings', label: 'Settings', icon: '⚙️' },
   ];

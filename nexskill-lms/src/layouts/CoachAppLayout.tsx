@@ -29,7 +29,8 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
     { path: '/coach/subcoach-management', label: 'Sub-Coaches'},
     { path: '/coach/earnings', label: 'Earnings'},
     { path: '/coach/messages', label: 'Messages'},
-    { path: '/coach/profile', label: 'Settings'},
+    { path: '/coach/profile', label: 'Profile'},
+    { path: '/coach/settings', label: 'Settings' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
