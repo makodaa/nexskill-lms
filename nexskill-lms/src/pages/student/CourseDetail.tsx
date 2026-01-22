@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import StudentAppLayout from '../../layouts/StudentAppLayout';
-import { supabase } from '../../lib/supabaseClient';
-import type { Course } from '../../types/db';
 
 // Dummy course detail data
 const coursesData: Record<string, any> = {
@@ -388,9 +386,7 @@ const CourseDetail: React.FC = () => {
               {activeTab === 'curriculum' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">Course curriculum</h3>
-                  {course.curriculum && course.curriculum.length > 0 ? (
-                    course.curriculum.map((module: any) => (
-                      <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
+                  {course.curriculum.map((module: any) => (
                     <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
                       <button
                         onClick={() => toggleModule(module.id)}
@@ -429,13 +425,7 @@ const CourseDetail: React.FC = () => {
                         </div>
                       )}
                     </div>
-                  ))
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="text-4xl mb-4">📚</div>
-                      <p className="text-text-muted">Curriculum details coming soon</p>
-                    </div>
-                  )}
+                  ))}
                 </div>
               )}
 

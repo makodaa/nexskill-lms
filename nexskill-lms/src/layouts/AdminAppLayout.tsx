@@ -19,36 +19,36 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/admin/dashboard'},
-    { label: 'Users', path: '/admin/users'},
-    { label: 'Coaches', path: '/admin/coaches'},
-    { label: 'Courses', path: '/admin/courses/moderation'},
-    { label: 'Funnels', path: '/admin/funnels'},
-    { label: 'Finance', path: '/admin/finance'},
-    { label: 'Contacts', path: '/admin/contacts'},
-    { label: 'CRM & Marketing', path: '/admin/crm-marketing'},
-    { label: 'Notifications', path: '/admin/notifications'},
-    { label: 'Analytics', path: '/admin/analytics'},
-    { label: 'Security', path: '/admin/security'},
-    { label: 'Settings', path: '/admin/settings'},
+    { label: 'Dashboard', path: '/admin/dashboard' },
+    { label: 'Users', path: '/admin/users' },
+    { label: 'Coaches', path: '/admin/coaches' },
+    { label: 'Courses', path: '/admin/courses/moderation' },
+    { label: 'Funnels', path: '/admin/funnels' },
+    { label: 'Finance', path: '/admin/finance' },
+    { label: 'Contacts', path: '/admin/contacts' },
+    { label: 'CRM & Marketing', path: '/admin/crm-marketing' },
+    { label: 'Notifications', path: '/admin/notifications' },
+    { label: 'Analytics', path: '/admin/analytics' },
+    { label: 'Security', path: '/admin/security' },
+    { label: 'Settings', path: '/admin/settings' },
   ];
 
   const isActive = (path: string) => {
     // Exact match
     if (location.pathname === path) return true;
-    
+
     // For nested routes, check if current path starts with nav path
     // e.g., /admin/contacts/123 should highlight /admin/contacts
     if (path !== '/admin/dashboard' && location.pathname.startsWith(path + '/')) {
       return true;
     }
-    
+
     return false;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F0F4FF] via-[#E8EEFF] to-[#F0F4FF] p-8 transition-colors">
-      <div className="max-w-[1440px] mx-auto bg-white rounded-[32px] shadow-card overflow-hidden flex transition-colors" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="mx-auto bg-white rounded-[32px] shadow-card overflow-hidden flex transition-colors" style={{ minHeight: 'calc(100vh - 64px)' }}>
         {/* Left Sidebar */}
         <aside className="w-[240px] flex-shrink-0 flex flex-col p-6 border-r border-[#EDF0FB]">
           {/* Logo */}
@@ -68,11 +68,10 @@ const AdminAppLayout: React.FC<AdminAppLayoutProps> = ({ children }) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive(item.path)
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(item.path)
                     ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white shadow-md'
                     : 'text-text-secondary hover:bg-[#F0F4FF] hover:text-text-primary'
-                }`}
+                  }`}
               >
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
