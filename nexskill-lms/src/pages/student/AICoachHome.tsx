@@ -24,7 +24,7 @@ const AICoachHome: React.FC = () => {
   return (
     <StudentAppLayout>
       <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-6 transition-colors">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-1xl">
           {/* Page header */}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">AI Student Coach</h1>
