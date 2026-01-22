@@ -3,14 +3,20 @@ import BrandLockup from '../components/brand/BrandLockup';
 
 interface StudentAuthLayoutProps {
   children: React.ReactNode;
-  maxWidth?: 'small' | 'large';
+  maxWidth?: 'small' | 'large' | 'full';
 }
 
 const StudentAuthLayout: React.FC<StudentAuthLayoutProps> = ({ 
   children, 
   maxWidth = 'large' 
 }) => {
-  const widthClass = maxWidth === 'small' ? 'max-w-[600px]' : 'max-w-[1100px]';
+  const widthClasses = {
+    small: 'max-w-[600px]',
+    large: 'max-w-[1100px]',
+    full: 'max-w-full'
+  };
+
+  const widthClass = widthClasses[maxWidth];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center p-8 transition-colors">

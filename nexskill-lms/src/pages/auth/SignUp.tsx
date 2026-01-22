@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import StudentAuthLayout from '../../layouts/StudentAuthLayout';
 import { useAuth } from '../../context/AuthContext';
 import { useUser } from '../../context/UserContext';
-
 type AccountType = 'STUDENT' | 'COACH';
-
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const { signUp } = useAuth();
@@ -25,7 +23,6 @@ const SignUp: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -37,46 +34,37 @@ const SignUp: React.FC = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
-
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'First name is required';
     }
-
     if (!formData.lastName.trim()) {
       newErrors.lastName = 'Last name is required';
     }
-
     if (!formData.username.trim()) {
       newErrors.username = 'Username is required';
     }
-
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     }
-
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-
     if (!formData.agreeToTerms) {
       newErrors.agreeToTerms = 'You must agree to the terms';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
@@ -91,12 +79,10 @@ const SignUp: React.FC = () => {
           formData.username,
           accountType
         );
-
         if (error) {
           setSubmitError(error.message);
           return;
         }
-
         // Navigate to the appropriate dashboard based on role (determined by user profile)
         // Note: For email verification enabled flows, you might want to navigate to a verification page instead
         navigate(getDefaultRoute());
@@ -108,13 +94,11 @@ const SignUp: React.FC = () => {
       }
     }
   };
-
   const handleSocialSignUp = (provider: string) => {
     // Dummy social signup - navigate based on account type
     console.log(`Signing up with ${provider} as ${accountType}`);
     setSubmitError(`Social signup with ${provider} is not yet configured.`);
   };
-
   return (
     <StudentAuthLayout maxWidth="small">
       <div className="max-w-md mx-auto">
@@ -123,7 +107,6 @@ const SignUp: React.FC = () => {
           <h1 className="text-3xl font-bold text-text-primary dark:text-white mb-2">Create your account</h1>
           <p className="text-text-secondary dark:text-slate-400 text-sm">Start your learning journey today</p>
         </div>
-
         {/* Account Type Selector */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-text-primary dark:text-white mb-3 text-center">
@@ -153,7 +136,7 @@ const SignUp: React.FC = () => {
             </button>
             <button
               type="button"
-              onClick={() => setAccountType('COACH')}
+              onClick={() => navigate('/coach/apply')}
               className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
                 accountType === 'COACH'
                   ? 'border-brand-primary bg-brand-primary-soft dark:bg-blue-900/30 shadow-md'
@@ -174,7 +157,6 @@ const SignUp: React.FC = () => {
             </button>
           </div>
         </div>
-
         {/* Sign Up Form */}
         <form onSubmit={handleSignUp} className="space-y-5">
           {submitError && (
@@ -204,7 +186,6 @@ const SignUp: React.FC = () => {
                 <p className="mt-1 text-xs text-red-500 ml-2">{errors.firstName}</p>
               )}
             </div>
-
             {/* Last Name Input */}
             <div>
               <label htmlFor="lastName" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
@@ -226,7 +207,6 @@ const SignUp: React.FC = () => {
               )}
             </div>
           </div>
-
           {/* Username Input */}
           <div>
             <label htmlFor="username" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
@@ -247,7 +227,6 @@ const SignUp: React.FC = () => {
               <p className="mt-1 text-xs text-red-500 ml-2">{errors.username}</p>
             )}
           </div>
-
           {/* Email Input */}
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
@@ -268,7 +247,6 @@ const SignUp: React.FC = () => {
               <p className="mt-1 text-xs text-red-500">{errors.email}</p>
             )}
           </div>
-
           {/* Password Input */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
@@ -308,7 +286,6 @@ const SignUp: React.FC = () => {
               <p className="mt-1 text-xs text-red-500">{errors.password}</p>
             )}
           </div>
-
           {/* Confirm Password Input */}
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-text-primary dark:text-white mb-2">
@@ -348,7 +325,6 @@ const SignUp: React.FC = () => {
               <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>
             )}
           </div>
-
           {/* Terms Checkbox */}
           <div>
             <label className="flex items-start gap-2 cursor-pointer">
@@ -374,7 +350,6 @@ const SignUp: React.FC = () => {
               <p className="mt-1 text-xs text-red-500">{errors.agreeToTerms}</p>
             )}
           </div>
-
           {/* Sign Up Button */}
           <button
             type="submit"
@@ -386,14 +361,12 @@ const SignUp: React.FC = () => {
             {isSubmitting ? 'Creating account...' : 'Create account'}
           </button>
         </form>
-
         {/* Divider */}
         <div className="flex items-center gap-4 my-6">
           <div className="flex-1 h-px bg-gray-200 dark:bg-slate-600"></div>
           <span className="text-xs text-text-muted dark:text-slate-400">or sign up with</span>
           <div className="flex-1 h-px bg-gray-200 dark:bg-slate-600"></div>
         </div>
-
         {/* Social Sign Up Buttons */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           <button
@@ -430,7 +403,6 @@ const SignUp: React.FC = () => {
             </svg>
           </button>
         </div>
-
         {/* Login Link */}
         <p className="text-center text-sm text-text-secondary dark:text-slate-400">
           Already have an account?{' '}
@@ -445,5 +417,4 @@ const SignUp: React.FC = () => {
     </StudentAuthLayout>
   );
 };
-
 export default SignUp;

@@ -69,7 +69,6 @@ import Error500Page from "./pages/system/Error500Page";
 import MaintenanceModePage from "./pages/system/MaintenanceModePage";
 import SecurityCenterPage from "./pages/admin/security/SecurityCenterPage";
 import CookieConsentBanner from "./components/system/CookieConsentBanner";
-
 // New role-based placeholder dashboards
 import PlatformOwnerDashboardPage from "./pages/owner/PlatformOwnerDashboardPage";
 import UsersRolesPage from "./pages/owner/UsersRolesPage";
@@ -85,7 +84,6 @@ import SubCoachGroupsPage from "./pages/subcoach/SubCoachGroupsPage";
 import SubCoachCommunityPage from "./pages/subcoach/SubCoachCommunityPage";
 import SubCoachNotificationsPage from "./pages/subcoach/SubCoachNotificationsPage";
 import SubCoachProfilePage from "./pages/subcoach/SubCoachProfilePage";
-
 // Support Staff Pages
 import SupportDashboardPage from "./pages/support/SupportDashboardPage";
 import SupportTicketsPage from "./pages/support/SupportTicketsPage";
@@ -94,16 +92,17 @@ import SupportTechStatusPage from "./pages/support/SupportTechStatusPage";
 import SupportCertificatesPage from "./pages/support/SupportCertificatesPage";
 import SupportKnowledgeBasePage from "./pages/support/SupportKnowledgeBasePage";
 import SupportProfilePage from "./pages/support/SupportProfilePage";
-
 // Community Manager Pages
 import CommunityDashboardPage from "./pages/community/CommunityDashboardPage";
 import CommunityOverviewPage from "./pages/community/CommunityOverviewPage";
+// Coach Application Pages
+import CoachApplicationPage from "./pages/coach/CoachApplicationPage";
+import VerificationPending from "./pages/auth/VerificationPending";
 import CommunityGroupsPage from "./pages/community/CommunityGroupsPage";
 import CommunityApprovalQueuePage from "./pages/community/CommunityApprovalQueuePage";
 import CommunityAnnouncementsPage from "./pages/community/CommunityAnnouncementsPage";
 import CommunityEngagementPage from "./pages/community/CommunityEngagementPage";
 import CommunityProfilePage from "./pages/community/CommunityProfilePage";
-
 // Organization Owner Pages
 import OrgDashboardPage from "./pages/org/OrgDashboardPage";
 import OrgTeamPage from "./pages/org/OrgTeamPage";
@@ -115,7 +114,6 @@ import OrgLicensesPage from "./pages/org/OrgLicensesPage";
 import OrgBillingPage from "./pages/org/OrgBillingPage";
 import OrgBrandingPage from "./pages/org/OrgBrandingPage";
 import OrgSettingsPage from "./pages/org/OrgSettingsPage";
-
 // Content Editor Pages
 import ContentEditorDashboardPage from "./pages/content/ContentEditorDashboardPage";
 import ContentReviewQueuePage from "./pages/content/ContentReviewQueuePage";
@@ -125,10 +123,8 @@ import TranslationReviewPage from "./pages/content/TranslationReviewPage";
 import ContentSuggestionsPage from "./pages/content/ContentSuggestionsPage";
 import ContentEditorProfilePage from "./pages/content/ContentEditorProfilePage";
 import { UserProvider } from "./context/UserContext";
-
 // Role Guard (temporarily disabled for testing)
 // import RoleGuard from './components/auth/RoleGuard';
-
 function App() {
     return (
         <UiPreferencesProvider>
@@ -142,7 +138,6 @@ function App() {
                                     path="/"
                                     element={<Navigate to="/login" replace />}
                                 />
-
                                 {/* Auth Routes */}
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/signup" element={<SignUp />} />
@@ -166,7 +161,9 @@ function App() {
                                     path="/admin/login"
                                     element={<AdminLogin />}
                                 />
-
+                                {/* Coach Application Routes */}
+                                <Route path="/coach/apply" element={<CoachApplicationPage />} />
+                                <Route path="/verification-pending" element={<VerificationPending />} />
                                 {/* Role-based Dashboard Routes */}
                                 {/* Platform Owner Routes */}
                                 <Route
@@ -193,7 +190,6 @@ function App() {
                                     path="/owner/ai-governance"
                                     element={<AiGovernancePage />}
                                 />
-
                                 {/* Admin Routes - accessible by PLATFORM_OWNER and ADMIN */}
                                 <Route
                                     path="/admin/dashboard"
@@ -251,7 +247,6 @@ function App() {
                                     path="/admin/settings"
                                     element={<AdminSystemSettingsPage />}
                                 />
-
                                 {/* Coach Routes */}
                                 <Route
                                     path="/coach/dashboard"
@@ -305,7 +300,6 @@ function App() {
                                     path="/coach/subcoach-management"
                                     element={<SubCoachManagement />}
                                 />
-
                                 {/* Sub-Coach Routes */}
                                 <Route
                                     path="/subcoach/dashboard"
@@ -339,7 +333,6 @@ function App() {
                                     path="/subcoach/profile"
                                     element={<SubCoachProfilePage />}
                                 />
-
                                 {/* Content Editor Routes - RoleGuard temporarily disabled for testing */}
                                 <Route
                                     path="/content/dashboard"
@@ -369,7 +362,6 @@ function App() {
                                     path="/content/profile"
                                     element={<ContentEditorProfilePage />}
                                 />
-
                                 {/* Community Manager Routes - RoleGuard temporarily disabled for testing */}
                                 <Route
                                     path="/community/dashboard"
@@ -399,7 +391,6 @@ function App() {
                                     path="/community/profile"
                                     element={<CommunityProfilePage />}
                                 />
-
                                 {/* Support Staff Routes - RoleGuard temporarily disabled for testing */}
                                 <Route
                                     path="/support/dashboard"
@@ -429,7 +420,6 @@ function App() {
                                     path="/support/profile"
                                     element={<SupportProfilePage />}
                                 />
-
                                 {/* Organization Owner Routes - RoleGuard temporarily disabled for testing */}
                                 <Route
                                     path="/org/dashboard"
@@ -471,7 +461,6 @@ function App() {
                                     path="/org/settings"
                                     element={<OrgSettingsPage />}
                                 />
-
                                 {/* Student Routes */}
                                 <Route
                                     path="/student/dashboard"
@@ -489,7 +478,6 @@ function App() {
                                     path="/student/courses/:courseId/lessons/:lessonId"
                                     element={<CoursePlayer />}
                                 />
-
                                 {/* Quiz Routes */}
                                 <Route
                                     path="/student/courses/:courseId/quizzes/:quizId"
@@ -503,7 +491,6 @@ function App() {
                                     path="/student/courses/:courseId/quizzes/:quizId/result"
                                     element={<QuizResult />}
                                 />
-
                                 {/* Community Routes */}
                                 <Route
                                     path="/student/community"
@@ -517,13 +504,11 @@ function App() {
                                     path="/student/courses/:courseId/circle"
                                     element={<CourseCircle />}
                                 />
-
                                 {/* AI Coach Route */}
                                 <Route
                                     path="/student/ai-coach"
                                     element={<AICoachHome />}
                                 />
-
                                 {/* Coaching Routes */}
                                 <Route
                                     path="/student/coaching"
@@ -541,7 +526,6 @@ function App() {
                                     path="/student/coaching/sessions"
                                     element={<CoachingSessions />}
                                 />
-
                                 {/* Live Classes Routes */}
                                 <Route
                                     path="/student/live-classes"
@@ -551,7 +535,6 @@ function App() {
                                     path="/student/live-class/:classId"
                                     element={<LiveClassRoom />}
                                 />
-
                                 {/* Profile Routes */}
                                 <Route
                                     path="/student/profile"
@@ -573,7 +556,6 @@ function App() {
                                     path="/student/settings/billing"
                                     element={<StudentBilling />}
                                 />
-
                                 {/* Certificates Routes */}
                                 <Route
                                     path="/student/certificates"
@@ -583,7 +565,6 @@ function App() {
                                     path="/student/certificates/:certificateId"
                                     element={<CertificateDetail />}
                                 />
-
                                 {/* Membership Routes */}
                                 <Route
                                     path="/student/membership"
@@ -597,19 +578,16 @@ function App() {
                                     path="/student/membership/confirmation"
                                     element={<MembershipConfirmation />}
                                 />
-
                                 {/* Student Messages Route */}
                                 <Route
                                     path="/student/messages"
                                     element={<StudentMessages />}
                                 />
-
                                 {/* Public Certificate Verification Route */}
                                 <Route
                                     path="/certificates/verify/:hash"
                                     element={<CertificateVerify />}
                                 />
-
                                 {/* System Error & Maintenance Routes */}
                                 <Route path="/404" element={<Error404Page />} />
                                 <Route path="/500" element={<Error500Page />} />
@@ -617,7 +595,6 @@ function App() {
                                     path="/maintenance"
                                     element={<MaintenanceModePage />}
                                 />
-
                                 {/* Catch-all route for 404 */}
                                 <Route path="*" element={<Error404Page />} />
                             </Routes>
@@ -629,5 +606,4 @@ function App() {
         </UiPreferencesProvider>
     );
 }
-
 export default App;

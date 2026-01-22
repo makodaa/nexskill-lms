@@ -20,7 +20,7 @@ interface AuthContextValue {
         lastName?: string,
         username?: string,
         role?: string
-    ) => Promise<{ data?: Record<string, unknown>; error: AuthError | null }>;
+    ) => Promise<{ data: { user: User | null } | null; error: AuthError | null }>;
     signIn: (
         email: string,
         password: string
