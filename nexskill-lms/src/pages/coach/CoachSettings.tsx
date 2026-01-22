@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import StudentAppLayout from '../../layouts/StudentAppLayout';
+import CoachAppLayout from '../../layouts/CoachAppLayout';
 import ProfileInterestsGoals from '../../components/profile/ProfileInterestsGoals';
 import ProfileLanguagePreferences from '../../components/profile/ProfileLanguagePreferences';
 import ProfileNotificationSettings from '../../components/profile/ProfileNotificationSettings';
@@ -9,7 +9,7 @@ import ThemeToggle from '../../components/system/ThemeToggle';
 
 type TabType = 'account' | 'preferences' | 'notifications' | 'privacy' | 'accessibility';
 
-const StudentSettings: React.FC = () => {
+const CoachSettings: React.FC = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('account');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -20,9 +20,9 @@ const StudentSettings: React.FC = () => {
 
   // State for all settings
   const [interestsGoals, setInterestsGoals] = useState({
-    interests: ['Design', 'Business', 'Career'],
-    goals: ['Get a job', 'Start a side project'],
-    level: 'Intermediate',
+    interests: ['Coaching', 'Mentoring', 'Business'],
+    goals: ['Help students succeed', 'Build coaching skills'],
+    level: 'Advanced',
   });
 
   const [languagePrefs, setLanguagePrefs] = useState({
@@ -41,7 +41,7 @@ const StudentSettings: React.FC = () => {
   });
 
   const [accountSettings, setAccountSettings] = useState({
-    email: 'sarah.johnson@example.com',
+    email: 'coach.johnson@example.com',
     timezone: 'Pacific Time (PST)',
     lastPasswordUpdate: 'Nov 15, 2025',
   });
@@ -100,18 +100,18 @@ const StudentSettings: React.FC = () => {
   ];
 
   return (
-    <StudentAppLayout>
+    <CoachAppLayout>
       {/* Header */}
       <div className="px-8 py-6 border-b border-[#EDF0FB] dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-1">Settings</h1>
+            <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-1">Coach Settings</h1>
             <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
-              Manage your account and customize your learning experience
+              Manage your account and customize your coaching experience
             </p>
           </div>
           <button
-            onClick={() => navigate('/student/profile')}
+            onClick={() => navigate('/coach/profile')}
             className="px-4 py-2 text-sm font-medium text-brand-primary hover:bg-blue-50 rounded-xl transition-colors"
           >
             ← Back to Profile
@@ -135,7 +135,7 @@ const StudentSettings: React.FC = () => {
           </div>
         )}
 
-        <div className="max-w-1xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           {/* Tabs */}
           <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 mb-6">
             <div className="flex overflow-x-auto">
@@ -143,10 +143,11 @@ const StudentSettings: React.FC = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 min-w-[140px] px-6 py-4 text-sm font-medium transition-all whitespace-nowrap ${activeTab === tab.id
+                  className={`flex-1 min-w-[140px] px-6 py-4 text-sm font-medium transition-all whitespace-nowrap ${
+                    activeTab === tab.id
                       ? 'text-brand-primary border-b-2 border-brand-primary bg-blue-50'
                       : 'text-text-secondary hover:bg-gray-50'
-                    }`}
+                  }`}
                 >
                   <span className="mr-2">{tab.icon}</span>
                   {tab.label}
@@ -161,7 +162,7 @@ const StudentSettings: React.FC = () => {
             {activeTab === 'account' && (
               <div className="space-y-6">
                 <ProfileAccountSettingsForm account={accountSettings} onChange={setAccountSettings} />
-
+                
                 {/* Delete Account Section */}
                 <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-red-200 p-6">
                   <h3 className="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-2">Danger Zone</h3>
@@ -194,15 +195,15 @@ const StudentSettings: React.FC = () => {
                   onChange={setInterestsGoals}
                 />
                 <ProfileLanguagePreferences preferences={languagePrefs} onChange={setLanguagePrefs} />
-
-                {/* Learning Preferences */}
+                
+                {/* Coaching Preferences */}
                 <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 p-6">
-                  <h3 className="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Learning Preferences</h3>
+                  <h3 className="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Coaching Preferences</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Auto-play next lesson</p>
-                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Automatically start the next lesson when one finishes</p>
+                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Auto-assign new students</p>
+                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Automatically assign new students to your coaching sessions</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -211,8 +212,8 @@ const StudentSettings: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Video playback speed memory</p>
-                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Remember your preferred playback speed</p>
+                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Weekly progress reports</p>
+                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Receive weekly reports on student progress</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" defaultChecked />
@@ -221,8 +222,8 @@ const StudentSettings: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Download for offline</p>
-                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Allow downloading courses for offline viewing</p>
+                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Session reminders</p>
+                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Get reminders for upcoming coaching sessions</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" className="sr-only peer" />
@@ -241,7 +242,7 @@ const StudentSettings: React.FC = () => {
                   settings={notificationSettings}
                   onChange={setNotificationSettings}
                 />
-
+                
                 {/* Email Digest Settings */}
                 <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 p-6">
                   <h3 className="text-lg font-bold text-text-primary dark:text-dark-text-primary mb-4">Email Digest</h3>
@@ -268,7 +269,7 @@ const StudentSettings: React.FC = () => {
                       <label className="text-sm font-medium text-text-primary mb-2 block">
                         Who can see your profile?
                       </label>
-                      <select
+                      <select 
                         value={privacySettings.profileVisibility}
                         onChange={(e) => setPrivacySettings({ ...privacySettings, profileVisibility: e.target.value })}
                         className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
@@ -278,16 +279,16 @@ const StudentSettings: React.FC = () => {
                         <option value="private">Only me</option>
                       </select>
                     </div>
-
+                    
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                       <div>
-                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Show course progress</p>
-                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Display your progress publicly on your profile</p>
+                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Show coaching stats</p>
+                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Display your coaching statistics publicly</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={privacySettings.showProgress}
                           onChange={(e) => setPrivacySettings({ ...privacySettings, showProgress: e.target.checked })}
                         />
@@ -297,13 +298,13 @@ const StudentSettings: React.FC = () => {
 
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                       <div>
-                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Show certificates</p>
-                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Display earned certificates on your profile</p>
+                        <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Show certifications</p>
+                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Display earned coaching certifications</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={privacySettings.showCertificates}
                           onChange={(e) => setPrivacySettings({ ...privacySettings, showCertificates: e.target.checked })}
                         />
@@ -314,12 +315,12 @@ const StudentSettings: React.FC = () => {
                     <div className="flex items-center justify-between pt-4 border-t border-gray-200">
                       <div>
                         <p className="text-sm font-medium text-text-primary dark:text-dark-text-primary">Allow direct messages</p>
-                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Let other students send you messages</p>
+                        <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Let students send you messages</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={privacySettings.allowMessages}
                           onChange={(e) => setPrivacySettings({ ...privacySettings, allowMessages: e.target.checked })}
                         />
@@ -338,16 +339,16 @@ const StudentSettings: React.FC = () => {
                         <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Share anonymous usage data to improve the platform</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={privacySettings.shareDataForImprovement}
                           onChange={(e) => setPrivacySettings({ ...privacySettings, shareDataForImprovement: e.target.checked })}
                         />
                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-primary"></div>
                       </label>
                     </div>
-
+                    
                     <div className="pt-4 border-t border-gray-200">
                       <button
                         onClick={() => setShowDownloadModal(true)}
@@ -371,7 +372,7 @@ const StudentSettings: React.FC = () => {
                       <label className="text-sm font-medium text-text-primary mb-2 block">
                         Font Size
                       </label>
-                      <select
+                      <select 
                         value={accessibilitySettings.fontSize}
                         onChange={(e) => setAccessibilitySettings({ ...accessibilitySettings, fontSize: e.target.value })}
                         className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
@@ -389,9 +390,9 @@ const StudentSettings: React.FC = () => {
                         <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Increase contrast for better readability</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={accessibilitySettings.highContrast}
                           onChange={(e) => setAccessibilitySettings({ ...accessibilitySettings, highContrast: e.target.checked })}
                         />
@@ -405,9 +406,9 @@ const StudentSettings: React.FC = () => {
                         <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Minimize animations and transitions</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={accessibilitySettings.reducedMotion}
                           onChange={(e) => setAccessibilitySettings({ ...accessibilitySettings, reducedMotion: e.target.checked })}
                         />
@@ -426,9 +427,9 @@ const StudentSettings: React.FC = () => {
                         <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Optimize interface for screen readers</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={accessibilitySettings.screenReaderOptimized}
                           onChange={(e) => setAccessibilitySettings({ ...accessibilitySettings, screenReaderOptimized: e.target.checked })}
                         />
@@ -442,9 +443,9 @@ const StudentSettings: React.FC = () => {
                         <p className="text-xs text-text-secondary dark:text-dark-text-secondary">Enable advanced keyboard shortcuts</p>
                       </div>
                       <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
+                        <input 
+                          type="checkbox" 
+                          className="sr-only peer" 
                           checked={accessibilitySettings.keyboardNavigation}
                           onChange={(e) => setAccessibilitySettings({ ...accessibilitySettings, keyboardNavigation: e.target.checked })}
                         />
@@ -469,7 +470,7 @@ const StudentSettings: React.FC = () => {
             <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-gray-700 p-6 sticky bottom-0">
               <div className="flex items-center justify-between">
                 <button
-                  onClick={() => navigate('/student/dashboard')}
+                  onClick={() => navigate('/coach/dashboard')}
                   className="px-6 py-2.5 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
                 >
                   Cancel
@@ -551,9 +552,9 @@ const StudentSettings: React.FC = () => {
                 </p>
                 <ul className="text-xs text-blue-700 space-y-1 ml-4 list-disc">
                   <li>Profile information and settings</li>
-                  <li>Course enrollment history</li>
-                  <li>Progress and achievements</li>
-                  <li>Certificates earned</li>
+                  <li>Coaching session history</li>
+                  <li>Student progress reports</li>
+                  <li>Certifications earned</li>
                   <li>Discussion posts and comments</li>
                 </ul>
               </div>
@@ -596,8 +597,8 @@ const StudentSettings: React.FC = () => {
                       <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">G + D</kbd>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Go to Courses</span>
-                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">G + C</kbd>
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Go to Students</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">G + S</kbd>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
                       <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Search</span>
@@ -606,23 +607,15 @@ const StudentSettings: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">Video Player</h3>
+                  <h3 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">Coaching Tools</h3>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Play/Pause</span>
-                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">Space</kbd>
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Start Session</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">Ctrl + S</kbd>
                     </div>
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Skip Forward 10s</span>
-                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">→</kbd>
-                    </div>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Skip Backward 10s</span>
-                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">←</kbd>
-                    </div>
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700">
-                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">Toggle Fullscreen</span>
-                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">F</kbd>
+                      <span className="text-sm text-text-secondary dark:text-dark-text-secondary">View Progress</span>
+                      <kbd className="px-3 py-1 bg-gray-100 dark:bg-gray-800 rounded-lg text-xs font-mono">Ctrl + P</kbd>
                     </div>
                   </div>
                 </div>
@@ -652,8 +645,8 @@ const StudentSettings: React.FC = () => {
           </div>
         </div>
       )}
-    </StudentAppLayout>
+    </CoachAppLayout>
   );
 };
 
-export default StudentSettings;
+export default CoachSettings;
