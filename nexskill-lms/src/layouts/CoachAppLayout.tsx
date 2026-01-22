@@ -20,16 +20,16 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
   };
 
   const navItems = [
-    { path: '/coach/dashboard', label: 'Dashboard'},
-    { path: '/coach/courses', label: 'Courses'},
-    { path: '/coach/ai-tools', label: 'AI Tools'},
-    { path: '/coach/quizzes', label: 'Quizzes & Assessments'},
-    { path: '/coach/coaching-tools', label: 'Coaching Tools'},
-    { path: '/coach/students', label: 'Students'},
-    { path: '/coach/subcoach-management', label: 'Sub-Coaches'},
-    { path: '/coach/earnings', label: 'Earnings'},
-    { path: '/coach/messages', label: 'Messages'},
-    { path: '/coach/profile', label: 'Profile'},
+    { path: '/coach/dashboard', label: 'Dashboard' },
+    { path: '/coach/courses', label: 'Courses' },
+    { path: '/coach/ai-tools', label: 'AI Tools' },
+    { path: '/coach/quizzes', label: 'Quizzes & Assessments' },
+    { path: '/coach/coaching-tools', label: 'Coaching Tools' },
+    { path: '/coach/students', label: 'Students' },
+    { path: '/coach/subcoach-management', label: 'Sub-Coaches' },
+    { path: '/coach/earnings', label: 'Earnings' },
+    { path: '/coach/messages', label: 'Messages' },
+    { path: '/coach/profile', label: 'Profile' },
     { path: '/coach/settings', label: 'Settings' },
   ];
 
@@ -37,7 +37,7 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E7F0FF] via-[#F9F0FF] to-[#E3F4FF] dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-8 transition-colors">
-      <div className="max-w-[1440px] mx-auto bg-white dark:bg-dark-background-shell rounded-[32px] shadow-card overflow-hidden flex transition-colors" style={{ minHeight: 'calc(100vh - 64px)' }}>
+      <div className="mx-auto bg-white dark:bg-dark-background-shell rounded-[32px] shadow-card overflow-hidden flex transition-colors" style={{ minHeight: 'calc(100vh - 64px)' }}>
         {/* Left Sidebar */}
         <aside className="w-[240px] flex-shrink-0 flex flex-col p-6 border-r border-[#EDF0FB] dark:border-gray-700">
           {/* Logo */}
@@ -57,11 +57,10 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
-                  isActive(item.path)
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${isActive(item.path)
                     ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium shadow-md'
                     : 'text-text-secondary dark:text-dark-text-secondary hover:bg-[#F5F7FF] dark:hover:bg-gray-800 hover:text-brand-primary dark:hover:text-blue-400'
-                }`}
+                  }`}
               >
                 <span className="text-sm">{item.label}</span>
               </Link>
@@ -96,7 +95,7 @@ const CoachAppLayout: React.FC<CoachAppLayoutProps> = ({ children }) => {
           <div className="flex items-center justify-end px-8 pt-6 pb-4 border-b border-[#EDF0FB] dark:border-gray-700">
             <GlobalTopBarControls />
           </div>
-          
+
           <div className="flex-1 overflow-auto">
             {children}
           </div>

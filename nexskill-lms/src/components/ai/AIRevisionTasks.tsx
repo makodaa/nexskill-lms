@@ -44,7 +44,7 @@ const AIRevisionTasks: React.FC = () => {
   const completedCount = tasks.filter((t) => t.completed).length;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-5 transition-colors flex flex-col">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-5 transition-colors max-h-[300px] flex flex-col">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
