@@ -34,12 +34,12 @@ import CertificateVerify from "./pages/student/CertificateVerify";
 import MembershipPlans from "./pages/student/MembershipPlans";
 import MembershipManage from "./pages/student/MembershipManage";
 import MembershipConfirmation from "./pages/student/MembershipConfirmation";
+import StudentMessages from "./pages/student/StudentMessages";
 import LiveClassRoom from "./pages/student/LiveClassRoom";
 import LiveClasses from "./pages/student/LiveClasses";
 import CoachDashboard from "./pages/coach/CoachDashboard";
 import CourseList from "./pages/coach/CourseList";
 import CourseCreate from "./pages/coach/CourseCreate";
-import DemoCreateLesson from "./pages/coach/DemoCreateLesson";
 import CourseBuilder from "./pages/coach/CourseBuilder";
 import AICourseToolsHome from "./pages/coach/AICourseToolsHome";
 import CourseStudents from "./pages/coach/CourseStudents";
@@ -134,8 +134,8 @@ function App() {
         <UiPreferencesProvider>
             <AuthProvider>
                 <UserProvider>
-                    <BrowserRouter>
-                        <ErrorBoundary>
+                    <ErrorBoundary>
+                        <BrowserRouter>
                             <Routes>
                                 {/* Redirect root to login */}
                                 <Route
@@ -264,10 +264,6 @@ function App() {
                                 <Route
                                     path="/coach/courses/new"
                                     element={<CourseCreate />}
-                                />
-                                <Route
-                                    path="/coach/demo-lesson"
-                                    element={<DemoCreateLesson />}
                                 />
                                 <Route
                                     path="/coach/courses/:courseId/edit"
@@ -602,6 +598,12 @@ function App() {
                                     element={<MembershipConfirmation />}
                                 />
 
+                                {/* Student Messages Route */}
+                                <Route
+                                    path="/student/messages"
+                                    element={<StudentMessages />}
+                                />
+
                                 {/* Public Certificate Verification Route */}
                                 <Route
                                     path="/certificates/verify/:hash"
@@ -619,12 +621,12 @@ function App() {
                                 {/* Catch-all route for 404 */}
                                 <Route path="*" element={<Error404Page />} />
                             </Routes>
-                        </ErrorBoundary>
-                    </BrowserRouter>
+                        </BrowserRouter>
+                    </ErrorBoundary>
                     <CookieConsentBanner />
                 </UserProvider>
             </AuthProvider>
-        </UiPreferencesProvider >
+        </UiPreferencesProvider>
     );
 }
 
