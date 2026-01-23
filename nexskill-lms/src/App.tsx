@@ -7,7 +7,7 @@ import SignUp from "./pages/auth/SignUp";
 import EmailVerification from "./pages/auth/EmailVerification";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
-import OnboardingPreferences from "./pages/auth/OnboardingPreferences";
+import OnboardingPreferences from "./pages/student/OnboardingPreferences";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import CourseCatalog from "./pages/student/CourseCatalog";
 import CourseDetail from "./pages/student/CourseDetail";
@@ -154,7 +154,7 @@ function App() {
                                     element={<ResetPassword />}
                                 />
                                 <Route
-                                    path="/onboarding-preferences"
+                                    path="/student/onboarding-preferences"
                                     element={<OnboardingPreferences />}
                                 />
                                 <Route
