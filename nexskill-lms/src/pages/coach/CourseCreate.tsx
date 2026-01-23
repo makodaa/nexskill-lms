@@ -63,6 +63,7 @@ const CourseCreate: React.FC = () => {
             level: formData.level,
             duration_hours: 0, // Default for now, can be updated later
             price: 0, // Default for now
+            visibility: 'private', // Default to private (Draft)
             coach_id: profile.id,
           },
         ])

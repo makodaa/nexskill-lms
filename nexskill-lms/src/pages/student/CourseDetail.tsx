@@ -1,37 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import StudentAppLayout from "../../layouts/StudentAppLayout";
-import { supabase } from "../../lib/supabaseClient";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import StudentAppLayout from '../../layouts/StudentAppLayout';
 
-// Course display interface (combination of DB and mock data)
-interface CourseDisplay {
-  id: string;
-  title: string;
-  category: string;
-  level: string;
-  rating: number;
-  reviewCount: number;
-  studentsCount: number;
-  duration: string;
-  price: number;
-  originalPrice?: number;
-  description: string;
-  whatYouLearn?: string[];
-  tools?: string[];
-  curriculum?: unknown[];
-  reviews?: unknown[];
-  coach?: unknown;
-  includes?: string[];
-}
-
-// Dummy course detail data (used as fallback if DB fetch fails)
-const coursesData: Record<string, CourseDisplay> = {
-  "1": {
-    id: "1",
-    title: "Complete UI/UX Design Bootcamp",
-    category: "Design",
-    level: "Beginner",
+// Dummy course detail data
+const coursesData: Record<string, any> = {
+  '1': {
+    id: '1',
+    title: 'Complete UI/UX Design Bootcamp',
+    category: 'Design',
+    level: 'Beginner',
     rating: 4.8,
     reviewCount: 1240,
     studentsCount: 12450,
@@ -520,11 +497,119 @@ const CourseDetail: React.FC = () => {
                               {item}
                             </span>
                           </div>
-                        ),
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {course.tools && course.tools.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">Tools & Technologies</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {course.tools.map((tool: string) => (
+                          <span
+                            key={tool}
+                            className="px-4 py-2 bg-[#F5F7FF] dark:bg-gray-800 text-brand-primary rounded-full text-sm font-medium"
+                          >
+                            {tool}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'curriculum' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">Course curriculum</h3>
+                  {course.curriculum.map((module: any) => (
+                    <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
+                      <button
+                        onClick={() => toggleModule(module.id)}
+                        className="w-full flex items-center justify-between p-4 hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <svg
+                            className={`w-5 h-5 text-text-muted transition-transform ${
+                              expandedModules.includes(module.id) ? 'rotate-90' : ''
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                          <span className="font-medium text-text-primary dark:text-dark-text-primary">{module.title}</span>
+                        </div>
+                        <span className="text-sm text-text-muted dark:text-dark-text-muted">{module.lessons.length} lessons</span>
+                      </button>
+
+                      {expandedModules.includes(module.id) && (
+                        <div className="bg-[#FAFBFF] p-4 space-y-2">
+                          {module.lessons.map((lesson: any) => (
+                            <div
+                              key={lesson.id}
+                              className="flex items-center justify-between py-2 px-3 hover:bg-white dark:bg-dark-background-card rounded-lg transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-text-muted dark:text-dark-text-muted">▶️</span>
+                                <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{lesson.title}</span>
+                              </div>
+                              <span className="text-xs text-text-muted dark:text-dark-text-muted">{lesson.duration}</span>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
+              )}
+
+              {activeTab === 'reviews' && (
+                <div className="space-y-6">
+                  {course.reviews && course.reviews.length > 0 ? (
+                    <>
+                      <div className="flex items-center gap-8 pb-6 border-b border-[#EDF0FB] dark:border-gray-700">
+                        <div className="text-center">
+                          <div className="text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-1">{course.rating}</div>
+                          <div className="text-yellow-500 text-xl mb-1">★★★★★</div>
+                          <div className="text-sm text-text-muted dark:text-dark-text-muted">{course.reviewCount} reviews</div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                    {course.reviews.map((review: any) => (
+                      <div key={review.id} className="pb-6 border-b border-[#EDF0FB] dark:border-gray-700 last:border-0">
+                        <div className="flex items-start gap-4">
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-2xl flex-shrink-0">
+                            {review.avatar}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-2">
+                              <div>
+                                <p className="font-medium text-text-primary dark:text-dark-text-primary">{review.userName}</p>
+                                <p className="text-xs text-text-muted dark:text-dark-text-muted">{review.date}</p>
+                              </div>
+                              <div className="text-yellow-500">
+                                {'★'.repeat(review.rating)}
+                              </div>
+                            </div>
+                            <p className="text-sm text-text-secondary dark:text-dark-text-secondary">{review.comment}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="text-4xl mb-4">⭐</div>
+                      <p className="text-text-muted">No reviews yet. Be the first to review this course!</p>
+                    </div>
+                  )}
+                </div>
+              )}
 
                 {course.tools && course.tools.length > 0 && (
                   <div>

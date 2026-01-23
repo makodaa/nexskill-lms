@@ -138,7 +138,7 @@ const LiveClasses: React.FC = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => alert('📅 Browse Schedule\n\nViewing the full schedule of upcoming live classes.')}
+              onClick={() => navigate('/student/browse-schedule')}
               className="px-4 py-2 text-sm font-medium text-text-secondary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
               📅 Browse Schedule
@@ -155,37 +155,34 @@ const LiveClasses: React.FC = () => {
 
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-8">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-1xl">
           {/* Tabs */}
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-[#EDF0FB] dark:border-slate-700 mb-6">
             <div className="flex">
               <button
                 onClick={() => setActiveTab('upcoming')}
-                className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${
-                  activeTab === 'upcoming'
+                className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${activeTab === 'upcoming'
                     ? 'text-brand-primary dark:text-blue-400 border-b-2 border-brand-primary dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
                     : 'text-text-secondary dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
-                }`}
+                  }`}
               >
                 🎥 Upcoming ({upcomingClasses.length})
               </button>
               <button
                 onClick={() => setActiveTab('completed')}
-                className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${
-                  activeTab === 'completed'
+                className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${activeTab === 'completed'
                     ? 'text-brand-primary dark:text-blue-400 border-b-2 border-brand-primary dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
                     : 'text-text-secondary dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
-                }`}
+                  }`}
               >
                 ✅ Completed ({completedClasses.length})
               </button>
               <button
                 onClick={() => setActiveTab('recorded')}
-                className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${
-                  activeTab === 'recorded'
+                className={`flex-1 px-6 py-4 text-sm font-medium transition-all ${activeTab === 'recorded'
                     ? 'text-brand-primary dark:text-blue-400 border-b-2 border-brand-primary dark:border-blue-400 bg-blue-50 dark:bg-blue-900/20'
                     : 'text-text-secondary dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-700'
-                }`}
+                  }`}
               >
                 📹 Recorded ({recordedClasses.length})
               </button>

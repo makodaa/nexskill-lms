@@ -1,133 +1,100 @@
-import { useState, useEffect, useMemo } from "react";
-import { supabase } from "../lib/supabaseClient";
-import type { Course } from "../types/db";
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
+import type { Course } from '../types/db';
 
-interface CourseListItem {
-  id: string;
-  title: string;
-  category: string;
-  level: "Beginner" | "Intermediate" | "Advanced";
-  rating: number;
-  studentsCount: number;
-  duration: string;
-  price: number;
-  originalPrice?: number;
-  isBestseller: boolean;
-  isNew: boolean;
-  thumbnail: string;
-  shortDescription: string;
-}
+export const useCourses = () => {
+    const [courses, setCourses] = useState<Course[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-interface CourseFilters {
-  searchQuery: string;
-  category: string;
-  level: string;
-  sortBy: string;
-}
+    useEffect(() => {
+        fetchCourses();
+    }, []);
 
-export const useCourses = (filters: CourseFilters) => {
-  const [allCourses, setAllCourses] = useState<CourseListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch courses from database
-  useEffect(() => {
     const fetchCourses = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+        try {
+            setLoading(true);
+            // Fetch courses with related category information if possible
+            // Note: we might need to adjust the query based on exact foreign key names
+            // For now, simple fetch
+            const { data, error } = await supabase
+                .from('courses')
+                .select(`
+          *,
+          category:categories(name)
+        `);
 
-        const { data, error: fetchError } = await supabase
-          .from("courses")
-          .select("*")
-          .order("created_at", { ascending: false });
+            if (error) throw error;
 
-        if (fetchError) {
-          throw fetchError;
+            // Transform data if necessary, or just set it
+            // Supabase returns nested data for joined tables.
+            // We might want to map it to our Course interface slightly if structure differs.
+            // For now, assuming strict match or tolerant UI.
+
+            setCourses(data as unknown as Course[]);
+        } catch (err: any) {
+            console.error('Error fetching courses:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
         }
-
-        if (data) {
-          const mappedCourses = data.map((course: Course) => ({
-            id: course.id,
-            title: course.title,
-            category: "General", // TODO: Join with categories table
-            level: course.level,
-            rating: 0, // TODO: Calculate from reviews
-            studentsCount: 0, // TODO: Count from enrollments
-            duration: `${course.duration_hours}h`,
-            price: course.price,
-            originalPrice: undefined,
-            isBestseller: false,
-            isNew: false,
-            thumbnail: "gradient-blue-purple",
-            shortDescription:
-              course.short_description || "No description available",
-          }));
-          setAllCourses(mappedCourses);
-        }
-      } catch (err) {
-        console.error("Error fetching courses:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch courses",
-        );
-      } finally {
-        setLoading(false);
-      }
     };
 
-    fetchCourses();
-  }, []);
+    return { courses, loading, error, refetch: fetchCourses };
+};
 
-  // Filter and sort courses
-  const filteredCourses = useMemo(() => {
-    let filtered = [...allCourses];
+export const useCourse = (courseId: string | undefined) => {
+    const [course, setCourse] = useState<Course | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // Search filter
-    if (filters.searchQuery) {
-      const query = filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (course) =>
-          course.title.toLowerCase().includes(query) ||
-          course.shortDescription.toLowerCase().includes(query),
-      );
-    }
+    useEffect(() => {
+        if (!courseId) return;
+        fetchCourse();
+    }, [courseId]);
 
-    // Category filter
-    if (filters.category !== "All") {
-      filtered = filtered.filter(
-        (course) => course.category === filters.category,
-      );
-    }
+    const fetchCourse = async () => {
+        if (!courseId) return;
 
-    // Level filter
-    if (filters.level !== "All") {
-      filtered = filtered.filter((course) => course.level === filters.level);
-    }
+        try {
+            setLoading(true);
 
-    // Sorting
-    switch (filters.sortBy) {
-      case "Most popular":
-        filtered.sort((a, b) => b.studentsCount - a.studentsCount);
-        break;
-      case "Highest rated":
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case "Newest":
-        filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-        break;
-      case "Price: low to high":
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-    }
+            // Fetch course with modules and lessons
+            // Assuming 'modules' table has foreign key 'course_id'
+            // and 'lessons' table has foreign key 'module_id'
 
-    return filtered;
-  }, [allCourses, filters]);
+            const { data, error } = await supabase
+                .from('courses')
+                .select(`
+          *,
+          modules (
+            *,
+            lessons (*)
+          )
+        `)
+                .eq('id', courseId)
+                .single();
 
-  return {
-    courses: filteredCourses,
-    loading,
-    error,
-    totalCount: allCourses.length,
-    filteredCount: filteredCourses.length,
-  };
+            if (error) throw error;
+
+            // Sort modules and lessons by order_index if available
+            if (data && data.modules) {
+                data.modules.sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0));
+                data.modules.forEach((mod: any) => {
+                    if (mod.lessons) {
+                        mod.lessons.sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0));
+                    }
+                });
+            }
+
+            setCourse(data as unknown as Course);
+        } catch (err: any) {
+            console.error('Error fetching course:', err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return { course, loading, error };
 };
