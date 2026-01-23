@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-
-interface Lesson {
-  id: string;
-  title: string;
-  type: 'video' | 'pdf' | 'quiz' | 'live';
-  duration: string;
-  summary: string;
-}
+import type { Lesson } from '../../types/lesson';
 
 interface Module {
   id: string;
@@ -18,9 +11,12 @@ interface CurriculumEditorProps {
   curriculum: Module[];
   onChange: (updatedCurriculum: Module[]) => void;
   onEditLesson: (moduleId: string, lessonId: string) => void;
+  onAddLesson?: (moduleId: string, newLesson: Lesson) => Promise<void>;
+  onDeleteLesson?: (moduleId: string, lessonId: string) => Promise<void>;
+  onMoveLesson?: (moduleId: string, lessonId: string, direction: 'up' | 'down') => Promise<void>;
 }
 
-const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChange, onEditLesson }) => {
+const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChange, onEditLesson, onAddLesson, onDeleteLesson, onMoveLesson }) => {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(curriculum.map((m) => m.id)));
 
   const toggleModule = (moduleId: string) => {
@@ -44,21 +40,37 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
     onChange([...curriculum, newModule]);
   };
 
-  const handleAddLesson = (moduleId: string) => {
-    const updatedCurriculum = curriculum.map((module) => {
-      if (module.id === moduleId) {
-        const newLesson: Lesson = {
-          id: `lesson-${Date.now()}`,
-          title: `Lesson ${module.lessons.length + 1}`,
-          type: 'video',
-          duration: '0 min',
-          summary: '',
-        };
-        return { ...module, lessons: [...module.lessons, newLesson] };
-      }
-      return module;
-    });
-    onChange(updatedCurriculum);
+  const handleAddLesson = async (moduleId: string) => {
+    // Find the module to get the lesson count
+    const module = curriculum.find(m => m.id === moduleId);
+
+    // Create a temporary lesson object with a placeholder ID
+    // The actual ID will be generated in the CourseBuilder when saving to DB
+    const newLesson: Lesson = {
+      id: '', // Will be replaced with UUID in CourseBuilder
+      title: `Lesson ${module?.lessons.length + 1 || 1}`,
+      type: 'text',
+      duration: '0 min',
+      summary: '',
+      content_blocks: [],
+      is_published: false
+    };
+
+    // If onAddLesson callback is provided, use it to create the lesson in the database
+    if (onAddLesson) {
+      await onAddLesson(moduleId, newLesson);
+    } else {
+      // Fallback to local state update only
+      // Generate a temporary ID for local use only
+      const lessonWithTempId = { ...newLesson, id: `lesson-${Date.now()}` };
+      const updatedCurriculum = curriculum.map((module) => {
+        if (module.id === moduleId) {
+          return { ...module, lessons: [...module.lessons, lessonWithTempId] };
+        }
+        return module;
+      });
+      onChange(updatedCurriculum);
+    }
   };
 
   const handleModuleTitleChange = (moduleId: string, newTitle: string) => {
@@ -68,31 +80,43 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
     onChange(updatedCurriculum);
   };
 
-  const handleDeleteLesson = (moduleId: string, lessonId: string) => {
-    const updatedCurriculum = curriculum.map((module) => {
-      if (module.id === moduleId) {
-        return { ...module, lessons: module.lessons.filter((l) => l.id !== lessonId) };
-      }
-      return module;
-    });
-    onChange(updatedCurriculum);
+  const handleDeleteLesson = async (moduleId: string, lessonId: string) => {
+    // If onDeleteLesson callback is provided, use it to delete the lesson from the database
+    if (onDeleteLesson) {
+      await onDeleteLesson(moduleId, lessonId);
+    } else {
+      // Fallback to local state update only
+      const updatedCurriculum = curriculum.map((module) => {
+        if (module.id === moduleId) {
+          return { ...module, lessons: module.lessons.filter((l) => l.id !== lessonId) };
+        }
+        return module;
+      });
+      onChange(updatedCurriculum);
+    }
   };
 
-  const handleMoveLesson = (moduleId: string, lessonId: string, direction: 'up' | 'down') => {
-    const updatedCurriculum = curriculum.map((module) => {
-      if (module.id === moduleId) {
-        const lessons = [...module.lessons];
-        const index = lessons.findIndex((l) => l.id === lessonId);
-        if (direction === 'up' && index > 0) {
-          [lessons[index], lessons[index - 1]] = [lessons[index - 1], lessons[index]];
-        } else if (direction === 'down' && index < lessons.length - 1) {
-          [lessons[index], lessons[index + 1]] = [lessons[index + 1], lessons[index]];
+  const handleMoveLesson = async (moduleId: string, lessonId: string, direction: 'up' | 'down') => {
+    // If onMoveLesson callback is provided, use it to update positions in the database
+    if (onMoveLesson) {
+      await onMoveLesson(moduleId, lessonId, direction);
+    } else {
+      // Fallback to local state update only
+      const updatedCurriculum = curriculum.map((module) => {
+        if (module.id === moduleId) {
+          const lessons = [...module.lessons];
+          const index = lessons.findIndex((l) => l.id === lessonId);
+          if (direction === 'up' && index > 0) {
+            [lessons[index], lessons[index - 1]] = [lessons[index - 1], lessons[index]];
+          } else if (direction === 'down' && index < lessons.length - 1) {
+            [lessons[index], lessons[index + 1]] = [lessons[index + 1], lessons[index]];
+          }
+          return { ...module, lessons };
         }
-        return { ...module, lessons };
-      }
-      return module;
-    });
-    onChange(updatedCurriculum);
+        return module;
+      });
+      onChange(updatedCurriculum);
+    }
   };
 
   const getTypeIcon = (type: string) => {
@@ -194,7 +218,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
                       <span className="text-lg">{getTypeIcon(lesson.type)}</span>
                       <div className="flex-1">
                         <p className="font-medium text-slate-900">{lesson.title}</p>
-                        <p className="text-xs text-slate-600">{lesson.duration}</p>
+                        <p className="text-xs text-slate-600">{lesson.duration || `${lesson.estimated_duration_minutes || 0} min`}</p>
                       </div>
                       <span className="px-2 py-1 text-xs font-medium text-slate-600 dark:text-dark-text-secondary bg-white dark:bg-dark-background-card rounded border border-slate-200 dark:border-gray-700 capitalize">
                         {lesson.type}
