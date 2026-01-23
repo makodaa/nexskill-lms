@@ -24,7 +24,7 @@ interface AuthContextValue {
     signIn: (
         email: string,
         password: string
-    ) => Promise<{ error: AuthError | null }>;
+    ) => Promise<{ data: { user: User | null; session: unknown | null }; error: AuthError | null }>;
     signOut: () => Promise<{ error: AuthError | null }>;
 
     // loginMock: (name: string, role: UserRole) => void;
