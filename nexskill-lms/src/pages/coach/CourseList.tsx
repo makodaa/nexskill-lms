@@ -28,13 +28,13 @@ const CourseList: React.FC = () => {
         if (data) {
           // Verify if we need to map the status or other fields.
           // The dummy data had 'status', 'enrolledStudents', 'rating', 'lastUpdated'.
-          // real data has 'created_at', 'updated_at', etc.
+          // real data has 'created_at', 'updated_at', 'visibility', etc.
           // We might need to adapt the data for CourseTable or update CourseTable.
           // For now let's map what we have.
-          const mappedCourses = data.map((course: Course) => ({
+          const mappedCourses = data.map((course: any) => ({
             id: course.id,
             title: course.title,
-            status: 'draft', // Default to draft as we don't have status in DB schema provided yet, or assume draft.
+            status: course.visibility === 'public' ? 'published' : 'draft', // Map visibility to status
             enrolledStudents: 0, // Need to count enrollments
             rating: 0, // Need to calculate ratings
             lastUpdated: new Date(course.updated_at).toLocaleDateString(),
