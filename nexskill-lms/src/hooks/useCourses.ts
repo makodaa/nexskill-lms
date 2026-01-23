@@ -22,7 +22,8 @@ export const useCourses = () => {
                 .select(`
           *,
           category:categories(name)
-        `);
+        `)
+                .eq('visibility', 'public');
 
             if (error) throw error;
 
