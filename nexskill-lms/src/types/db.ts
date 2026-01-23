@@ -67,3 +67,21 @@ export interface Profile {
     name_extension?: string;
     role: UserRole;
 }
+
+export type SessionStatus = 'scheduled' | 'live' | 'completed' | 'cancelled';
+
+export interface LiveSession {
+    id: string;
+    course_id: string;
+    coach_id: string;
+    title: string;
+    description?: string;
+    scheduled_at: string;
+    duration_minutes: number;
+    meeting_link?: string;
+    is_live: boolean;
+    status: SessionStatus;
+    recording_url?: string;
+    created_at?: string;
+    updated_at?: string;
+}
