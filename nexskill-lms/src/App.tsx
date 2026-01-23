@@ -31,6 +31,7 @@ import StudentBilling from "./pages/student/StudentBilling";
 import CertificatesList from "./pages/student/CertificatesList";
 import CertificateDetail from "./pages/student/CertificateDetail";
 import CertificateVerify from "./pages/student/CertificateVerify";
+import StudentMessagesPage from "./pages/student/StudentMessagesPage";
 import MembershipPlans from "./pages/student/MembershipPlans";
 import MembershipManage from "./pages/student/MembershipManage";
 import MembershipConfirmation from "./pages/student/MembershipConfirmation";
@@ -449,6 +450,10 @@ function App() {
                 <Route
                   path="/student/coaching/sessions"
                   element={<CoachingSessions />}
+                />
+                <Route
+                  path="/student/messages"
+                  element={<StudentMessagesPage />}
                 />
 
                 {/* Live Classes Routes */}
