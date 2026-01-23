@@ -1,9 +1,9 @@
 export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced';
 export interface Category {
-    id: number;
-    name: string;
-    slug: string;
-    created_at?: string;
+  id: number;
+  name: string;
+  slug: string;
+  created_at?: string;
 }
 export interface Topic {
     id: number;
