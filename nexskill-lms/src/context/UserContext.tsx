@@ -12,7 +12,10 @@ import { useAuth } from "./AuthContext";
 import { supabase } from "../lib/supabaseClient";
 import type { UserRole } from "../types/roles";
 import { defaultLandingRouteByRole, mapStringToRole } from "../types/roles";
-
+// Actually mapStringToRole is used, let me check if I should move it or just fix imports.
+// I didn't move mapStringToRole to db.ts yet. I should probably check roles.ts content.
+// For now, let's assume roles.ts still exists and has mapStringToRole. 
+// If I moved UserRole and defaultLandingRouteByRole to db.ts, I should import them from there.
 interface UserProfile {
     id: string;
     email: string;
@@ -22,7 +25,6 @@ interface UserProfile {
     updated_at: string;
     role: UserRole;
 }
-
 interface UserContextValue {
     profile: UserProfile | null;
     loading: boolean;
@@ -34,11 +36,9 @@ interface UserContextValue {
     getDefaultRoute: () => string;
     switchRole: (role: UserRole) => void;
 }
-
 export const UserContext = createContext<UserContextValue | undefined>(
     undefined
 );
-
 export const UserProvider: React.FC<{ children: ReactNode }> = ({
     children,
 }) => {
@@ -46,7 +46,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     // Explicitly type the state
     const [profile, setProfile] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
-
     const fetchProfile = useCallback(async () => {
         if (!user) return;
         try {
@@ -56,9 +55,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                 .select("*")
                 .eq("id", user.id)
                 .single();
-
             if (error) throw error;
-
             if (
                 !data ||
                 typeof data.id !== "string" ||
@@ -68,7 +65,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                 setProfile(null);
                 return;
             }
-
             // Map the role string to UserRole type (now case-insensitive)
             const mappedRole = mapStringToRole(data.role);
             if (!mappedRole) {
@@ -79,7 +75,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                 setProfile(null);
                 return;
             }
-
             // Map snake_case to camelCase
             const mappedProfile: UserProfile = {
                 id: data.id,
@@ -90,7 +85,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                 updated_at: data.updated_at,
                 role: mappedRole,
             };
-
             setProfile(mappedProfile);
         } catch (error) {
             console.error("Error fetching/syncing profile:", error);
@@ -99,7 +93,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
             setLoading(false);
         }
     }, [user]);
-
     useEffect(() => {
         if (user) {
             fetchProfile();
@@ -108,12 +101,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
             setLoading(false);
         }
     }, [user, fetchProfile]);
-
     const updateProfile = useCallback(
         async (updates: Partial<UserProfile>) => {
             try {
                 if (!user) throw new Error("No active user session");
-
                 // Map camelCase back to snake_case for Supabase
                 const supabaseUpdates: Record<string, unknown> = { ...updates };
                 if (updates.firstName !== undefined) {
@@ -124,16 +115,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                     supabaseUpdates.last_name = updates.lastName;
                     delete supabaseUpdates.lastName;
                 }
-
                 const { data, error } = await supabase
                     .from("profiles")
                     .update(supabaseUpdates)
                     .eq("id", user.id)
                     .select() // Select the updated row
                     .single();
-
                 if (error) throw error;
-
                 // Basic validation of returned row before updating local state
                 if (data && typeof data.id === "string") {
                     // Map the role string to UserRole type if role exists in data
@@ -154,7 +142,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                             };
                         }
                     }
-
                     // Map snake_case to camelCase
                     const updatedProfile: UserProfile = {
                         id: data.id,
@@ -165,7 +152,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                         updated_at: data.updated_at,
                         role: mappedRole as UserRole,
                     };
-
                     setProfile(updatedProfile);
                 } else {
                     console.error(
@@ -173,7 +159,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                         data
                     );
                 }
-
                 return { error: null };
             } catch (error) {
                 console.error(
@@ -189,12 +174,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         if (!profile) return "/login";
         return defaultLandingRouteByRole[profile.role];
     }, [profile]);
-
     const switchRole = useCallback((role: UserRole) => {
         if (!profile) return;
         setProfile(prev => prev ? { ...prev, role } : null);
     }, [profile]);
-
     const value = useMemo(
         () => ({
             profile,
@@ -206,9 +189,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         }),
         [profile, loading, fetchProfile, updateProfile, getDefaultRoute, switchRole]
     );
-
-
-
     return (
         <UserContext.Provider value={value}>{children}</UserContext.Provider>
     );

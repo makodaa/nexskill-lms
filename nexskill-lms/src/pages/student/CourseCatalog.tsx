@@ -4,153 +4,9 @@ import StudentAppLayout from "../../layouts/StudentAppLayout";
 import CourseFilterBar from "../../components/courses/CourseFilterBar";
 import CourseCategorySidebar from "../../components/courses/CourseCategorySidebar";
 import CourseGridItem from "../../components/courses/CourseGridItem";
-import { supabase } from "../../lib/supabaseClient";
-import type { Course } from "../../types/db";
+import { useCourses } from '../../hooks/useCourses';
 
-// Dummy course data (fallback for testing)
-const allCoursesFallback = [
-  {
-    id: "1",
-    title: "Complete UI/UX Design Bootcamp",
-    category: "Design",
-    level: "Beginner" as const,
-    rating: 4.8,
-    studentsCount: 12450,
-    duration: "24h 30m",
-    price: 49,
-    originalPrice: 99,
-    isBestseller: true,
-    isNew: false,
-    thumbnail: "gradient-blue-purple",
-    shortDescription:
-      "Master UI/UX design from scratch with hands-on projects and real-world examples.",
-  },
-  {
-    id: "2",
-    title: "Advanced React & TypeScript",
-    category: "Development",
-    level: "Advanced" as const,
-    rating: 4.9,
-    studentsCount: 8920,
-    duration: "18h 15m",
-    price: 79,
-    originalPrice: 129,
-    isBestseller: true,
-    isNew: false,
-    thumbnail: "gradient-purple-pink",
-    shortDescription:
-      "Build scalable applications with modern React patterns and TypeScript best practices.",
-  },
-  {
-    id: "3",
-    title: "Digital Marketing Fundamentals",
-    category: "Marketing",
-    level: "Beginner" as const,
-    rating: 4.6,
-    studentsCount: 15230,
-    duration: "12h 45m",
-    price: 39,
-    isBestseller: false,
-    isNew: true,
-    thumbnail: "gradient-pink-orange",
-    shortDescription:
-      "Learn SEO, social media marketing, content strategy, and analytics from industry experts.",
-  },
-  {
-    id: "4",
-    title: "Data Science with Python",
-    category: "Data & Analytics",
-    level: "Intermediate" as const,
-    rating: 4.7,
-    studentsCount: 10540,
-    duration: "32h 20m",
-    price: 89,
-    originalPrice: 149,
-    isBestseller: false,
-    isNew: false,
-    thumbnail: "gradient-green-blue",
-    shortDescription:
-      "Master data analysis, visualization, and machine learning with Python and popular libraries.",
-  },
-  {
-    id: "5",
-    title: "Figma Mastery for Designers",
-    category: "Design",
-    level: "Intermediate" as const,
-    rating: 4.8,
-    studentsCount: 7890,
-    duration: "15h 30m",
-    price: 59,
-    isBestseller: false,
-    isNew: true,
-    thumbnail: "gradient-purple-pink",
-    shortDescription:
-      "Become a Figma expert with advanced techniques for UI design, prototyping, and collaboration.",
-  },
-  {
-    id: "6",
-    title: "Full-Stack Web Development",
-    category: "Development",
-    level: "Intermediate" as const,
-    rating: 4.9,
-    studentsCount: 18750,
-    duration: "45h 00m",
-    price: 99,
-    originalPrice: 179,
-    isBestseller: true,
-    isNew: false,
-    thumbnail: "gradient-blue-purple",
-    shortDescription:
-      "Build complete web applications from frontend to backend with modern technologies.",
-  },
-  {
-    id: "7",
-    title: "Business Strategy & Leadership",
-    category: "Business",
-    level: "Advanced" as const,
-    rating: 4.7,
-    studentsCount: 5430,
-    duration: "20h 10m",
-    price: 69,
-    isBestseller: false,
-    isNew: false,
-    thumbnail: "gradient-orange-red",
-    shortDescription:
-      "Develop strategic thinking and leadership skills to drive business growth and innovation.",
-  },
-  {
-    id: "8",
-    title: "SQL & Database Design",
-    category: "Data & Analytics",
-    level: "Beginner" as const,
-    rating: 4.6,
-    studentsCount: 9320,
-    duration: "16h 40m",
-    price: 45,
-    isBestseller: false,
-    isNew: true,
-    thumbnail: "gradient-green-blue",
-    shortDescription:
-      "Learn SQL queries, database design, and data modeling for effective data management.",
-  },
-  {
-    id: "9",
-    title: "Growth Marketing & Analytics",
-    category: "Marketing",
-    level: "Intermediate" as const,
-    rating: 4.8,
-    studentsCount: 6210,
-    duration: "14h 25m",
-    price: 55,
-    originalPrice: 89,
-    isBestseller: false,
-    isNew: false,
-    thumbnail: "gradient-pink-orange",
-    shortDescription:
-      "Master growth hacking strategies, A/B testing, and data-driven marketing techniques.",
-  },
-];
-
+// Categories for the filter sidebar
 const categories = [
   "All",
   "Design",
@@ -160,77 +16,40 @@ const categories = [
   "Business",
 ];
 
+// Helper to format duration from hours (number) to string
+const formatDuration = (hours: number) => {
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+};
+
 const CourseCatalog: React.FC = () => {
   const navigate = useNavigate();
+  const { courses: dbCourses, loading, error } = useCourses();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedLevel, setSelectedLevel] = useState("All");
   const [sortOption, setSortOption] = useState("Most popular");
-  const [allCourses, setAllCourses] = useState<
-    Array<{
-      id: string;
-      title: string;
-      category: string;
-      level: "Beginner" | "Intermediate" | "Advanced";
-      rating: number;
-      studentsCount: number;
-      duration: string;
-      price: number;
-      originalPrice?: number;
-      isBestseller: boolean;
-      isNew: boolean;
-      thumbnail: string;
-      shortDescription: string;
-    }>
-  >([]);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch courses from Supabase
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        setLoading(true);
-
-        // TODO: In future, add filter for visibility = 'public' and status = 'published'
-        const { data, error } = await supabase
-          .from("courses")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (error) {
-          console.error("Error fetching courses:", error);
-          // Use fallback data if Supabase fails
-          setAllCourses(allCoursesFallback);
-        } else if (data) {
-          // Map DB data to component format
-          const mappedCourses = data.map((course: Course) => ({
-            id: course.id,
-            title: course.title,
-            category: "General", // TODO: Join with categories table
-            level: course.level,
-            rating: 0, // TODO: Calculate from reviews
-            studentsCount: 0, // TODO: Count from enrollments
-            duration: `${course.duration_hours}h`,
-            price: course.price,
-            originalPrice: undefined,
-            isBestseller: false,
-            isNew: false,
-            thumbnail: "gradient-blue-purple", // Default gradient
-            shortDescription:
-              course.short_description || "No description available",
-          }));
-          setAllCourses(mappedCourses);
-        }
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        setAllCourses(allCoursesFallback);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourses();
-  }, []);
+  // Map DB courses to UI format
+  const allCourses = useMemo(() => {
+    return dbCourses.map(course => ({
+      id: course.id,
+      title: course.title,
+      category: (course as any).category?.name || 'Uncategorized', // Handle joined data
+      level: course.level || 'Beginner',
+      rating: 0, // Not in DB yet
+      studentsCount: 0, // Not in DB yet
+      duration: formatDuration(course.duration_hours || 0),
+      price: course.price || 0,
+      originalPrice: undefined,
+      isBestseller: false,
+      isNew: new Date(course.created_at).getTime() > Date.now() - 7 * 24 * 60 * 60 * 1000, // New if < 7 days
+      thumbnail: 'gradient-blue-purple', // Placeholder or add logic to vary
+      shortDescription: course.short_description || '',
+    }));
+  }, [dbCourses]);
 
   // Filter and sort courses
   const filteredCourses = useMemo(() => {
@@ -318,11 +137,12 @@ const CourseCatalog: React.FC = () => {
             />
 
             {/* Results Count */}
-            <div className="mb-4">
+            <div className="mb-4 flex items-center justify-between">
               <p className="text-sm text-text-secondary dark:text-dark-text-secondary">
                 {filteredCourses.length}{" "}
                 {filteredCourses.length === 1 ? "course" : "courses"} found
               </p>
+              {loading && <p className="text-sm text-brand-primary">Loading courses...</p>}
             </div>
 
             {/* Course Grid */}

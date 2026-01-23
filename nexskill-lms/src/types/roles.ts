@@ -2,7 +2,6 @@
  * Role-based access control types and utilities for NexSkill LMS
  * Defines all user roles and their associated metadata
  */
-
 export type UserRole =
     | "PLATFORM_OWNER"
     | "ADMIN"
@@ -12,8 +11,8 @@ export type UserRole =
     | "COMMUNITY_MANAGER"
     | "SUPPORT_STAFF"
     | "STUDENT"
-    | "ORG_OWNER";
-
+    | "ORG_OWNER"
+    | "UNASSIGNED";
 /**
  * Human-readable labels for each role
  */
@@ -27,8 +26,8 @@ export const labelByRole: Record<UserRole, string> = {
     SUPPORT_STAFF: "Support Staff",
     STUDENT: "Student",
     ORG_OWNER: "Organization Owner",
+    UNASSIGNED: "Unassigned",
 };
-
 /**
  * Default landing route for each role after login
  */
@@ -42,8 +41,8 @@ export const defaultLandingRouteByRole: Record<UserRole, string> = {
     SUPPORT_STAFF: "/support/dashboard",
     STUDENT: "/student/dashboard",
     ORG_OWNER: "/org/dashboard",
+    UNASSIGNED: "/verification-pending",
 };
-
 /**
  * Role descriptions for documentation and UI display
  */
@@ -64,8 +63,8 @@ export const roleDescriptions: Record<UserRole, string> = {
         "Learner with access to courses, community features, coaching sessions, and personal progress tracking.",
     ORG_OWNER:
         "B2B organization owner. Manages team members, tracks organizational learning progress, and handles billing.",
+    UNASSIGNED: "User with no assigned role. Pending verification.",
 };
-
 /**
  * Role emoji icons for visual identification
  */
@@ -79,8 +78,8 @@ export const roleIcons: Record<UserRole, string> = {
     SUPPORT_STAFF: "🎧",
     STUDENT: "👨‍🎓",
     ORG_OWNER: "🏢",
+    UNASSIGNED: "❓",
 };
-
 /**
  * Role color schemes for badges and UI elements
  */
@@ -133,8 +132,12 @@ export const roleColors: Record<
         text: "text-orange-800",
         border: "border-orange-300",
     },
+    UNASSIGNED: {
+        bg: "bg-gray-100",
+        text: "text-gray-500",
+        border: "border-gray-200",
+    },
 };
-
 /**
  * Role capabilities/permissions summary (for display purposes)
  */
@@ -210,8 +213,8 @@ export const roleCapabilities: Record<UserRole, string[]> = {
         "Bulk user management",
         "Custom branding",
     ],
+    UNASSIGNED: ["Wait for verification"],
 };
-
 /**
  * All available roles as an array (useful for dropdowns)
  */
@@ -225,8 +228,8 @@ export const allRoles: UserRole[] = [
     "SUPPORT_STAFF",
     "STUDENT",
     "ORG_OWNER",
+    "UNASSIGNED",
 ];
-
 /**
  * Maps a string value from Supabase to a valid UserRole type.
  * Returns the role if valid, or null if the string doesn't match any UserRole.
@@ -242,11 +245,9 @@ export const mapStringToRole = (
     role: string | null | undefined
 ): UserRole | null => {
     if (!role) return null;
-
     // Type guard: check if the string is a valid UserRole
     if (allRoles.includes(role.toUpperCase() as UserRole)) {
         return role.toUpperCase() as UserRole;
     }
-
     return null;
 };
