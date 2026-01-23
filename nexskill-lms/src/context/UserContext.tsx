@@ -23,6 +23,7 @@ interface UserProfile {
     lastName: string;
     username: string;
     updated_at: string;
+    created_at: string;
     role: UserRole;
 }
 interface UserContextValue {
@@ -33,7 +34,7 @@ interface UserContextValue {
         updates: Partial<UserProfile>
     ) => Promise<{ error: PostgrestError | null }>;
     refreshProfile: () => Promise<void>;
-    getDefaultRoute: () => string;
+    getDefaultRoute: () => Promise<string>;
     switchRole: (role: UserRole) => void;
 }
 export const UserContext = createContext<UserContextValue | undefined>(
@@ -83,6 +84,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                 lastName: data.last_name || "",
                 username: data.username || "",
                 updated_at: data.updated_at,
+                created_at: data.created_at,
                 role: mappedRole,
             };
             setProfile(mappedProfile);
@@ -150,6 +152,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                         lastName: data.last_name || "",
                         username: data.username || "",
                         updated_at: data.updated_at,
+                        created_at: data.created_at,
                         role: mappedRole as UserRole,
                     };
                     setProfile(updatedProfile);
@@ -170,8 +173,36 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
         },
         [user, profile]
     );
-    const getDefaultRoute = useCallback((): string => {
+
+    const getDefaultRoute = useCallback(async (): Promise<string> => {
         if (!profile) return "/login";
+
+        // Check if user is a student AND hasn't completed onboarding
+        if (profile.role === 'STUDENT') {
+            try {
+                // Fetch student_profile to check if onboarding fields are filled
+                const { data: studentProfile, error } = await supabase
+                    .from('student_profiles')
+                    .select('current_skill_level')
+                    .eq('user_id', profile.id)
+                    .maybeSingle();
+
+                if (error) {
+                    console.error('Error checking student profile:', error);
+                    // If there's an error, just go to default route
+                    return defaultLandingRouteByRole[profile.role];
+                }
+
+                // Check if student_profile exists and has onboarding data
+                // If current_skill_level is null or student_profile doesn't exist, redirect to onboarding
+                if (!studentProfile || !studentProfile.current_skill_level) {
+                    return '/auth/onboarding-preferences';
+                }
+            } catch (err) {
+                console.error('Error in getDefaultRoute:', err);
+            }
+        }
+
         return defaultLandingRouteByRole[profile.role];
     }, [profile]);
     const switchRole = useCallback((role: UserRole) => {

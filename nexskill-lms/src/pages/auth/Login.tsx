@@ -117,8 +117,9 @@ const Login: React.FC = () => {
       // The profile might still be fetching in UserContext, so we use a small delay 
       // or rely on the fact that getDefaultRoute() will handle the null profile case
       // by returning "/login" which we are already on, but ideally we wait for profile.
-      setTimeout(() => {
-        navigate(getDefaultRoute());
+      setTimeout(async () => {
+        const route = await getDefaultRoute();
+        navigate(route);
       }, 100);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred';

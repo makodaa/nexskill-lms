@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import StudentAppLayout from '../../layouts/StudentAppLayout';
-import { supabase } from '../../lib/supabaseClient';
-// import type { Course } from '../../types/db';
 
 // Dummy course detail data
 const coursesData: Record<string, any> = {
@@ -388,53 +386,46 @@ const CourseDetail: React.FC = () => {
               {activeTab === 'curriculum' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">Course curriculum</h3>
-                  {course.curriculum && course.curriculum.length > 0 ? (
-                    course.curriculum.map((module: any) => (
-                      <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
-                        <button
-                          onClick={() => toggleModule(module.id)}
-                          className="w-full flex items-center justify-between p-4 hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <svg
-                              className={`w-5 h-5 text-text-muted transition-transform ${
-                                expandedModules.includes(module.id) ? 'rotate-90' : ''
-                              }`}
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                            <span className="font-medium text-text-primary dark:text-dark-text-primary">{module.title}</span>
-                          </div>
-                          <span className="text-sm text-text-muted dark:text-dark-text-muted">{module.lessons.length} lessons</span>
-                        </button>
+                  {course.curriculum.map((module: any) => (
+                    <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
+                      <button
+                        onClick={() => toggleModule(module.id)}
+                        className="w-full flex items-center justify-between p-4 hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <svg
+                            className={`w-5 h-5 text-text-muted transition-transform ${
+                              expandedModules.includes(module.id) ? 'rotate-90' : ''
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                          <span className="font-medium text-text-primary dark:text-dark-text-primary">{module.title}</span>
+                        </div>
+                        <span className="text-sm text-text-muted dark:text-dark-text-muted">{module.lessons.length} lessons</span>
+                      </button>
 
-                        {expandedModules.includes(module.id) && (
-                          <div className="bg-[#FAFBFF] p-4 space-y-2">
-                            {module.lessons.map((lesson: any) => (
-                              <div
-                                key={lesson.id}
-                                className="flex items-center justify-between py-2 px-3 hover:bg-white dark:bg-dark-background-card rounded-lg transition-colors"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className="text-text-muted dark:text-dark-text-muted">▶️</span>
-                                  <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{lesson.title}</span>
-                                </div>
-                                <span className="text-xs text-text-muted dark:text-dark-text-muted">{lesson.duration}</span>
+                      {expandedModules.includes(module.id) && (
+                        <div className="bg-[#FAFBFF] p-4 space-y-2">
+                          {module.lessons.map((lesson: any) => (
+                            <div
+                              key={lesson.id}
+                              className="flex items-center justify-between py-2 px-3 hover:bg-white dark:bg-dark-background-card rounded-lg transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-text-muted dark:text-dark-text-muted">▶️</span>
+                                <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{lesson.title}</span>
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="text-4xl mb-4">📚</div>
-                      <p className="text-text-muted">Curriculum details coming soon</p>
+                              <span className="text-xs text-text-muted dark:text-dark-text-muted">{lesson.duration}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
 
