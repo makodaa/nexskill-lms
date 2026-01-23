@@ -46,7 +46,12 @@ interface Filters {
 
 const CourseModerationPage: React.FC = () => {
   // Dummy data for courses
-  const [courses] = useState<Course[]>([
+  // Supabase for Active Courses
+  const [activeCourses, setActiveCourses] = useState<Course[]>([]);
+  const [loadingActive, setLoadingActive] = useState(true);
+
+  // Mock for Pending/Rejected
+  const [mockCourses, setMockCourses] = useState<Course[]>([
     {
       id: 'c1',
       title: 'Complete Python Programming Bootcamp 2024',
@@ -86,25 +91,6 @@ const CourseModerationPage: React.FC = () => {
       reportsCount: 2,
     },
     {
-      id: 'c3',
-      title: 'Data Science with R and Python',
-      instructorName: 'Dr. Emily Rodriguez',
-      instructorEmail: 'emily.rodriguez@example.com',
-      instructorId: 'i3',
-      category: 'Data Science',
-      status: 'pending',
-      submittedAt: '2024-01-13',
-      qualityScore: 92,
-      qualityMetrics: {
-        contentCompleteness: 95,
-        engagementPotential: 90,
-        productionQuality: 91,
-        policyCompliance: 92,
-      },
-      qualityFlags: [],
-      reportsCount: 0,
-    },
-    {
       id: 'c4',
       title: 'Introduction to Cryptocurrency Trading',
       instructorName: 'Alex Martinez',
@@ -126,82 +112,6 @@ const CourseModerationPage: React.FC = () => {
         'Video resolution below standards',
       ],
       reportsCount: 3,
-    },
-    {
-      id: 'c5',
-      title: 'Advanced JavaScript: ES6 and Beyond',
-      instructorName: 'Kevin Park',
-      instructorEmail: 'kevin.park@example.com',
-      instructorId: 'i5',
-      category: 'Programming',
-      status: 'approved',
-      submittedAt: '2024-01-10',
-      qualityScore: 88,
-      qualityMetrics: {
-        contentCompleteness: 90,
-        engagementPotential: 87,
-        productionQuality: 86,
-        policyCompliance: 89,
-      },
-      qualityFlags: [],
-      reportsCount: 0,
-    },
-    {
-      id: 'c6',
-      title: 'UX/UI Design Fundamentals',
-      instructorName: 'Jessica Lee',
-      instructorEmail: 'jessica.lee@example.com',
-      instructorId: 'i6',
-      category: 'Design',
-      status: 'approved',
-      submittedAt: '2024-01-08',
-      qualityScore: 91,
-      qualityMetrics: {
-        contentCompleteness: 92,
-        engagementPotential: 93,
-        productionQuality: 89,
-        policyCompliance: 90,
-      },
-      qualityFlags: [],
-      reportsCount: 0,
-    },
-    {
-      id: 'c7',
-      title: 'Digital Marketing Strategy 2024',
-      instructorName: 'David Thompson',
-      instructorEmail: 'david.thompson@example.com',
-      instructorId: 'i7',
-      category: 'Marketing',
-      status: 'approved',
-      submittedAt: '2024-01-05',
-      qualityScore: 84,
-      qualityMetrics: {
-        contentCompleteness: 85,
-        engagementPotential: 86,
-        productionQuality: 82,
-        policyCompliance: 83,
-      },
-      qualityFlags: [],
-      reportsCount: 0,
-    },
-    {
-      id: 'c8',
-      title: 'Machine Learning Basics',
-      instructorName: 'Dr. Rachel Kim',
-      instructorEmail: 'rachel.kim@example.com',
-      instructorId: 'i8',
-      category: 'Data Science',
-      status: 'approved',
-      submittedAt: '2024-01-03',
-      qualityScore: 89,
-      qualityMetrics: {
-        contentCompleteness: 90,
-        engagementPotential: 88,
-        productionQuality: 89,
-        policyCompliance: 89,
-      },
-      qualityFlags: [],
-      reportsCount: 0,
     },
     {
       id: 'c9',
@@ -245,8 +155,59 @@ const CourseModerationPage: React.FC = () => {
       },
       qualityFlags: ['Incomplete course structure', 'Copyright concerns'],
       reportsCount: 1,
-    },
+    }
   ]);
+
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'pending' | 'active' | 'rejected'>('pending');
+
+  React.useEffect(() => {
+    const fetchActiveCourses = async () => {
+      setLoadingActive(true);
+      const { supabase } = await import('../../lib/supabaseClient');
+
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*'); // We might want to filter by status='published' if that column exists
+
+      if (error) {
+        console.error("Error fetching courses:", error);
+      } else if (data) {
+        // Map to Course interface
+        const mapped: Course[] = data.map((c: any) => ({
+          id: c.id,
+          title: c.title,
+          instructorName: 'Unknown', // Need join with profiles
+          instructorEmail: 'N/A',
+          instructorId: c.coach_id || 'unknown',
+          category: 'General', // Need join with categories
+          status: 'approved',
+          submittedAt: c.created_at,
+          qualityScore: 90, // Placeholder
+          qualityMetrics: {
+            contentCompleteness: 90,
+            engagementPotential: 90,
+            productionQuality: 90,
+            policyCompliance: 90,
+          },
+          qualityFlags: [],
+          reportsCount: 0
+        }));
+        setActiveCourses(mapped);
+      }
+      setLoadingActive(false);
+    };
+
+    if (activeTab === 'active') {
+      fetchActiveCourses();
+    }
+  }, [activeTab]);
+
+  // Combine properly based on tab
+  const courses = activeTab === 'active'
+    ? activeCourses
+    : mockCourses.filter(c => c.status === activeTab);
+
 
   // Dummy data for reports
   const [reports] = useState<Report[]>([
@@ -400,13 +361,46 @@ const CourseModerationPage: React.FC = () => {
 
   return (
     <AdminAppLayout>
-      <div className="space-y-6">
+      <div className="m-5 space-y-6">
         {/* Page Header */}
         <div>
           <h1 className="text-2xl font-bold text-[#111827] mb-2">Course Moderation</h1>
           <p className="text-sm text-[#5F6473]">
             Review and approve courses, manage quality standards, and handle reported content
           </p>
+        </div>
+
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6">
+          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+            <button
+              onClick={() => setActiveTab('pending')}
+              className={`${activeTab === 'pending'
+                ? 'border-[#304DB5] text-[#304DB5]'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Pending Review
+            </button>
+            <button
+              onClick={() => setActiveTab('active')}
+              className={`${activeTab === 'active'
+                ? 'border-[#304DB5] text-[#304DB5]'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Active Courses
+            </button>
+            <button
+              onClick={() => setActiveTab('rejected')}
+              className={`${activeTab === 'rejected'
+                ? 'border-[#304DB5] text-[#304DB5]'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+            >
+              Rejected
+            </button>
+          </nav>
         </div>
 
         {/* Filters */}
@@ -417,19 +411,20 @@ const CourseModerationPage: React.FC = () => {
           <div className="bg-gradient-to-br from-[#DBEAFE] to-white rounded-2xl p-4 border border-[#93C5FD]">
             <p className="text-sm text-[#1E40AF] mb-1">Pending Review</p>
             <p className="text-2xl font-bold text-[#111827]">
-              {courses.filter((c) => c.status === 'pending').length}
+              {mockCourses.filter((c) => c.status === 'pending').length}
             </p>
           </div>
           <div className="bg-gradient-to-br from-[#D1FAE5] to-white rounded-2xl p-4 border border-[#6EE7B7]">
             <p className="text-sm text-[#047857] mb-1">Approved</p>
             <p className="text-2xl font-bold text-[#111827]">
-              {courses.filter((c) => c.status === 'approved').length}
+              {/* This is just loaded ones, real count might need separate query */}
+              {activeCourses.length}
             </p>
           </div>
           <div className="bg-gradient-to-br from-[#FEE2E2] to-white rounded-2xl p-4 border border-[#FCA5A5]">
             <p className="text-sm text-[#991B1B] mb-1">Rejected</p>
             <p className="text-2xl font-bold text-[#111827]">
-              {courses.filter((c) => c.status === 'rejected').length}
+              {mockCourses.filter((c) => c.status === 'rejected').length}
             </p>
           </div>
           <div className="bg-gradient-to-br from-[#FED7AA] to-white rounded-2xl p-4 border border-[#FDBA74]">

@@ -69,7 +69,6 @@ import Error500Page from "./pages/system/Error500Page";
 import MaintenanceModePage from "./pages/system/MaintenanceModePage";
 import SecurityCenterPage from "./pages/admin/security/SecurityCenterPage";
 import CookieConsentBanner from "./components/system/CookieConsentBanner";
-
 // New role-based placeholder dashboards
 import PlatformOwnerDashboardPage from "./pages/owner/PlatformOwnerDashboardPage";
 import UsersRolesPage from "./pages/owner/UsersRolesPage";
@@ -85,7 +84,6 @@ import SubCoachGroupsPage from "./pages/subcoach/SubCoachGroupsPage";
 import SubCoachCommunityPage from "./pages/subcoach/SubCoachCommunityPage";
 import SubCoachNotificationsPage from "./pages/subcoach/SubCoachNotificationsPage";
 import SubCoachProfilePage from "./pages/subcoach/SubCoachProfilePage";
-
 // Support Staff Pages
 import SupportDashboardPage from "./pages/support/SupportDashboardPage";
 import SupportTicketsPage from "./pages/support/SupportTicketsPage";
@@ -94,16 +92,17 @@ import SupportTechStatusPage from "./pages/support/SupportTechStatusPage";
 import SupportCertificatesPage from "./pages/support/SupportCertificatesPage";
 import SupportKnowledgeBasePage from "./pages/support/SupportKnowledgeBasePage";
 import SupportProfilePage from "./pages/support/SupportProfilePage";
-
 // Community Manager Pages
 import CommunityDashboardPage from "./pages/community/CommunityDashboardPage";
 import CommunityOverviewPage from "./pages/community/CommunityOverviewPage";
+// Coach Application Pages
+import CoachApplicationPage from "./pages/coach/CoachApplicationPage";
+import VerificationPending from "./pages/auth/VerificationPending";
 import CommunityGroupsPage from "./pages/community/CommunityGroupsPage";
 import CommunityApprovalQueuePage from "./pages/community/CommunityApprovalQueuePage";
 import CommunityAnnouncementsPage from "./pages/community/CommunityAnnouncementsPage";
 import CommunityEngagementPage from "./pages/community/CommunityEngagementPage";
 import CommunityProfilePage from "./pages/community/CommunityProfilePage";
-
 // Organization Owner Pages
 import OrgDashboardPage from "./pages/org/OrgDashboardPage";
 import OrgTeamPage from "./pages/org/OrgTeamPage";
@@ -115,7 +114,6 @@ import OrgLicensesPage from "./pages/org/OrgLicensesPage";
 import OrgBillingPage from "./pages/org/OrgBillingPage";
 import OrgBrandingPage from "./pages/org/OrgBrandingPage";
 import OrgSettingsPage from "./pages/org/OrgSettingsPage";
-
 // Content Editor Pages
 import ContentEditorDashboardPage from "./pages/content/ContentEditorDashboardPage";
 import ContentReviewQueuePage from "./pages/content/ContentReviewQueuePage";
@@ -125,196 +123,487 @@ import TranslationReviewPage from "./pages/content/TranslationReviewPage";
 import ContentSuggestionsPage from "./pages/content/ContentSuggestionsPage";
 import ContentEditorProfilePage from "./pages/content/ContentEditorProfilePage";
 import { UserProvider } from "./context/UserContext";
-import BrowseSchedule from './pages/student/BrowseSchedule';
-
 // Role Guard (temporarily disabled for testing)
 // import RoleGuard from './components/auth/RoleGuard';
-
 function App() {
-  return (
-    <UiPreferencesProvider>
-      <AuthProvider>
-        <UserProvider>
-          <ErrorBoundary>
-            <BrowserRouter>
-              <Routes>
-                {/* Redirect root to login */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
-
-                {/* Auth Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/email-verification" element={<EmailVerification />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/auth/onboarding-preferences" element={<OnboardingPreferences />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-
-                {/* Role-based Dashboard Routes */}
-                {/* Platform Owner Routes */}
-                <Route path="/owner/dashboard" element={<PlatformOwnerDashboardPage />} />
-                <Route path="/owner/users" element={<UsersRolesPage />} />
-                <Route path="/owner/billing" element={<BillingPayoutsPage />} />
-                <Route path="/owner/security" element={<SecurityCompliancePage />} />
-                <Route path="/owner/settings" element={<SystemSettingsPage />} />
-                <Route path="/owner/ai-governance" element={<AiGovernancePage />} />
-
-                {/* Admin Routes - accessible by PLATFORM_OWNER and ADMIN */}
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/users" element={<UsersManagementPage />} />
-                <Route path="/admin/coaches" element={<CoachesManagementPage />} />
-                <Route path="/admin/courses/moderation" element={<CourseModerationPage />} />
-                <Route path="/admin/funnels" element={<FunnelDashboardPage />} />
-                <Route path="/admin/funnels/:funnelId" element={<FunnelBuilderPage />} />
-                <Route path="/admin/finance" element={<FinancialControlPage />} />
-                <Route path="/admin/contacts" element={<ContactsPage />} />
-                <Route path="/admin/contacts/:contactId" element={<ContactProfilePlaceholderPage />} />
-                <Route path="/admin/crm-marketing" element={<AdminCrmMarketingPage />} />
-                <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
-                <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
-                <Route path="/admin/security" element={<SecurityCenterPage />} />
-                <Route path="/admin/settings" element={<AdminSystemSettingsPage />} />
-
-                {/* Coach Routes */}
-                <Route path="/coach/dashboard" element={<CoachDashboard />} />
-                <Route path="/coach/courses" element={<CourseList />} />
-                <Route path="/coach/courses/new" element={<CourseCreate />} />
-                <Route path="/coach/courses/:courseId/edit" element={<CourseBuilder />} />
-                <Route path="/coach/courses/:courseId/students" element={<CourseStudents />} />
-                <Route path="/coach/ai-tools" element={<AICourseToolsHome />} />
-                <Route path="/coach/coaching-tools" element={<CoachingToolsHub />} />
-                <Route path="/coach/earnings" element={<EarningsDashboard />} />
-                <Route path="/coach/profile" element={<CoachProfilePage />} />
-                <Route path="/coach/messages" element={<CoachMessagesPage />} />
-                <Route path="/coach/students" element={<CoachStudentsPage />} />
-                <Route path="/coach/quizzes" element={<CoachQuizzesPage />} />
-                <Route path="/coach/subcoach-management" element={<SubCoachManagement />} />
-
-                {/* Sub-Coach Routes */}
-                <Route path="/subcoach/dashboard" element={<SubCoachDashboardPage />} />
-                <Route path="/subcoach/students" element={<SubCoachStudentsPage />} />
-                <Route path="/subcoach/lessons" element={<SubCoachLessonsPage />} />
-                <Route path="/subcoach/grading" element={<SubCoachGradingPage />} />
-                <Route path="/subcoach/groups" element={<SubCoachGroupsPage />} />
-                <Route path="/subcoach/community" element={<SubCoachCommunityPage />} />
-                <Route path="/subcoach/notifications" element={<SubCoachNotificationsPage />} />
-                <Route path="/subcoach/profile" element={<SubCoachProfilePage />} />
-
-                {/* Content Editor Routes - RoleGuard temporarily disabled for testing */}
-                <Route path="/content/dashboard" element={<ContentEditorDashboardPage />} />
-                <Route path="/content/review-queue" element={<ContentReviewQueuePage />} />
-                <Route path="/content/courses" element={<CourseContentBrowserPage />} />
-                <Route path="/content/resources" element={<ResourceLibraryPage />} />
-                <Route path="/content/translations" element={<TranslationReviewPage />} />
-                <Route path="/content/suggestions" element={<ContentSuggestionsPage />} />
-                <Route path="/content/profile" element={<ContentEditorProfilePage />} />
-
-                {/* Community Manager Routes - RoleGuard temporarily disabled for testing */}
-                <Route path="/community/dashboard" element={<CommunityDashboardPage />} />
-                <Route path="/community/overview" element={<CommunityOverviewPage />} />
-                <Route path="/community/groups" element={<CommunityGroupsPage />} />
-                <Route path="/community/approvals" element={<CommunityApprovalQueuePage />} />
-                <Route path="/community/announcements" element={<CommunityAnnouncementsPage />} />
-                <Route path="/community/engagement" element={<CommunityEngagementPage />} />
-                <Route path="/community/profile" element={<CommunityProfilePage />} />
-
-                {/* Support Staff Routes - RoleGuard temporarily disabled for testing */}
-                <Route path="/support/dashboard" element={<SupportDashboardPage />} />
-                <Route path="/support/tickets" element={<SupportTicketsPage />} />
-                <Route path="/support/students" element={<SupportStudentsPage />} />
-                <Route path="/support/tech-status" element={<SupportTechStatusPage />} />
-                <Route path="/support/certificates" element={<SupportCertificatesPage />} />
-                <Route path="/support/knowledge-base" element={<SupportKnowledgeBasePage />} />
-                <Route path="/support/profile" element={<SupportProfilePage />} />
-
-                {/* Organization Owner Routes - RoleGuard temporarily disabled for testing */}
-                <Route path="/org/dashboard" element={<OrgDashboardPage />} />
-                <Route path="/org/team" element={<OrgTeamPage />} />
-                <Route path="/org/seats" element={<OrgSeatsPage />} />
-                <Route path="/org/learners" element={<OrgLearnersPage />} />
-                <Route path="/org/analytics" element={<OrgAnalyticsPage />} />
-                <Route path="/org/programs" element={<OrgProgramsPage />} />
-                <Route path="/org/licenses" element={<OrgLicensesPage />} />
-                <Route path="/org/billing" element={<OrgBillingPage />} />
-                <Route path="/org/branding" element={<OrgBrandingPage />} />
-                <Route path="/org/settings" element={<OrgSettingsPage />} />
-
-                {/* Student Routes */}
-                <Route path="/student/dashboard" element={<StudentDashboard />} />
-                <Route path="/student/courses" element={<CourseCatalog />} />
-                <Route path="/student/courses/:courseId" element={<CourseDetail />} />
-                <Route path="/student/courses/:courseId/lessons/:lessonId" element={<CoursePlayer />} />
-
-                {/* Quiz Routes */}
-                <Route path="/student/courses/:courseId/quizzes/:quizId" element={<QuizStart />} />
-                <Route path="/student/courses/:courseId/quizzes/:quizId/take" element={<QuizSession />} />
-                <Route path="/student/courses/:courseId/quizzes/:quizId/result" element={<QuizResult />} />
-
-                {/* Community Routes */}
-                <Route path="/student/community" element={<DiscussionBoard />} />
-                <Route path="/student/community/threads/:threadId" element={<ThreadView />} />
-                <Route path="/student/courses/:courseId/circle" element={<CourseCircle />} />
-
-                {/* AI Coach Route */}
-                <Route path="/student/ai-coach" element={<AICoachHome />} />
-
-                {/* Coaching Routes */}
-                <Route path="/student/coaching" element={<CoachingCalendar />} />
-                <Route path="/student/coaching/coaches/:coachId" element={<CoachProfile />} />
-                <Route path="/student/coaching/coaches/:coachId/book" element={<CoachingBooking />} />
-                <Route path="/student/coaching/sessions" element={<CoachingSessions />} />
-
-                {/* Live Classes Routes */}
-                <Route path="/student/live-classes" element={<LiveClasses />} />
-                <Route path="/student/live-class/:classId" element={<LiveClassRoom />} />
-                <Route path="/student/Browse-Schedule" element={<BrowseSchedule />} />
-
-                {/* Profile Routes */}
-                <Route path="/student/profile" element={<StudentProfileView />} />
-                <Route path="/student/profile/edit" element={<StudentProfileEdit />} />
-                <Route path="/student/settings" element={<StudentSettings />} />
-                <Route path="/student/settings/account" element={<StudentAccountSettings />} />
-                <Route path="/student/settings/billing" element={<StudentBilling />} />
-
-                {/* Certificates Routes */}
-                <Route path="/student/certificates" element={<CertificatesList />} />
-                <Route path="/student/certificates/:certificateId" element={<CertificateDetail />} />
-
-                {/* Membership Routes */}
-                <Route path="/student/membership" element={<MembershipPlans />} />
-                <Route path="/student/membership/manage" element={<MembershipManage />} />
-                <Route path="/student/membership/confirmation" element={<MembershipConfirmation />} />
-
-                {/* Student Messages Route */}
-                <Route
-                  path="/student/messages"
-                  element={<StudentMessages />}
-                />
-
-                {/* Public Certificate Verification Route */}
-                <Route
-                  path="/certificates/verify/:hash"
-                  element={<CertificateVerify />}
-                />
-
-                {/* System Error & Maintenance Routes */}
-                <Route path="/404" element={<Error404Page />} />
-                <Route path="/500" element={<Error500Page />} />
-                <Route
-                  path="/maintenance"
-                  element={<MaintenanceModePage />}
-                />
-
-                {/* Catch-all route for 404 */}
-                <Route path="*" element={<Error404Page />} />
-              </Routes>
-            </BrowserRouter>
-          </ErrorBoundary>
-          <CookieConsentBanner />
-        </UserProvider>
-      </AuthProvider>
-    </UiPreferencesProvider>
-  );
+    return (
+        <UiPreferencesProvider>
+            <AuthProvider>
+                <UserProvider>
+                    <ErrorBoundary>
+                        <BrowserRouter>
+                            <Routes>
+                                {/* Redirect root to login */}
+                                <Route
+                                    path="/"
+                                    element={<Navigate to="/login" replace />}
+                                />
+                                {/* Auth Routes */}
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/signup" element={<SignUp />} />
+                                <Route
+                                    path="/email-verification"
+                                    element={<EmailVerification />}
+                                />
+                                <Route
+                                    path="/forgot-password"
+                                    element={<ForgotPassword />}
+                                />
+                                <Route
+                                    path="/reset-password"
+                                    element={<ResetPassword />}
+                                />
+                                <Route
+                                    path="/onboarding-preferences"
+                                    element={<OnboardingPreferences />}
+                                />
+                                <Route
+                                    path="/admin/login"
+                                    element={<AdminLogin />}
+                                />
+                                {/* Coach Application Routes */}
+                                <Route path="/coach/apply" element={<CoachApplicationPage />} />
+                                <Route path="/verification-pending" element={<VerificationPending />} />
+                                {/* Role-based Dashboard Routes */}
+                                {/* Platform Owner Routes */}
+                                <Route
+                                    path="/owner/dashboard"
+                                    element={<PlatformOwnerDashboardPage />}
+                                />
+                                <Route
+                                    path="/owner/users"
+                                    element={<UsersRolesPage />}
+                                />
+                                <Route
+                                    path="/owner/billing"
+                                    element={<BillingPayoutsPage />}
+                                />
+                                <Route
+                                    path="/owner/security"
+                                    element={<SecurityCompliancePage />}
+                                />
+                                <Route
+                                    path="/owner/settings"
+                                    element={<SystemSettingsPage />}
+                                />
+                                <Route
+                                    path="/owner/ai-governance"
+                                    element={<AiGovernancePage />}
+                                />
+                                {/* Admin Routes - accessible by PLATFORM_OWNER and ADMIN */}
+                                <Route
+                                    path="/admin/dashboard"
+                                    element={<AdminDashboard />}
+                                />
+                                <Route
+                                    path="/admin/users"
+                                    element={<UsersManagementPage />}
+                                />
+                                <Route
+                                    path="/admin/coaches"
+                                    element={<CoachesManagementPage />}
+                                />
+                                <Route
+                                    path="/admin/courses/moderation"
+                                    element={<CourseModerationPage />}
+                                />
+                                <Route
+                                    path="/admin/funnels"
+                                    element={<FunnelDashboardPage />}
+                                />
+                                <Route
+                                    path="/admin/funnels/:funnelId"
+                                    element={<FunnelBuilderPage />}
+                                />
+                                <Route
+                                    path="/admin/finance"
+                                    element={<FinancialControlPage />}
+                                />
+                                <Route
+                                    path="/admin/contacts"
+                                    element={<ContactsPage />}
+                                />
+                                <Route
+                                    path="/admin/contacts/:contactId"
+                                    element={<ContactProfilePlaceholderPage />}
+                                />
+                                <Route
+                                    path="/admin/crm-marketing"
+                                    element={<AdminCrmMarketingPage />}
+                                />
+                                <Route
+                                    path="/admin/notifications"
+                                    element={<AdminNotificationsPage />}
+                                />
+                                <Route
+                                    path="/admin/analytics"
+                                    element={<AdminAnalyticsPage />}
+                                />
+                                <Route
+                                    path="/admin/security"
+                                    element={<SecurityCenterPage />}
+                                />
+                                <Route
+                                    path="/admin/settings"
+                                    element={<AdminSystemSettingsPage />}
+                                />
+                                {/* Coach Routes */}
+                                <Route
+                                    path="/coach/dashboard"
+                                    element={<CoachDashboard />}
+                                />
+                                <Route
+                                    path="/coach/courses"
+                                    element={<CourseList />}
+                                />
+                                <Route
+                                    path="/coach/courses/new"
+                                    element={<CourseCreate />}
+                                />
+                                <Route
+                                    path="/coach/courses/:courseId/edit"
+                                    element={<CourseBuilder />}
+                                />
+                                <Route
+                                    path="/coach/courses/:courseId/students"
+                                    element={<CourseStudents />}
+                                />
+                                <Route
+                                    path="/coach/ai-tools"
+                                    element={<AICourseToolsHome />}
+                                />
+                                <Route
+                                    path="/coach/coaching-tools"
+                                    element={<CoachingToolsHub />}
+                                />
+                                <Route
+                                    path="/coach/earnings"
+                                    element={<EarningsDashboard />}
+                                />
+                                <Route
+                                    path="/coach/profile"
+                                    element={<CoachProfilePage />}
+                                />
+                                <Route
+                                    path="/coach/messages"
+                                    element={<CoachMessagesPage />}
+                                />
+                                <Route
+                                    path="/coach/students"
+                                    element={<CoachStudentsPage />}
+                                />
+                                <Route
+                                    path="/coach/quizzes"
+                                    element={<CoachQuizzesPage />}
+                                />
+                                <Route
+                                    path="/coach/subcoach-management"
+                                    element={<SubCoachManagement />}
+                                />
+                                {/* Sub-Coach Routes */}
+                                <Route
+                                    path="/subcoach/dashboard"
+                                    element={<SubCoachDashboardPage />}
+                                />
+                                <Route
+                                    path="/subcoach/students"
+                                    element={<SubCoachStudentsPage />}
+                                />
+                                <Route
+                                    path="/subcoach/lessons"
+                                    element={<SubCoachLessonsPage />}
+                                />
+                                <Route
+                                    path="/subcoach/grading"
+                                    element={<SubCoachGradingPage />}
+                                />
+                                <Route
+                                    path="/subcoach/groups"
+                                    element={<SubCoachGroupsPage />}
+                                />
+                                <Route
+                                    path="/subcoach/community"
+                                    element={<SubCoachCommunityPage />}
+                                />
+                                <Route
+                                    path="/subcoach/notifications"
+                                    element={<SubCoachNotificationsPage />}
+                                />
+                                <Route
+                                    path="/subcoach/profile"
+                                    element={<SubCoachProfilePage />}
+                                />
+                                {/* Content Editor Routes - RoleGuard temporarily disabled for testing */}
+                                <Route
+                                    path="/content/dashboard"
+                                    element={<ContentEditorDashboardPage />}
+                                />
+                                <Route
+                                    path="/content/review-queue"
+                                    element={<ContentReviewQueuePage />}
+                                />
+                                <Route
+                                    path="/content/courses"
+                                    element={<CourseContentBrowserPage />}
+                                />
+                                <Route
+                                    path="/content/resources"
+                                    element={<ResourceLibraryPage />}
+                                />
+                                <Route
+                                    path="/content/translations"
+                                    element={<TranslationReviewPage />}
+                                />
+                                <Route
+                                    path="/content/suggestions"
+                                    element={<ContentSuggestionsPage />}
+                                />
+                                <Route
+                                    path="/content/profile"
+                                    element={<ContentEditorProfilePage />}
+                                />
+                                {/* Community Manager Routes - RoleGuard temporarily disabled for testing */}
+                                <Route
+                                    path="/community/dashboard"
+                                    element={<CommunityDashboardPage />}
+                                />
+                                <Route
+                                    path="/community/overview"
+                                    element={<CommunityOverviewPage />}
+                                />
+                                <Route
+                                    path="/community/groups"
+                                    element={<CommunityGroupsPage />}
+                                />
+                                <Route
+                                    path="/community/approvals"
+                                    element={<CommunityApprovalQueuePage />}
+                                />
+                                <Route
+                                    path="/community/announcements"
+                                    element={<CommunityAnnouncementsPage />}
+                                />
+                                <Route
+                                    path="/community/engagement"
+                                    element={<CommunityEngagementPage />}
+                                />
+                                <Route
+                                    path="/community/profile"
+                                    element={<CommunityProfilePage />}
+                                />
+                                {/* Support Staff Routes - RoleGuard temporarily disabled for testing */}
+                                <Route
+                                    path="/support/dashboard"
+                                    element={<SupportDashboardPage />}
+                                />
+                                <Route
+                                    path="/support/tickets"
+                                    element={<SupportTicketsPage />}
+                                />
+                                <Route
+                                    path="/support/students"
+                                    element={<SupportStudentsPage />}
+                                />
+                                <Route
+                                    path="/support/tech-status"
+                                    element={<SupportTechStatusPage />}
+                                />
+                                <Route
+                                    path="/support/certificates"
+                                    element={<SupportCertificatesPage />}
+                                />
+                                <Route
+                                    path="/support/knowledge-base"
+                                    element={<SupportKnowledgeBasePage />}
+                                />
+                                <Route
+                                    path="/support/profile"
+                                    element={<SupportProfilePage />}
+                                />
+                                {/* Organization Owner Routes - RoleGuard temporarily disabled for testing */}
+                                <Route
+                                    path="/org/dashboard"
+                                    element={<OrgDashboardPage />}
+                                />
+                                <Route
+                                    path="/org/team"
+                                    element={<OrgTeamPage />}
+                                />
+                                <Route
+                                    path="/org/seats"
+                                    element={<OrgSeatsPage />}
+                                />
+                                <Route
+                                    path="/org/learners"
+                                    element={<OrgLearnersPage />}
+                                />
+                                <Route
+                                    path="/org/analytics"
+                                    element={<OrgAnalyticsPage />}
+                                />
+                                <Route
+                                    path="/org/programs"
+                                    element={<OrgProgramsPage />}
+                                />
+                                <Route
+                                    path="/org/licenses"
+                                    element={<OrgLicensesPage />}
+                                />
+                                <Route
+                                    path="/org/billing"
+                                    element={<OrgBillingPage />}
+                                />
+                                <Route
+                                    path="/org/branding"
+                                    element={<OrgBrandingPage />}
+                                />
+                                <Route
+                                    path="/org/settings"
+                                    element={<OrgSettingsPage />}
+                                />
+                                {/* Student Routes */}
+                                <Route
+                                    path="/student/dashboard"
+                                    element={<StudentDashboard />}
+                                />
+                                <Route
+                                    path="/student/courses"
+                                    element={<CourseCatalog />}
+                                />
+                                <Route
+                                    path="/student/courses/:courseId"
+                                    element={<CourseDetail />}
+                                />
+                                <Route
+                                    path="/student/courses/:courseId/lessons/:lessonId"
+                                    element={<CoursePlayer />}
+                                />
+                                {/* Quiz Routes */}
+                                <Route
+                                    path="/student/courses/:courseId/quizzes/:quizId"
+                                    element={<QuizStart />}
+                                />
+                                <Route
+                                    path="/student/courses/:courseId/quizzes/:quizId/take"
+                                    element={<QuizSession />}
+                                />
+                                <Route
+                                    path="/student/courses/:courseId/quizzes/:quizId/result"
+                                    element={<QuizResult />}
+                                />
+                                {/* Community Routes */}
+                                <Route
+                                    path="/student/community"
+                                    element={<DiscussionBoard />}
+                                />
+                                <Route
+                                    path="/student/community/threads/:threadId"
+                                    element={<ThreadView />}
+                                />
+                                <Route
+                                    path="/student/courses/:courseId/circle"
+                                    element={<CourseCircle />}
+                                />
+                                {/* AI Coach Route */}
+                                <Route
+                                    path="/student/ai-coach"
+                                    element={<AICoachHome />}
+                                />
+                                {/* Coaching Routes */}
+                                <Route
+                                    path="/student/coaching"
+                                    element={<CoachingCalendar />}
+                                />
+                                <Route
+                                    path="/student/coaching/coaches/:coachId"
+                                    element={<CoachProfile />}
+                                />
+                                <Route
+                                    path="/student/coaching/coaches/:coachId/book"
+                                    element={<CoachingBooking />}
+                                />
+                                <Route
+                                    path="/student/coaching/sessions"
+                                    element={<CoachingSessions />}
+                                />
+                                {/* Live Classes Routes */}
+                                <Route
+                                    path="/student/live-classes"
+                                    element={<LiveClasses />}
+                                />
+                                <Route
+                                    path="/student/live-class/:classId"
+                                    element={<LiveClassRoom />}
+                                />
+                                {/* Profile Routes */}
+                                <Route
+                                    path="/student/profile"
+                                    element={<StudentProfileView />}
+                                />
+                                <Route
+                                    path="/student/profile/edit"
+                                    element={<StudentProfileEdit />}
+                                />
+                                <Route
+                                    path="/student/settings"
+                                    element={<StudentSettings />}
+                                />
+                                <Route
+                                    path="/student/settings/account"
+                                    element={<StudentAccountSettings />}
+                                />
+                                <Route
+                                    path="/student/settings/billing"
+                                    element={<StudentBilling />}
+                                />
+                                {/* Certificates Routes */}
+                                <Route
+                                    path="/student/certificates"
+                                    element={<CertificatesList />}
+                                />
+                                <Route
+                                    path="/student/certificates/:certificateId"
+                                    element={<CertificateDetail />}
+                                />
+                                {/* Membership Routes */}
+                                <Route
+                                    path="/student/membership"
+                                    element={<MembershipPlans />}
+                                />
+                                <Route
+                                    path="/student/membership/manage"
+                                    element={<MembershipManage />}
+                                />
+                                <Route
+                                    path="/student/membership/confirmation"
+                                    element={<MembershipConfirmation />}
+                                />
+                                {/* Student Messages Route */}
+                                <Route
+                                    path="/student/messages"
+                                    element={<StudentMessages />}
+                                />
+                                {/* Public Certificate Verification Route */}
+                                <Route
+                                    path="/certificates/verify/:hash"
+                                    element={<CertificateVerify />}
+                                />
+                                {/* System Error & Maintenance Routes */}
+                                <Route path="/404" element={<Error404Page />} />
+                                <Route path="/500" element={<Error500Page />} />
+                                <Route
+                                    path="/maintenance"
+                                    element={<MaintenanceModePage />}
+                                />
+                                {/* Catch-all route for 404 */}
+                                <Route path="*" element={<Error404Page />} />
+                            </Routes>
+                        </BrowserRouter>
+                    </ErrorBoundary>
+                    <CookieConsentBanner />
+                </UserProvider>
+            </AuthProvider>
+        </UiPreferencesProvider>
+    );
 }
-
 export default App;

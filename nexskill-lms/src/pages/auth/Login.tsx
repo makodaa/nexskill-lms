@@ -170,6 +170,14 @@ const Login: React.FC = () => {
           <p className="mt-2 text-xs text-text-muted italic">
             Please use your registered credentials to sign in.
           </p>
+          <div className="mt-4 text-center">
+            <Link
+              to="/admin/login"
+              className="text-xs text-brand-primary hover:underline hover:text-brand-primary-light transition-colors"
+            >
+              Go to Admin Login
+            </Link>
+          </div>
         </div>
 
         {/* Login Form */}
