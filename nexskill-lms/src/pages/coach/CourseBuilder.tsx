@@ -11,10 +11,11 @@ import CoursePricingForm from '../../components/coach/CoursePricingForm';
 import CoursePublishWorkflow from '../../components/coach/CoursePublishWorkflow';
 import CoursePreviewPane from '../../components/coach/CoursePreviewPane';
 import LessonEditorPanel from '../../components/coach/LessonEditorPanel';
+import LiveSessionManager from '../../components/coach/LiveSessionManager';
 import type { Lesson } from '../../types/lesson';
 import { supabase } from '../../lib/supabaseClient';
 
-type SectionKey = 'settings' | 'curriculum' | 'lessons' | 'quizzes' | 'drip' | 'pricing' | 'publish' | 'preview';
+type SectionKey = 'settings' | 'curriculum' | 'lessons' | 'live-sessions' | 'quizzes' | 'drip' | 'pricing' | 'publish' | 'preview';
 
 interface CourseSettings {
   title: string;
@@ -667,6 +668,10 @@ const CourseBuilder: React.FC = () => {
         if (removeError) console.error('Error removing topics:', removeError);
       }
 
+      // Sync local status
+      setCourseStatus(settings.visibility === 'public' ? 'published' : 'draft');
+      window.alert('Settings saved successfully');
+
     } catch (error) {
       console.error('Error saving settings:', error);
       window.alert('Failed to save settings');
@@ -704,6 +709,8 @@ const CourseBuilder: React.FC = () => {
             </button>
           </div>
         );
+      case 'live-sessions':
+        return <LiveSessionManager />;
       case 'quizzes':
         return <QuizBuilderPanel questions={questions} onChange={setQuestions} />;
       case 'drip':

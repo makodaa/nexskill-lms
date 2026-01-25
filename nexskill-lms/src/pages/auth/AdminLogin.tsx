@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useUser } from '../../context/UserContext';
+// import { useUser } from '../../context/UserContext';
+
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const AdminLogin: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { signIn } = useAuth();
-  const { getDefaultRoute } = useUser();
+  // const { getDefaultRoute } = useUser();
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,17 +29,59 @@ const AdminLogin: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { error: signInError } = await signIn(formData.email, formData.password);
-      
+      // 1. Authenticate with Supabase
+      const { data: authData, error: signInError } = await signIn(formData.email, formData.password);
+
       if (signInError) {
         setError(signInError.message);
         setIsLoading(false);
         return;
       }
 
-      // Small delay to ensure profile is fetched
+      if (!authData?.user) {
+        setError("Authentication failed. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // 2. Check if user has 'admin' or 'platform_owner' role
+      // We need to import supabase from lib/supabaseClient to make this query
+      // Note: This assumes a 'profiles' table exists with a 'role' column
+      const { supabase } = await import('../../lib/supabaseClient');
+
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', authData.user.id)
+        .single();
+
+      if (profileError) {
+        console.error("Error fetching profile:", profileError);
+        // Fallback: accept if no profile found? Or reject? 
+        // Safer to reject for an admin portal if database query fails.
+        // However, if we are in development and using mock data, this might block us.
+        // For now, let's log it but proceed to rejection if we can't verify.
+        setError("Failed to verify admin privileges.");
+        await useAuth().signOut; // ensure we sign out if check fails
+        setIsLoading(false);
+        return;
+      }
+
+      // Check for Admin or Platform Owner roles
+      const allowedRoles = ['admin', 'platform_owner'];
+      const userRole = profile?.role?.toLowerCase();
+
+      if (!userRole || !allowedRoles.includes(userRole)) {
+        setError("Unauthorized access. Admin privileges required.");
+        // Sign out immediately
+        await supabase.auth.signOut();
+        setIsLoading(false);
+        return;
+      }
+
+      // Small delay to ensure state propagates
       setTimeout(() => {
-        navigate(getDefaultRoute());
+        navigate('/admin/dashboard');
       }, 100);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -143,11 +186,10 @@ const AdminLogin: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full py-3 rounded-full font-semibold transition-all ${
-                isLoading
-                  ? 'bg-[#E5E7EB] text-[#9CA3B5] cursor-not-allowed'
-                  : 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
-              }`}
+              className={`w-full py-3 rounded-full font-semibold transition-all ${isLoading
+                ? 'bg-[#E5E7EB] text-[#9CA3B5] cursor-not-allowed'
+                : 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
+                }`}
             >
               {isLoading ? 'Authenticating...' : 'Sign In to Admin Console'}
             </button>

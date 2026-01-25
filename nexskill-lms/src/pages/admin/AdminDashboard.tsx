@@ -104,7 +104,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <AdminAppLayout>
-      <div className="space-y-6">
+      <div className="m-5 space-y-6">
         {/* Page Header */}
         <div className="flex items-start justify-between">
           <div>
@@ -144,11 +144,10 @@ const AdminDashboard: React.FC = () => {
                         setShowTimeframeDropdown(false);
                         window.alert(`📊 Timeframe Updated\n\nSelected Period: ${option}\n\n📈 Dashboard Analytics:\n• Refreshing all metrics\n• Loading comparison data\n• Updating trend graphs\n• Recalculating KPIs\n\n💡 What's Included:\n• Revenue & enrollment data\n• User engagement metrics\n• Course performance stats\n• Growth comparisons\n\nAll widgets will update with ${option} data.`);
                       }}
-                      className={`w-full text-left px-4 py-2 text-sm hover:bg-[#F5F7FF] transition-colors ${
-                        timeframe === option
-                          ? 'text-[#304DB5] font-semibold'
-                          : 'text-[#5F6473]'
-                      }`}
+                      className={`w-full text-left px-4 py-2 text-sm hover:bg-[#F5F7FF] transition-colors ${timeframe === option
+                        ? 'text-[#304DB5] font-semibold'
+                        : 'text-[#5F6473]'
+                        }`}
                     >
                       {option}
                     </button>

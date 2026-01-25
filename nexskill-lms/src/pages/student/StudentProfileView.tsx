@@ -20,16 +20,18 @@ interface StudentProfile {
 const StudentProfileView: React.FC = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [interests, setInterests] = useState<string[]>([]);
+  const [goals, setGoals] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch profile data
+  // Fetch profile data with interests and goals
   useEffect(() => {
     async function fetchProfile() {
       try {
         // Get current user
         const { data: { user }, error: userError } = await supabase.auth.getUser();
-        
+
         if (userError) throw userError;
         if (!user) {
           navigate('/login');
@@ -41,11 +43,53 @@ const StudentProfileView: React.FC = () => {
           .from('student_profiles')
           .select('*')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         if (profileError) throw profileError;
-        
+
         setProfile(profileData);
+
+        // Fetch interests
+        const { data: interestsData, error: interestsError } = await supabase
+          .from('student_interests')
+          .select(`
+            interest_id,
+            interests (
+              id,
+              name
+            )
+          `)
+          .eq('student_profile_id', profileData.id);
+
+        if (interestsError) {
+          console.error('Error fetching interests:', interestsError);
+        } else {
+          const interestNames = interestsData
+            ?.map((item: any) => item.interests?.name)
+            .filter(Boolean) || [];
+          setInterests(interestNames);
+        }
+
+        // Fetch goals
+        const { data: goalsData, error: goalsError } = await supabase
+          .from('student_goals')
+          .select(`
+            goal_id,
+            goals (
+              id,
+              name
+            )
+          `)
+          .eq('student_profile_id', profileData.id);
+
+        if (goalsError) {
+          console.error('Error fetching goals:', goalsError);
+        } else {
+          const goalNames = goalsData
+            ?.map((item: any) => item.goals?.name)
+            .filter(Boolean) || [];
+          setGoals(goalNames);
+        }
       } catch (err) {
         console.error('Error fetching profile:', err);
         setError(err instanceof Error ? err.message : 'Failed to load profile');
@@ -93,7 +137,6 @@ const StudentProfileView: React.FC = () => {
   }
 
   // Transform profile data for ProfileHeaderCard component
-  // Using dummy data for stats until they're implemented in the database
   const profileData = {
     name: `${profile.first_name} ${profile.last_name}`,
     headline: profile.headline || 'Student',
@@ -101,8 +144,8 @@ const StudentProfileView: React.FC = () => {
     memberSince: new Date(profile.created_at).getFullYear().toString(),
     streakDays: 12, // TODO: Implement streak tracking in database
     bio: profile.bio || "I'm a career switcher passionate about creating user-centered digital experiences. Currently learning UI/UX design fundamentals and building my portfolio.",
-    interests: ['Design', 'Business', 'Career'], // TODO: Load from database when implemented
-    goals: ['Get a job', 'Start a side project'], // TODO: Load from database when implemented
+    interests: interests,
+    goals: goals,
     completedCourses: 8, // TODO: Implement course tracking in database
     certificates: 3, // TODO: Implement certificate tracking in database
     hoursLearned: 45, // TODO: Implement hours tracking in database
@@ -127,8 +170,7 @@ const StudentProfileView: React.FC = () => {
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{profileData.bio}</p>
             </div>
 
-            {/* Interests & Goals - Using dummy data for now */}
-            {/* TODO: Connect to database when interests and goals are implemented */}
+            {/* Interests & Goals */}
             <ProfileInterestsGoals
               mode="view"
               interests={profileData.interests}

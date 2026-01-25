@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import StudentAppLayout from '../../layouts/StudentAppLayout';
-import { supabase } from '../../lib/supabaseClient';
-// import type { Course } from '../../types/db';
 
 // Dummy course detail data
 const coursesData: Record<string, any> = {
@@ -14,159 +12,173 @@ const coursesData: Record<string, any> = {
     rating: 4.8,
     reviewCount: 1240,
     studentsCount: 12450,
-    duration: '24h 30m',
+    duration: "24h 30m",
     price: 49,
     originalPrice: 99,
-    description: 'Dive deep into the world of UI/UX design with this comprehensive bootcamp. Learn industry-standard tools, design thinking methodologies, and create stunning user interfaces. This course covers everything from wireframing to high-fidelity prototyping, user research, and usability testing.',
+    description:
+      "Dive deep into the world of UI/UX design with this comprehensive bootcamp. Learn industry-standard tools, design thinking methodologies, and create stunning user interfaces. This course covers everything from wireframing to high-fidelity prototyping, user research, and usability testing.",
     whatYouLearn: [
-      'Master Figma, Sketch, and Adobe XD from scratch',
-      'Create wireframes and interactive prototypes',
-      'Conduct user research and usability testing',
-      'Apply design thinking methodology to solve problems',
-      'Build a professional portfolio with real-world projects',
-      'Understand color theory, typography, and layout principles',
+      "Master Figma, Sketch, and Adobe XD from scratch",
+      "Create wireframes and interactive prototypes",
+      "Conduct user research and usability testing",
+      "Apply design thinking methodology to solve problems",
+      "Build a professional portfolio with real-world projects",
+      "Understand color theory, typography, and layout principles",
     ],
-    tools: ['Figma', 'Sketch', 'Adobe XD', 'InVision', 'Principle'],
+    tools: ["Figma", "Sketch", "Adobe XD", "InVision", "Principle"],
     curriculum: [
       {
         id: 1,
-        title: 'Module 1: Design Foundations',
+        title: "Module 1: Design Foundations",
         lessons: [
-          { id: 1, title: 'Introduction to UI/UX Design', duration: '15:30' },
-          { id: 2, title: 'Design Thinking Process', duration: '22:45' },
-          { id: 3, title: 'Color Theory Fundamentals', duration: '18:20' },
-          { id: 4, title: 'Typography Best Practices', duration: '25:10' },
+          { id: 1, title: "Introduction to UI/UX Design", duration: "15:30" },
+          { id: 2, title: "Design Thinking Process", duration: "22:45" },
+          { id: 3, title: "Color Theory Fundamentals", duration: "18:20" },
+          { id: 4, title: "Typography Best Practices", duration: "25:10" },
         ],
       },
       {
         id: 2,
-        title: 'Module 2: Wireframing & Prototyping',
+        title: "Module 2: Wireframing & Prototyping",
         lessons: [
-          { id: 1, title: 'Low-Fidelity Wireframing', duration: '28:15' },
-          { id: 2, title: 'High-Fidelity Mockups', duration: '32:40' },
-          { id: 3, title: 'Interactive Prototyping', duration: '35:25' },
-          { id: 4, title: 'Micro-interactions & Animations', duration: '30:50' },
+          { id: 1, title: "Low-Fidelity Wireframing", duration: "28:15" },
+          { id: 2, title: "High-Fidelity Mockups", duration: "32:40" },
+          { id: 3, title: "Interactive Prototyping", duration: "35:25" },
+          {
+            id: 4,
+            title: "Micro-interactions & Animations",
+            duration: "30:50",
+          },
         ],
       },
       {
         id: 3,
-        title: 'Module 3: User Research & Testing',
+        title: "Module 3: User Research & Testing",
         lessons: [
-          { id: 1, title: 'User Personas & Journey Maps', duration: '20:30' },
-          { id: 2, title: 'Conducting User Interviews', duration: '24:15' },
-          { id: 3, title: 'Usability Testing Methods', duration: '27:45' },
-          { id: 4, title: 'Analyzing & Implementing Feedback', duration: '22:30' },
+          { id: 1, title: "User Personas & Journey Maps", duration: "20:30" },
+          { id: 2, title: "Conducting User Interviews", duration: "24:15" },
+          { id: 3, title: "Usability Testing Methods", duration: "27:45" },
+          {
+            id: 4,
+            title: "Analyzing & Implementing Feedback",
+            duration: "22:30",
+          },
         ],
       },
     ],
     reviews: [
       {
         id: 1,
-        userName: 'Emily Rodriguez',
-        avatar: '👩',
+        userName: "Emily Rodriguez",
+        avatar: "👩",
         rating: 5,
-        date: 'Nov 28, 2025',
-        comment: 'Absolutely amazing course! The instructor explains complex concepts in a very simple way. The projects are practical and helped me build a strong portfolio.',
+        date: "Nov 28, 2025",
+        comment:
+          "Absolutely amazing course! The instructor explains complex concepts in a very simple way. The projects are practical and helped me build a strong portfolio.",
       },
       {
         id: 2,
-        userName: 'James Chen',
-        avatar: '👨',
+        userName: "James Chen",
+        avatar: "👨",
         rating: 5,
-        date: 'Nov 15, 2025',
-        comment: 'Best investment I made for my career. Went from knowing nothing about UI/UX to landing my first design job in 3 months!',
+        date: "Nov 15, 2025",
+        comment:
+          "Best investment I made for my career. Went from knowing nothing about UI/UX to landing my first design job in 3 months!",
       },
       {
         id: 3,
-        userName: 'Sarah Williams',
-        avatar: '👩',
+        userName: "Sarah Williams",
+        avatar: "👩",
         rating: 4,
-        date: 'Nov 10, 2025',
-        comment: 'Great content and well-structured. Would love to see more advanced topics covered in future updates.',
+        date: "Nov 10, 2025",
+        comment:
+          "Great content and well-structured. Would love to see more advanced topics covered in future updates.",
       },
     ],
     coach: {
-      name: 'Alexandra Morgan',
-      avatar: '👩‍🏫',
-      bio: 'Senior Product Designer with 10+ years of experience at leading tech companies. Passionate about teaching and helping aspiring designers break into the industry.',
+      name: "Alexandra Morgan",
+      avatar: "👩‍🏫",
+      bio: "Senior Product Designer with 10+ years of experience at leading tech companies. Passionate about teaching and helping aspiring designers break into the industry.",
       studentsCount: 45000,
       coursesCount: 8,
       rating: 4.9,
     },
     includes: [
-      '24.5 hours of on-demand video',
-      '45 downloadable resources',
-      'Lifetime access',
-      'Certificate of completion',
-      'Access on mobile and desktop',
-      'Community support',
+      "24.5 hours of on-demand video",
+      "45 downloadable resources",
+      "Lifetime access",
+      "Certificate of completion",
+      "Access on mobile and desktop",
+      "Community support",
     ],
   },
-  '2': {
-    id: '2',
-    title: 'Advanced React & TypeScript',
-    category: 'Development',
-    level: 'Advanced',
+  "2": {
+    id: "2",
+    title: "Advanced React & TypeScript",
+    category: "Development",
+    level: "Advanced",
     rating: 4.9,
     reviewCount: 892,
     studentsCount: 8920,
-    duration: '18h 15m',
+    duration: "18h 15m",
     price: 79,
     originalPrice: 129,
-    description: 'Take your React skills to the next level with advanced patterns, performance optimization, and TypeScript integration. Build production-ready applications with best practices used by industry leaders.',
+    description:
+      "Take your React skills to the next level with advanced patterns, performance optimization, and TypeScript integration. Build production-ready applications with best practices used by industry leaders.",
     whatYouLearn: [
-      'Master advanced React patterns and hooks',
-      'Write type-safe code with TypeScript',
-      'Optimize performance and bundle size',
-      'Implement state management with Redux Toolkit',
-      'Build scalable application architecture',
-      'Testing strategies with Jest and React Testing Library',
+      "Master advanced React patterns and hooks",
+      "Write type-safe code with TypeScript",
+      "Optimize performance and bundle size",
+      "Implement state management with Redux Toolkit",
+      "Build scalable application architecture",
+      "Testing strategies with Jest and React Testing Library",
     ],
-    tools: ['React', 'TypeScript', 'Redux', 'Jest', 'Webpack'],
+    tools: ["React", "TypeScript", "Redux", "Jest", "Webpack"],
     curriculum: [
       {
         id: 1,
-        title: 'Module 1: Advanced React Patterns',
+        title: "Module 1: Advanced React Patterns",
         lessons: [
-          { id: 1, title: 'Custom Hooks Deep Dive', duration: '32:15' },
-          { id: 2, title: 'Compound Components', duration: '28:40' },
-          { id: 3, title: 'Render Props vs HOCs', duration: '25:30' },
+          { id: 1, title: "Custom Hooks Deep Dive", duration: "32:15" },
+          { id: 2, title: "Compound Components", duration: "28:40" },
+          { id: 3, title: "Render Props vs HOCs", duration: "25:30" },
         ],
       },
       {
         id: 2,
-        title: 'Module 2: TypeScript Integration',
+        title: "Module 2: TypeScript Integration",
         lessons: [
-          { id: 1, title: 'TypeScript Fundamentals', duration: '35:20' },
-          { id: 2, title: 'Typing React Components', duration: '30:45' },
-          { id: 3, title: 'Generics and Utility Types', duration: '27:15' },
+          { id: 1, title: "TypeScript Fundamentals", duration: "35:20" },
+          { id: 2, title: "Typing React Components", duration: "30:45" },
+          { id: 3, title: "Generics and Utility Types", duration: "27:15" },
         ],
       },
     ],
     reviews: [
       {
         id: 1,
-        userName: 'Michael Tech',
-        avatar: '👨‍💻',
+        userName: "Michael Tech",
+        avatar: "👨‍💻",
         rating: 5,
-        date: 'Dec 1, 2025',
-        comment: 'The most comprehensive React course I\'ve taken. Really helped me understand advanced patterns.',
+        date: "Dec 1, 2025",
+        comment:
+          "The most comprehensive React course I've taken. Really helped me understand advanced patterns.",
       },
     ],
     coach: {
-      name: 'David Kim',
-      avatar: '👨‍💼',
-      bio: 'Full-stack developer and tech lead with experience at Google and Facebook. Love sharing knowledge about modern web development.',
+      name: "David Kim",
+      avatar: "👨‍💼",
+      bio: "Full-stack developer and tech lead with experience at Google and Facebook. Love sharing knowledge about modern web development.",
       studentsCount: 32000,
       coursesCount: 6,
       rating: 4.9,
     },
     includes: [
-      '18 hours of on-demand video',
-      '30 coding exercises',
-      'Lifetime access',
-      'Certificate of completion',
-      'GitHub repository access',
+      "18 hours of on-demand video",
+      "30 coding exercises",
+      "Lifetime access",
+      "Certificate of completion",
+      "GitHub repository access",
     ],
   },
 };
@@ -174,27 +186,58 @@ const coursesData: Record<string, any> = {
 const CourseDetail: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'reviews' | 'coach'>('overview');
-  const [expandedModules, setExpandedModules] = useState<number[]>([1]);
+  const { user } = useAuth();
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [course, setCourse] = useState<any>(null);
+  const [course, setCourse] = useState<CourseDisplay | null>(null);
   const [loading, setLoading] = useState(true);
+  const [enrolling, setEnrolling] = useState(false);
+  const [checkingEnrollment, setCheckingEnrollment] = useState(false);
+
+  // Check if user is enrolled in the course
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (!user || !courseId) return;
+
+      try {
+        setCheckingEnrollment(true);
+        const { data, error } = await supabase
+          .from("enrollments")
+          .select("*")
+          .eq("profile_id", user.id)
+          .eq("course_id", courseId)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 = no rows returned
+          console.error("Error checking enrollment:", error);
+        } else if (data) {
+          setIsEnrolled(true);
+        }
+      } catch (err) {
+        console.error("Unexpected error checking enrollment:", err);
+      } finally {
+        setCheckingEnrollment(false);
+      }
+    };
+
+    checkEnrollment();
+  }, [user, courseId]);
 
   // Fetch course from Supabase
   useEffect(() => {
     const fetchCourse = async () => {
       if (!courseId) return;
-      
+
       try {
         setLoading(true);
         const { data, error } = await supabase
-          .from('courses')
-          .select('*')
-          .eq('id', courseId)
+          .from("courses")
+          .select("*")
+          .eq("id", courseId)
           .single();
 
         if (error) {
-          console.error('Error fetching course:', error);
+          console.error("Error fetching course:", error);
           // Fallback to mock data if available
           setCourse(coursesData[courseId] || null);
         } else if (data) {
@@ -202,14 +245,17 @@ const CourseDetail: React.FC = () => {
           setCourse({
             id: data.id,
             title: data.title,
-            category: 'General', // TODO: Join with categories
+            category: "General", // TODO: Join with categories
             level: data.level,
             rating: 0, // TODO: Calculate from reviews
             reviewCount: 0,
             studentsCount: 0, // TODO: Count from enrollments
             duration: `${data.duration_hours}h`,
             price: data.price,
-            description: data.long_description || data.short_description || 'No description available',
+            description:
+              data.long_description ||
+              data.short_description ||
+              "No description available",
             // Temporarily disabled sections (no data available)
             whatYouLearn: [],
             tools: [],
@@ -220,7 +266,7 @@ const CourseDetail: React.FC = () => {
           });
         }
       } catch (err) {
-        console.error('Unexpected error:', err);
+        console.error("Unexpected error:", err);
         setCourse(coursesData[courseId] || null);
       } finally {
         setLoading(false);
@@ -249,8 +295,12 @@ const CourseDetail: React.FC = () => {
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-center">
             <div className="text-6xl mb-4">📚</div>
-            <h2 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-2">Course not found</h2>
-            <p className="text-text-secondary dark:text-dark-text-secondary mb-6">The course you're looking for doesn't exist.</p>
+            <h2 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
+              Course not found
+            </h2>
+            <p className="text-text-secondary dark:text-dark-text-secondary mb-6">
+              The course you're looking for doesn't exist.
+            </p>
             <Link
               to="/student/courses"
               className="inline-block px-6 py-3 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full hover:shadow-lg transition-all"
@@ -263,21 +313,85 @@ const CourseDetail: React.FC = () => {
     );
   }
 
-  const toggleModule = (moduleId: number) => {
-    setExpandedModules((prev) =>
-      prev.includes(moduleId) ? prev.filter((id) => id !== moduleId) : [...prev, moduleId]
-    );
+  const handleEnroll = async () => {
+    if (!user || !courseId) {
+      alert("⚠️ Please log in to enroll in courses");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setEnrolling(true);
+
+      const { error } = await supabase.from("enrollments").insert({
+        profile_id: user.id,
+        course_id: courseId,
+      });
+
+      if (error) {
+        console.error("Error enrolling in course:", error);
+        alert(`❌ Failed to enroll: ${error.message}`);
+        return;
+      }
+
+      setIsEnrolled(true);
+      alert(
+        `✅ Successfully enrolled in ${course.title}!\n\n🎉 Welcome to the course! You can now access the course circle and connect with other students.`,
+      );
+    } catch (err) {
+      console.error("Unexpected error during enrollment:", err);
+      alert("❌ An unexpected error occurred. Please try again.");
+    } finally {
+      setEnrolling(false);
+    }
   };
 
-  const handleEnroll = () => {
-    console.log('Enrolling in course:', course.id);
-    alert(`✅ Successfully enrolled in ${course.title}!\n\n🎉 Welcome to the course! You can now access all lessons and materials.`);
-    setIsEnrolled(true);
+  const handleUnenroll = async () => {
+    if (!user || !courseId) return;
+
+    const confirmed = window.confirm(
+      `Are you sure you want to leave ${course.title}?\n\n` +
+        "You will lose access to:\n" +
+        "• Course circle discussions\n" +
+        "• Progress tracking\n" +
+        "• Community features\n\n" +
+        "You can re-enroll at any time.",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setEnrolling(true);
+
+      const { error } = await supabase
+        .from("enrollments")
+        .delete()
+        .eq("profile_id", user.id)
+        .eq("course_id", courseId);
+
+      if (error) {
+        console.error("Error unenrolling from course:", error);
+        alert(`❌ Failed to unenroll: ${error.message}`);
+        return;
+      }
+
+      setIsEnrolled(false);
+      alert(
+        `✓ You have been unenrolled from ${course.title}\n\nYou can re-enroll at any time from the course catalog.`,
+      );
+    } catch (err) {
+      console.error("Unexpected error during unenrollment:", err);
+      alert("❌ An unexpected error occurred. Please try again.");
+    } finally {
+      setEnrolling(false);
+    }
   };
 
   const handleAddToWishlist = () => {
-    console.log('Added to wishlist:', course.id);
-    alert(`❤️ Added to wishlist!\n\n${course.title} has been saved to your wishlist.`);
+    console.log("Added to wishlist:", course.id);
+    alert(
+      `❤️ Added to wishlist!\n\n${course.title} has been saved to your wishlist.`,
+    );
   };
 
   return (
@@ -285,11 +399,21 @@ const CourseDetail: React.FC = () => {
       {/* Header */}
       <div className="px-8 py-6 border-b border-[#EDF0FB] dark:border-gray-700">
         <button
-          onClick={() => navigate('/student/courses')}
+          onClick={() => navigate("/student/courses")}
           className="flex items-center gap-2 text-sm text-text-secondary hover:text-brand-primary mb-4 transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
           Back to catalog
         </button>
@@ -297,17 +421,25 @@ const CourseDetail: React.FC = () => {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.title}</h1>
+              <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">
+                {course.title}
+              </h1>
               <span className="px-3 py-1 bg-brand-primary-soft text-brand-primary rounded-full text-xs font-medium">
                 {course.level}
               </span>
             </div>
-            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-3">{course.category}</p>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-3">
+              {course.category}
+            </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-1">
                 <span className="text-yellow-500">★</span>
-                <span className="font-semibold text-text-primary dark:text-dark-text-primary">{course.rating}</span>
-                <span className="text-text-muted dark:text-dark-text-muted">({course.reviewCount} reviews)</span>
+                <span className="font-semibold text-text-primary dark:text-dark-text-primary">
+                  {course.rating}
+                </span>
+                <span className="text-text-muted dark:text-dark-text-muted">
+                  ({course.reviewCount} reviews)
+                </span>
               </div>
               <div className="flex items-center gap-1 text-text-secondary dark:text-dark-text-secondary">
                 <span>👥</span>
@@ -327,40 +459,43 @@ const CourseDetail: React.FC = () => {
         <div className="flex gap-6">
           {/* Left: Tabbed Content */}
           <div className="flex-1 min-w-0">
-            {/* Tab Bar */}
+            {/* Tab Bar - Only Overview */}
             <div className="flex gap-2 mb-6 border-b border-[#EDF0FB] dark:border-gray-700">
-              {(['overview', 'curriculum', 'reviews', 'coach'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-3 text-sm font-medium capitalize transition-all ${
-                    activeTab === tab
-                      ? 'text-brand-primary border-b-2 border-brand-primary'
-                      : 'text-text-secondary hover:text-brand-primary'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+              <button className="px-6 py-3 text-sm font-medium capitalize text-brand-primary border-b-2 border-brand-primary">
+                Overview
+              </button>
+              <div className="flex-1 flex items-center justify-end gap-2 text-sm text-text-muted dark:text-dark-text-muted pb-3">
+                <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs">
+                  📚 Curriculum coming soon
+                </span>
+              </div>
             </div>
 
             {/* Tab Content */}
-            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card dark:bg-dark-background-card p-8">
-              {activeTab === 'overview' && (
-                <div className="space-y-8">
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">About this course</h3>
-                    <p className="text-text-secondary leading-relaxed">{course.description}</p>
-                  </div>
+            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card p-8">
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+                    About this course
+                  </h3>
+                  <p className="text-text-secondary dark:text-dark-text-secondary leading-relaxed">
+                    {course.description}
+                  </p>
+                </div>
 
-                  {course.whatYouLearn && course.whatYouLearn.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">What you'll learn</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {course.whatYouLearn.map((item: string, index: number) => (
+                {course.whatYouLearn && course.whatYouLearn.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+                      What you'll learn
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {course.whatYouLearn.map(
+                        (item: string, index: number) => (
                           <div key={index} className="flex items-start gap-3">
                             <span className="text-green-500 mt-1">✓</span>
-                            <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{item}</span>
+                            <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                              {item}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -388,53 +523,46 @@ const CourseDetail: React.FC = () => {
               {activeTab === 'curriculum' && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">Course curriculum</h3>
-                  {course.curriculum && course.curriculum.length > 0 ? (
-                    course.curriculum.map((module: any) => (
-                      <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
-                        <button
-                          onClick={() => toggleModule(module.id)}
-                          className="w-full flex items-center justify-between p-4 hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <svg
-                              className={`w-5 h-5 text-text-muted transition-transform ${
-                                expandedModules.includes(module.id) ? 'rotate-90' : ''
-                              }`}
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                            <span className="font-medium text-text-primary dark:text-dark-text-primary">{module.title}</span>
-                          </div>
-                          <span className="text-sm text-text-muted dark:text-dark-text-muted">{module.lessons.length} lessons</span>
-                        </button>
+                  {course.curriculum.map((module: any) => (
+                    <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
+                      <button
+                        onClick={() => toggleModule(module.id)}
+                        className="w-full flex items-center justify-between p-4 hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <svg
+                            className={`w-5 h-5 text-text-muted transition-transform ${
+                              expandedModules.includes(module.id) ? 'rotate-90' : ''
+                            }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                          <span className="font-medium text-text-primary dark:text-dark-text-primary">{module.title}</span>
+                        </div>
+                        <span className="text-sm text-text-muted dark:text-dark-text-muted">{module.lessons.length} lessons</span>
+                      </button>
 
-                        {expandedModules.includes(module.id) && (
-                          <div className="bg-[#FAFBFF] p-4 space-y-2">
-                            {module.lessons.map((lesson: any) => (
-                              <div
-                                key={lesson.id}
-                                className="flex items-center justify-between py-2 px-3 hover:bg-white dark:bg-dark-background-card rounded-lg transition-colors"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <span className="text-text-muted dark:text-dark-text-muted">▶️</span>
-                                  <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{lesson.title}</span>
-                                </div>
-                                <span className="text-xs text-text-muted dark:text-dark-text-muted">{lesson.duration}</span>
+                      {expandedModules.includes(module.id) && (
+                        <div className="bg-[#FAFBFF] p-4 space-y-2">
+                          {module.lessons.map((lesson: any) => (
+                            <div
+                              key={lesson.id}
+                              className="flex items-center justify-between py-2 px-3 hover:bg-white dark:bg-dark-background-card rounded-lg transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-text-muted dark:text-dark-text-muted">▶️</span>
+                                <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{lesson.title}</span>
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="text-4xl mb-4">📚</div>
-                      <p className="text-text-muted">Curriculum details coming soon</p>
+                              <span className="text-xs text-text-muted dark:text-dark-text-muted">{lesson.duration}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                 </div>
               )}
 
@@ -483,87 +611,113 @@ const CourseDetail: React.FC = () => {
                 </div>
               )}
 
-              {activeTab === 'coach' && (
-                <div className="space-y-6">
-                  {course.coach ? (
-                    <>
-                      <div className="flex items-start gap-6">
-                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-primary to-brand-primary-light flex items-center justify-center text-5xl flex-shrink-0">
-                          {course.coach.avatar}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-xl font-bold text-text-primary dark:text-dark-text-primary mb-2">{course.coach.name}</h3>
-                          <p className="text-text-secondary dark:text-dark-text-secondary mb-4">{course.coach.bio}</p>
-                      
-                      <div className="flex gap-6">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.coach.studentsCount.toLocaleString()}</div>
-                          <div className="text-xs text-text-muted dark:text-dark-text-muted">Students</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.coach.coursesCount}</div>
-                          <div className="text-xs text-text-muted dark:text-dark-text-muted">Courses</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.coach.rating}</div>
-                          <div className="text-xs text-text-muted dark:text-dark-text-muted">Rating</div>
-                        </div>
-                      </div>
+                {course.tools && course.tools.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+                      Tools & Technologies
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {course.tools.map((tool: string) => (
+                        <span
+                          key={tool}
+                          className="px-4 py-2 bg-[#F5F7FF] dark:bg-gray-800 text-brand-primary rounded-full text-sm font-medium"
+                        >
+                          {tool}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                    </>
-                  ) : (
-                    <div className="text-center py-12">
-                      <div className="text-4xl mb-4">👨‍🏫</div>
-                      <p className="text-text-muted">Instructor information coming soon</p>
-                    </div>
+                )}
+
+                {/* Information about hidden features */}
+                <div className="mt-8 p-6 bg-blue-50 dark:bg-gray-800 rounded-2xl border border-blue-200 dark:border-gray-700">
+                  <h4 className="font-semibold text-text-primary dark:text-dark-text-primary mb-2 flex items-center gap-2">
+                    <span>🚧</span>
+                    <span>Course Content Under Development</span>
+                  </h4>
+                  <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-3">
+                    Lessons, quizzes, and detailed curriculum are currently
+                    being prepared by the instructor.
+                  </p>
+                  {isEnrolled && (
+                    <p className="text-sm text-brand-primary font-medium">
+                      💬 Meanwhile, join the Course Circle to connect with other
+                      enrolled students and the instructor!
+                    </p>
                   )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
           {/* Right: Pricing Card */}
           <div className="w-80 flex-shrink-0">
-            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card dark:bg-dark-background-card p-6 sticky top-6">
+            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card p-6 sticky top-6">
               <div className="mb-6">
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-3xl font-bold text-text-primary dark:text-dark-text-primary">${course.price}</span>
+                  <span className="text-3xl font-bold text-text-primary dark:text-dark-text-primary">
+                    ${course.price}
+                  </span>
                   {course.originalPrice && (
-                    <span className="text-lg text-text-muted line-through">${course.originalPrice}</span>
+                    <span className="text-lg text-text-muted line-through">
+                      ${course.originalPrice}
+                    </span>
                   )}
                 </div>
                 {course.originalPrice && (
                   <span className="text-sm text-green-600 font-medium">
-                    Save {Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}%
+                    Save{" "}
+                    {Math.round(
+                      ((course.originalPrice - course.price) /
+                        course.originalPrice) *
+                        100,
+                    )}
+                    %
                   </span>
                 )}
               </div>
 
-              {isEnrolled ? (
+              {checkingEnrollment ? (
+                <div className="py-8 text-center">
+                  <div className="w-8 h-8 border-3 border-brand-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <p className="text-sm text-text-muted">
+                    Checking enrollment...
+                  </p>
+                </div>
+              ) : isEnrolled ? (
                 <div className="space-y-3 mb-6">
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-2xl text-center">
-                    <span className="text-green-700 font-medium">✓ Enrolled!</span>
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-2xl text-center">
+                    <span className="text-green-700 dark:text-green-400 font-medium">
+                      ✓ You're enrolled!
+                    </span>
                   </div>
                   <Link
                     to={`/student/courses/${course.id}/circle`}
                     className="w-full py-3 px-4 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium rounded-full flex items-center justify-center gap-2 hover:shadow-lg hover:scale-[1.02] transition-all"
                   >
                     <span>💬</span>
-                    <span>Join Circle Chat</span>
+                    <span>Join Course Circle</span>
                   </Link>
+                  <button
+                    onClick={handleUnenroll}
+                    disabled={enrolling}
+                    className="w-full py-3 bg-white dark:bg-gray-800 border-2 border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 font-medium rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {enrolling ? "Processing..." : "Leave Course"}
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-3 mb-6">
                   <button
                     onClick={handleEnroll}
-                    className="w-full py-3 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] transition-all"
+                    disabled={enrolling}
+                    className="w-full py-3 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Enroll now
+                    {enrolling ? "Enrolling..." : "Enroll now"}
                   </button>
                   <button
                     onClick={handleAddToWishlist}
-                    className="w-full py-3 bg-white border-2 border-brand-primary text-brand-primary font-medium rounded-full hover:bg-brand-primary-soft transition-colors"
+                    className="w-full py-3 bg-white dark:bg-gray-800 border-2 border-brand-primary text-brand-primary font-medium rounded-full hover:bg-brand-primary-soft dark:hover:bg-gray-700 transition-colors"
                   >
                     Add to wishlist
                   </button>
@@ -573,16 +727,49 @@ const CourseDetail: React.FC = () => {
               <div className="pt-6 border-t border-[#EDF0FB] dark:border-gray-700">
                 {course.includes && course.includes.length > 0 && (
                   <>
-                    <h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">This course includes:</h4>
+                    <h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">
+                      This course includes:
+                    </h4>
                     <div className="space-y-2">
                       {course.includes.map((item: string, index: number) => (
                         <div key={index} className="flex items-start gap-2">
                           <span className="text-brand-primary mt-0.5">✓</span>
-                          <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{item}</span>
+                          <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                            {item}
+                          </span>
                         </div>
                       ))}
                     </div>
                   </>
+                )}
+
+                {/* Enrollment Benefits */}
+                {!isEnrolled && (
+                  <div className="mt-6 pt-6 border-t border-[#EDF0FB] dark:border-gray-700">
+                    <h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">
+                      When you enroll:
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-0.5">💬</span>
+                        <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                          Access to Course Circle chat
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">👥</span>
+                        <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                          Connect with other students
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-purple-500 mt-0.5">📚</span>
+                        <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                          Early access to course materials
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>

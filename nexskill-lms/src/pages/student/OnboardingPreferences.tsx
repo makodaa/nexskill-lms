@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../context/UserContext';
 import { supabase } from '../../lib/supabaseClient';
 import StudentAuthLayout from '../../layouts/StudentAuthLayout';
-import AutocompleteModal from '../../components/AutocompleteModal';
 
 interface Interest {
   id: string;
@@ -15,12 +14,6 @@ interface Goal {
   name: string;
 }
 
-interface CategorizedOption {
-  id: string;
-  name: string;
-  type: 'interest' | 'goal';
-}
-
 const OnboardingPreferences: React.FC = () => {
   const navigate = useNavigate();
   const { profile } = useUser();
@@ -28,18 +21,24 @@ const OnboardingPreferences: React.FC = () => {
   // Available options from database
   const [availableInterests, setAvailableInterests] = useState<Interest[]>([]);
   const [availableGoals, setAvailableGoals] = useState<Goal[]>([]);
-  const [categorizedOptions, setCategorizedOptions] = useState<CategorizedOption[]>([]);
-
   // Selected items
   const [selectedInterestIds, setSelectedInterestIds] = useState<string[]>([]);
   const [selectedGoalIds, setSelectedGoalIds] = useState<string[]>([]);
-  const [experienceLevel, setExperienceLevel] = useState('');
+  const [experienceLevel, setExperienceLevel] = useState<string>('');
 
   // UI state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [showInterestModal, setShowInterestModal] = useState(false);
-  const [showGoalModal, setShowGoalModal] = useState(false);
+
+  // Inline search state
+  const [interestSearchQuery, setInterestSearchQuery] = useState('');
+  const [goalSearchQuery, setGoalSearchQuery] = useState('');
+  const [showInterestDropdown, setShowInterestDropdown] = useState(false);
+  const [showGoalDropdown, setShowGoalDropdown] = useState(false);
+
+  // Refs for click outside detection
+  const interestSearchRef = useRef<HTMLDivElement>(null);
+  const goalSearchRef = useRef<HTMLDivElement>(null);
 
   const experienceLevels = [
     { id: 'Beginner', label: 'Beginner', description: 'New to learning online', icon: '🌱' },
@@ -79,37 +78,37 @@ const OnboardingPreferences: React.FC = () => {
     fetchOptions();
   }, []);
 
-  // Combine interests and goals into categorized options
+  // Click outside to close dropdowns
   useEffect(() => {
-    const interests: CategorizedOption[] = availableInterests.map(i => ({
-      id: i.id,
-      name: i.name,
-      type: 'interest' as const,
-    }));
-
-    const goals: CategorizedOption[] = availableGoals.map(g => ({
-      id: g.id,
-      name: g.name,
-      type: 'goal' as const,
-    }));
-
-    setCategorizedOptions([...interests, ...goals]);
-  }, [availableInterests, availableGoals]);
-
-  const handleSelect = (id: string, type: 'interest' | 'goal') => {
-    if (type === 'interest') {
-      if (selectedInterestIds.includes(id)) {
-        setSelectedInterestIds(prev => prev.filter(i => i !== id));
-      } else {
-        setSelectedInterestIds(prev => [...prev, id]);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (interestSearchRef.current && !interestSearchRef.current.contains(event.target as Node)) {
+        setShowInterestDropdown(false);
       }
-    } else {
-      if (selectedGoalIds.includes(id)) {
-        setSelectedGoalIds(prev => prev.filter(g => g !== id));
-      } else {
-        setSelectedGoalIds(prev => [...prev, id]);
+      if (goalSearchRef.current && !goalSearchRef.current.contains(event.target as Node)) {
+        setShowGoalDropdown(false);
       }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handle interest selection from dropdown
+  const handleSelectInterest = (interestId: string) => {
+    if (!selectedInterestIds.includes(interestId)) {
+      setSelectedInterestIds(prev => [...prev, interestId]);
     }
+    setInterestSearchQuery('');
+    setShowInterestDropdown(false);
+  };
+
+  // Handle goal selection from dropdown
+  const handleSelectGoal = (goalId: string) => {
+    if (!selectedGoalIds.includes(goalId)) {
+      setSelectedGoalIds(prev => [...prev, goalId]);
+    }
+    setGoalSearchQuery('');
+    setShowGoalDropdown(false);
   };
 
   const handleRemoveInterest = (interestId: string) => {
@@ -212,6 +211,7 @@ const OnboardingPreferences: React.FC = () => {
     try {
       setIsSubmitting(true);
 
+      // Just create the blank student profile (if it doesn't exist)
       let { data: studentProfile, error: profileError } = await supabase
         .from('student_profiles')
         .select('id')
@@ -227,6 +227,7 @@ const OnboardingPreferences: React.FC = () => {
             user_id: profile.id,
             first_name: profile.firstName || '',
             last_name: profile.lastName || '',
+
           })
           .select('id')
           .single();
@@ -237,13 +238,7 @@ const OnboardingPreferences: React.FC = () => {
 
       if (!studentProfile) throw new Error('Failed to get or create student profile');
 
-      const { error: updateError } = await supabase
-        .from('student_profiles')
-        .update({ current_skill_level: 'Intermediate' })
-        .eq('id', studentProfile.id);
-
-      if (updateError) throw updateError;
-
+      // Just navigate - don't update anything else
       navigate('/student/dashboard');
     } catch (error) {
       console.error('Error during skip:', error);
@@ -269,39 +264,78 @@ const OnboardingPreferences: React.FC = () => {
   const selectedInterests = availableInterests.filter(i => selectedInterestIds.includes(i.id));
   const selectedGoals = availableGoals.filter(g => selectedGoalIds.includes(g.id));
 
+  // Filter interests and goals based on search query
+  const filteredInterests = availableInterests.filter(interest =>
+    !selectedInterestIds.includes(interest.id) &&
+    interest.name.toLowerCase().includes(interestSearchQuery.toLowerCase())
+  );
+
+  const filteredGoals = availableGoals.filter(goal =>
+    !selectedGoalIds.includes(goal.id) &&
+    goal.name.toLowerCase().includes(goalSearchQuery.toLowerCase())
+  );
+
   return (
     <StudentAuthLayout maxWidth="large">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-brand-primary to-brand-primary-light rounded-full">
+          <div className="inline-flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] rounded-full">
             <span className="text-3xl">👋</span>
           </div>
-          <h1 className="text-3xl font-bold text-text-primary mb-2">Welcome to NexSkill!</h1>
-          <p className="text-text-secondary text-sm">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome to NexSkill!</h1>
+          <p className="text-slate-600 text-sm">
             Let's personalize your learning experience
           </p>
         </div>
 
         <form onSubmit={handleContinue} className="space-y-8">
           {/* Interests Section */}
-          <div className="bg-white rounded-3xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-semibold text-text-primary">Your Interests</h2>
-                <p className="text-sm text-text-secondary mt-1">Choose topics you're passionate about</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowInterestModal(true)}
-                className="px-4 py-2 bg-brand-primary text-white rounded-full text-sm font-medium hover:bg-brand-primary-dark transition-colors flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-1">Your Interests</h2>
+            <p className="text-sm text-slate-600 mb-4">Choose topics you're passionate about</p>
+
+            {/* Inline Search Field */}
+            <div className="mb-4" ref={interestSearchRef}>
+              <div className="relative">
+                <svg
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                Add
-              </button>
+                <input
+                  type="text"
+                  value={interestSearchQuery}
+                  onChange={(e) => {
+                    setInterestSearchQuery(e.target.value);
+                    setShowInterestDropdown(true);
+                  }}
+                  onFocus={() => setShowInterestDropdown(true)}
+                  placeholder="Search interests (e.g., Design, Data, Business...)"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                />
+
+                {/* Dropdown */}
+                {showInterestDropdown && interestSearchQuery && filteredInterests.length > 0 && (
+                  <div className="absolute z-10 w-full mt-2 bg-white rounded-xl border border-slate-200 shadow-lg max-h-60 overflow-y-auto">
+                    {filteredInterests.map((interest) => (
+                      <button
+                        key={interest.id}
+                        type="button"
+                        onClick={() => handleSelectInterest(interest.id)}
+                        className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-slate-100 last:border-b-0"
+                      >
+                        <span className="font-medium text-slate-900">{interest.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
+
             {selectedInterests.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {selectedInterests.map((interest) => (
@@ -323,30 +357,58 @@ const OnboardingPreferences: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-text-secondary text-sm">
-                No interests selected yet. Click "Add" to get started!
+              <div className="text-center py-4 text-slate-500 text-sm">
+                No interests selected yet. Search to add some!
               </div>
             )}
           </div>
 
           {/* Learning Goals Section */}
-          <div className="bg-white rounded-3xl border-2 border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-semibold text-text-primary">Learning Goals</h2>
-                <p className="text-sm text-text-secondary mt-1">What do you want to achieve?</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowGoalModal(true)}
-                className="px-4 py-2 bg-brand-primary text-white rounded-full text-sm font-medium hover:bg-brand-primary-dark transition-colors flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-1">Learning Goals</h2>
+            <p className="text-sm text-slate-600 mb-4">What do you want to achieve?</p>
+
+            {/* Inline Search Field */}
+            <div className="mb-4" ref={goalSearchRef}>
+              <div className="relative">
+                <svg
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
-                Add
-              </button>
+                <input
+                  type="text"
+                  value={goalSearchQuery}
+                  onChange={(e) => {
+                    setGoalSearchQuery(e.target.value);
+                    setShowGoalDropdown(true);
+                  }}
+                  onFocus={() => setShowGoalDropdown(true)}
+                  placeholder="Search goals (e.g., Get a Job, Upskill, Learn new skills...)"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100"
+                />
+
+                {/* Dropdown */}
+                {showGoalDropdown && goalSearchQuery && filteredGoals.length > 0 && (
+                  <div className="absolute z-10 w-full mt-2 bg-white rounded-xl border border-slate-200 shadow-lg max-h-60 overflow-y-auto">
+                    {filteredGoals.map((goal) => (
+                      <button
+                        key={goal.id}
+                        type="button"
+                        onClick={() => handleSelectGoal(goal.id)}
+                        className="w-full px-4 py-3 text-left hover:bg-green-50 transition-colors border-b border-slate-100 last:border-b-0"
+                      >
+                        <span className="font-medium text-slate-900">{goal.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
+
             {selectedGoals.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {selectedGoals.map((goal) => (
@@ -368,44 +430,28 @@ const OnboardingPreferences: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-text-secondary text-sm">
-                No goals selected yet. Click "Add" to get started!
+              <div className="text-center py-4 text-slate-500 text-sm">
+                No goals selected yet. Search to add some!
               </div>
             )}
           </div>
 
           {/* Experience Level Section */}
-          <div className="bg-white rounded-3xl border-2 border-gray-200 p-6">
-            <h2 className="text-xl font-semibold text-text-primary mb-2">Experience Level</h2>
-            <p className="text-sm text-text-secondary mb-4">This helps us recommend the right courses</p>
-            <div className="space-y-3">
+          <div className="bg-white rounded-3xl border-2 border-slate-200 p-6">
+            <h2 className="text-xl font-bold text-slate-900 mb-2">Experience Level</h2>
+            <p className="text-sm text-slate-600 mb-4">This helps us recommend the right courses</p>
+            <div className="flex gap-2">
               {experienceLevels.map((level) => (
                 <button
                   key={level.id}
                   type="button"
                   onClick={() => setExperienceLevel(level.id)}
-                  className={`w-full p-4 rounded-3xl border-2 transition-all text-left ${experienceLevel === level.id
-                    ? 'border-brand-primary bg-brand-primary-soft'
-                    : 'border-gray-200 bg-white hover:border-brand-primary-light'
+                  className={`flex-1 py-4 text-sm font-medium rounded-full transition-all ${experienceLevel === level.id
+                    ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{level.icon}</span>
-                      <div>
-                        <p className="font-medium text-text-primary mb-1">{level.label}</p>
-                        <p className="text-sm text-text-secondary">{level.description}</p>
-                      </div>
-                    </div>
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${experienceLevel === level.id ? 'border-brand-primary' : 'border-gray-300'
-                        }`}
-                    >
-                      {experienceLevel === level.id && (
-                        <div className="w-3 h-3 rounded-full bg-brand-primary"></div>
-                      )}
-                    </div>
-                  </div>
+                  {level.label}
                 </button>
               ))}
             </div>
@@ -416,7 +462,7 @@ const OnboardingPreferences: React.FC = () => {
             <button
               type="submit"
               disabled={selectedInterestIds.length === 0 || selectedGoalIds.length === 0 || !experienceLevel || isSubmitting}
-              className="flex-1 py-3 px-6 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="flex-1 py-3 px-6 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium rounded-full shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isSubmitting ? 'Saving...' : 'Continue to dashboard'}
             </button>
@@ -424,7 +470,7 @@ const OnboardingPreferences: React.FC = () => {
               type="button"
               onClick={handleSkip}
               disabled={isSubmitting}
-              className="sm:w-auto px-6 py-3 text-text-secondary font-medium hover:text-brand-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="sm:w-auto px-6 py-3 text-slate-500 font-medium hover:text-[#304DB5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Skip for now
             </button>
@@ -433,32 +479,13 @@ const OnboardingPreferences: React.FC = () => {
 
         {/* Progress Indicator */}
         <div className="mt-8 flex justify-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-brand-primary"></div>
-          <div className="w-2 h-2 rounded-full bg-brand-primary"></div>
-          <div className="w-2 h-2 rounded-full bg-brand-primary"></div>
+          <div className="w-2 h-2 rounded-full bg-[#304DB5]"></div>
+          <div className="w-2 h-2 rounded-full bg-[#304DB5]"></div>
+          <div className="w-2 h-2 rounded-full bg-[#304DB5]"></div>
         </div>
+
+        <div className="h-6"></div>
       </div>
-
-      {/* Modals */}
-      <AutocompleteModal
-        isOpen={showInterestModal}
-        onClose={() => setShowInterestModal(false)}
-        title="Add Interests"
-        placeholder="Search interests (e.g., Design, Data...)"
-        options={categorizedOptions.filter(opt => opt.type === 'interest')}
-        selectedIds={selectedInterestIds}
-        onSelect={handleSelect}
-      />
-
-      <AutocompleteModal
-        isOpen={showGoalModal}
-        onClose={() => setShowGoalModal(false)}
-        title="Add Learning Goals"
-        placeholder="Search goals (e.g., Get a Job...)"
-        options={categorizedOptions.filter(opt => opt.type === 'goal')}
-        selectedIds={selectedGoalIds}
-        onSelect={handleSelect}
-      />
     </StudentAuthLayout>
   );
 };
