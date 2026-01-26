@@ -196,7 +196,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
                 // Check if student_profile exists and has onboarding data
                 // If current_skill_level is null or student_profile doesn't exist, redirect to onboarding
                 if (!studentProfile || !studentProfile.current_skill_level) {
-                    return '/onboarding-preferences';
+                    return '/student/onboarding-preferences';
                 }
             } catch (err) {
                 console.error('Error in getDefaultRoute:', err);

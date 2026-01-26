@@ -17,6 +17,7 @@ const sections: Section[] = [
   { key: 'settings', label: 'Overview & settings', icon: '⚙️' },
   { key: 'curriculum', label: 'Curriculum', icon: '📚' },
   { key: 'lessons', label: 'Lessons & media', icon: '🎬' },
+  { key: 'live-sessions', label: 'Live Sessions', icon: '📹' },
   { key: 'quizzes', label: 'Quizzes', icon: '📝' },
   { key: 'drip', label: 'Drip schedule', icon: '📅' },
   { key: 'pricing', label: 'Pricing', icon: '💰' },
@@ -52,11 +53,10 @@ const CourseBuilderSidebar: React.FC<CourseBuilderSidebarProps> = ({
           <button
             key={section.key}
             onClick={() => onChangeSection(section.key)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${
-              activeSection === section.key
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${activeSection === section.key
                 ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium shadow-md'
                 : 'text-slate-700 dark:text-dark-text-primary hover:bg-slate-100'
-            }`}
+              }`}
           >
             <span className="text-lg">{section.icon}</span>
             <span className="text-sm">{section.label}</span>

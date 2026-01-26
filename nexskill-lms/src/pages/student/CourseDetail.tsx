@@ -20,8 +20,40 @@ const CourseDetail: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'reviews' | 'coach'>('overview');
   const [expandedModules, setExpandedModules] = useState<number[]>([1]);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [course, setCourse] = useState<any>(null);
+  const [course, setCourse] = useState<CourseDisplay | null>(null);
   const [loading, setLoading] = useState(true);
+  const [enrolling, setEnrolling] = useState(false);
+  const [checkingEnrollment, setCheckingEnrollment] = useState(false);
+
+  // Check if user is enrolled in the course
+  useEffect(() => {
+    const checkEnrollment = async () => {
+      if (!user || !courseId) return;
+
+      try {
+        setCheckingEnrollment(true);
+        const { data, error } = await supabase
+          .from("enrollments")
+          .select("*")
+          .eq("profile_id", user.id)
+          .eq("course_id", courseId)
+          .single();
+
+        if (error && error.code !== "PGRST116") {
+          // PGRST116 = no rows returned
+          console.error("Error checking enrollment:", error);
+        } else if (data) {
+          setIsEnrolled(true);
+        }
+      } catch (err) {
+        console.error("Unexpected error checking enrollment:", err);
+      } finally {
+        setCheckingEnrollment(false);
+      }
+    };
+
+    checkEnrollment();
+  }, [user, courseId]);
 
   // Fetch course and enrollment status
   useEffect(() => {
@@ -177,8 +209,12 @@ const CourseDetail: React.FC = () => {
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-center">
             <div className="text-6xl mb-4">📚</div>
-            <h2 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-2">Course not found</h2>
-            <p className="text-text-secondary dark:text-dark-text-secondary mb-6">The course you're looking for doesn't exist.</p>
+            <h2 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary mb-2">
+              Course not found
+            </h2>
+            <p className="text-text-secondary dark:text-dark-text-secondary mb-6">
+              The course you're looking for doesn't exist.
+            </p>
             <Link
               to="/student/courses"
               className="inline-block px-6 py-3 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full hover:shadow-lg transition-all"
@@ -196,11 +232,21 @@ const CourseDetail: React.FC = () => {
       {/* Header */}
       <div className="px-8 py-6 border-b border-[#EDF0FB] dark:border-gray-700">
         <button
-          onClick={() => navigate('/student/courses')}
+          onClick={() => navigate("/student/courses")}
           className="flex items-center gap-2 text-sm text-text-secondary hover:text-brand-primary mb-4 transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
           Back to catalog
         </button>
@@ -208,17 +254,25 @@ const CourseDetail: React.FC = () => {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.title}</h1>
+              <h1 className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">
+                {course.title}
+              </h1>
               <span className="px-3 py-1 bg-brand-primary-soft text-brand-primary rounded-full text-xs font-medium">
                 {course.level}
               </span>
             </div>
-            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-3">{course.category}</p>
+            <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-3">
+              {course.category}
+            </p>
             <div className="flex items-center gap-6 text-sm">
               <div className="flex items-center gap-1">
                 <span className="text-yellow-500">★</span>
-                <span className="font-semibold text-text-primary dark:text-dark-text-primary">{course.rating}</span>
-                <span className="text-text-muted dark:text-dark-text-muted">({course.reviewCount} reviews)</span>
+                <span className="font-semibold text-text-primary dark:text-dark-text-primary">
+                  {course.rating}
+                </span>
+                <span className="text-text-muted dark:text-dark-text-muted">
+                  ({course.reviewCount} reviews)
+                </span>
               </div>
               <div className="flex items-center gap-1 text-text-secondary dark:text-dark-text-secondary">
                 <span>👥</span>
@@ -238,7 +292,7 @@ const CourseDetail: React.FC = () => {
         <div className="flex gap-6">
           {/* Left: Tabbed Content */}
           <div className="flex-1 min-w-0">
-            {/* Tab Bar */}
+            {/* Tab Bar - Only Overview */}
             <div className="flex gap-2 mb-6 border-b border-[#EDF0FB] dark:border-gray-700">
               {(['overview', 'curriculum', 'reviews', 'coach'] as const).map((tab) => (
                 <button
@@ -255,22 +309,30 @@ const CourseDetail: React.FC = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card dark:bg-dark-background-card p-8">
-              {activeTab === 'overview' && (
-                <div className="space-y-8">
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">About this course</h3>
-                    <p className="text-text-secondary leading-relaxed">{course.description}</p>
-                  </div>
+            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card p-8">
+              <div className="space-y-8">
+                <div>
+                  <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+                    About this course
+                  </h3>
+                  <p className="text-text-secondary dark:text-dark-text-secondary leading-relaxed">
+                    {course.description}
+                  </p>
+                </div>
 
-                  {course.whatYouLearn && course.whatYouLearn.length > 0 && (
-                    <div>
-                      <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">What you'll learn</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {course.whatYouLearn.map((item: string, index: number) => (
+                {course.whatYouLearn && course.whatYouLearn.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">
+                      What you'll learn
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {course.whatYouLearn.map(
+                        (item: string, index: number) => (
                           <div key={index} className="flex items-start gap-3">
                             <span className="text-green-500 mt-1">✓</span>
-                            <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{item}</span>
+                            <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                              {item}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -423,51 +485,78 @@ const CourseDetail: React.FC = () => {
                     </div>
                   )}
                 </div>
-              )}
+              </div>
             </div>
           </div>
 
           {/* Right: Pricing Card */}
           <div className="w-80 flex-shrink-0">
-            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card dark:bg-dark-background-card p-6 sticky top-6">
+            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card p-6 sticky top-6">
               <div className="mb-6">
                 <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-3xl font-bold text-text-primary dark:text-dark-text-primary">${course.price}</span>
+                  <span className="text-3xl font-bold text-text-primary dark:text-dark-text-primary">
+                    ${course.price}
+                  </span>
                   {course.originalPrice && (
-                    <span className="text-lg text-text-muted line-through">${course.originalPrice}</span>
+                    <span className="text-lg text-text-muted line-through">
+                      ${course.originalPrice}
+                    </span>
                   )}
                 </div>
                 {course.originalPrice && (
                   <span className="text-sm text-green-600 font-medium">
-                    Save {Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}%
+                    Save{" "}
+                    {Math.round(
+                      ((course.originalPrice - course.price) /
+                        course.originalPrice) *
+                        100,
+                    )}
+                    %
                   </span>
                 )}
               </div>
 
-              {isEnrolled ? (
+              {checkingEnrollment ? (
+                <div className="py-8 text-center">
+                  <div className="w-8 h-8 border-3 border-brand-primary border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <p className="text-sm text-text-muted">
+                    Checking enrollment...
+                  </p>
+                </div>
+              ) : isEnrolled ? (
                 <div className="space-y-3 mb-6">
-                  <div className="p-4 bg-green-50 border border-green-200 rounded-2xl text-center">
-                    <span className="text-green-700 font-medium">✓ Enrolled!</span>
+                  <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-2xl text-center">
+                    <span className="text-green-700 dark:text-green-400 font-medium">
+                      ✓ You're enrolled!
+                    </span>
                   </div>
                   <Link
                     to={`/student/courses/${course.id}/circle`}
                     className="w-full py-3 px-4 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium rounded-full flex items-center justify-center gap-2 hover:shadow-lg hover:scale-[1.02] transition-all"
                   >
                     <span>💬</span>
-                    <span>Join Circle Chat</span>
+                    <span>Join Course Circle</span>
                   </Link>
+                  <button
+                    onClick={handleUnenroll}
+                    disabled={enrolling}
+                    className="w-full py-3 bg-white dark:bg-gray-800 border-2 border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 font-medium rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {enrolling ? "Processing..." : "Leave Course"}
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-3 mb-6">
                   <button
                     onClick={handleEnroll}
-                    className="w-full py-3 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] transition-all"
+                    disabled={enrolling}
+                    className="w-full py-3 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full shadow-button-primary hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Enroll now
+                    {enrolling ? "Enrolling..." : "Enroll now"}
                   </button>
                   <button
                     onClick={handleAddToWishlist}
-                    className="w-full py-3 bg-white border-2 border-brand-primary text-brand-primary font-medium rounded-full hover:bg-brand-primary-soft transition-colors"
+                    className="w-full py-3 bg-white dark:bg-gray-800 border-2 border-brand-primary text-brand-primary font-medium rounded-full hover:bg-brand-primary-soft dark:hover:bg-gray-700 transition-colors"
                   >
                     Add to wishlist
                   </button>
@@ -477,16 +566,49 @@ const CourseDetail: React.FC = () => {
               <div className="pt-6 border-t border-[#EDF0FB] dark:border-gray-700">
                 {course.includes && course.includes.length > 0 && (
                   <>
-                    <h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">This course includes:</h4>
+                    <h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">
+                      This course includes:
+                    </h4>
                     <div className="space-y-2">
                       {course.includes.map((item: string, index: number) => (
                         <div key={index} className="flex items-start gap-2">
                           <span className="text-brand-primary mt-0.5">✓</span>
-                          <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{item}</span>
+                          <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                            {item}
+                          </span>
                         </div>
                       ))}
                     </div>
                   </>
+                )}
+
+                {/* Enrollment Benefits */}
+                {!isEnrolled && (
+                  <div className="mt-6 pt-6 border-t border-[#EDF0FB] dark:border-gray-700">
+                    <h4 className="text-sm font-semibold text-text-primary dark:text-dark-text-primary mb-3">
+                      When you enroll:
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-0.5">💬</span>
+                        <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                          Access to Course Circle chat
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-green-500 mt-0.5">👥</span>
+                        <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                          Connect with other students
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-purple-500 mt-0.5">📚</span>
+                        <span className="text-sm text-text-secondary dark:text-dark-text-secondary">
+                          Early access to course materials
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
