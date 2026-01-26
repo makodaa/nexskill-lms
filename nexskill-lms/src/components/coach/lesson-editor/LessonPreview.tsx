@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
-import { Clock, Calendar, ArrowLeft } from 'lucide-react';
-import type { Lesson } from '../../types/lesson';
+import { ArrowLeft } from 'lucide-react';
+import type { Lesson } from '../../../types/lesson';
 import ContentBlockRenderer from './ContentBlockRenderer';
+import LessonHeader from './LessonHeader';
 
 interface LessonPreviewProps {
   lesson: Lesson;
@@ -47,31 +48,19 @@ const LessonPreview: React.FC<LessonPreviewProps> = ({ lesson, onExitPreview }) 
       {/* Lesson Content */}
       <div className="max-w-5xl mx-auto px-6 py-12">
         {/* Lesson Metadata */}
-        <header className="mb-12 border-b border-gray-100 dark:border-gray-800 pb-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white leading-tight mb-4">
-            {lesson.title || 'Untitled Lesson'}
-          </h1>
-          
-          {lesson.description && (
-            <p className="text-xl text-gray-600 dark:text-gray-400 leading-relaxed mb-6 block font-light">
-              {lesson.description}
-            </p>
-          )}
-          
-          <div className="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
-            {lesson.estimated_duration_minutes && (
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-blue-500" />
-                <span className="font-medium text-gray-700 dark:text-gray-300">{lesson.estimated_duration_minutes} min read</span>
-              </div>
-            )}
-            
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              <span>Last updated: {new Date().toLocaleDateString()}</span>
-            </div>
-          </div>
-        </header>
+        <LessonHeader
+          lesson={lesson}
+          isEditing={false}
+          onToggleEdit={() => {}}
+          title={lesson.title}
+          description={lesson.description || ''}
+          duration={lesson.estimated_duration_minutes?.toString() || ''}
+          onTitleChange={() => {}}
+          onDescriptionChange={() => {}}
+          onDurationChange={() => {}}
+          onBlur={() => {}}
+          showEditButton={false}
+        />
 
         {/* Content Blocks */}
         <div className="space-y-6">

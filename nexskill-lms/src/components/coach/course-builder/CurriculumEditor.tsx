@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Lesson } from '../../types/lesson';
+import type { Lesson } from '../../../types/lesson';
 
 interface Module {
   id: string;

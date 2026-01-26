@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useLiveSessions } from '../../hooks/useLiveSessions';
-import type { LiveSession, SessionStatus } from '../../types/db';
+import { useLiveSessions } from '../../../hooks/useLiveSessions';
+import type { LiveSession, SessionStatus } from '../../../types/db';
 import { useParams } from 'react-router-dom';
 
 const LiveSessionManager: React.FC = () => {
@@ -61,7 +61,7 @@ const LiveSessionManager: React.FC = () => {
         e.preventDefault();
         try {
             // Need the current user ID for coach_id
-            const { supabase } = await import('../../lib/supabaseClient');
+            const { supabase } = await import('../../../lib/supabaseClient');
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {

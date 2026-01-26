@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CoachAppLayout from '../../layouts/CoachAppLayout';
-import CourseTable from '../../components/coach/CourseTable';
+import CourseTable from '../../components/coach/course-builder/CourseTable';
 import { useUser } from '../../context/UserContext';
 import { supabase } from '../../lib/supabaseClient';
 import type { Course } from '../../types/db';
