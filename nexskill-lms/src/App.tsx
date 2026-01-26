@@ -147,7 +147,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route
-                  path="/onboarding-preferences"
+                  path="/student/onboarding-preferences"
                   element={<OnboardingPreferences />}
                 />
                 <Route path="/admin/login" element={<AdminLogin />} />
