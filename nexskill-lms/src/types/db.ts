@@ -107,3 +107,33 @@ export interface LiveSession {
     };
     participants_count?: number;
 }
+
+// Chat & Messaging Types
+export interface Message {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  course_id?: string;
+  content: string;
+  read_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MessageWithProfiles extends Message {
+  sender_profile?: Profile;
+  recipient_profile?: Profile;
+  course?: Course;
+}
+
+export interface Conversation {
+  user1_id: string;
+  user2_id: string;
+  course_id?: string;
+  last_message: string;
+  last_message_at: string;
+  last_sender_id: string;
+  other_user_id: string;
+  other_user_profile?: Profile;
+  unread_count?: number;
+}

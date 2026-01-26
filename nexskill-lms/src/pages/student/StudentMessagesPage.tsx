@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import CoachAppLayout from "../../layouts/CoachAppLayout";
+import StudentAppLayout from "../../layouts/StudentAppLayout";
 import { Search, Send, Plus, AlertCircle, ArrowDown } from "lucide-react";
 import { useMessages, useConversations } from "../../hooks/useChat";
 import { isSupabaseConfigured, supabase } from "../../lib/supabaseClient";
 import type { Profile } from "../../types/db";
 
-const CoachMessagesPage: React.FC = () => {
+const StudentMessagesPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRecipientId, setSelectedRecipientId] = useState<string | null>(
     null,
@@ -17,7 +17,9 @@ const CoachMessagesPage: React.FC = () => {
   const [showNewConversationModal, setShowNewConversationModal] =
     useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [availableStudents, setAvailableStudents] = useState<Profile[]>([]);
+  const [availableCoaches, setAvailableCoaches] = useState<Profile[]>([]);
+  const [selectedUserProfile, setSelectedUserProfile] =
+    useState<Profile | null>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -53,22 +55,41 @@ const CoachMessagesPage: React.FC = () => {
     getCurrentUser();
   }, []);
 
-  // Load available students for new conversation
+  // Load available coaches for new conversation
   useEffect(() => {
-    const loadStudents = async () => {
+    const loadCoaches = async () => {
       if (!isSupabaseConfigured || !showNewConversationModal) return;
 
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("role", "student");
+        .eq("role", "coach");
 
       if (!error && data) {
-        setAvailableStudents(data);
+        setAvailableCoaches(data);
       }
     };
-    loadStudents();
+    loadCoaches();
   }, [showNewConversationModal]);
+
+  // Handle scroll to detect if user scrolled up (throttled for performance)
+  const handleScroll = useCallback(() => {
+    if (scrollThrottleRef.current) return;
+
+    scrollThrottleRef.current = setTimeout(() => {
+      if (!messagesContainerRef.current) {
+        scrollThrottleRef.current = null;
+        return;
+      }
+
+      const { scrollTop, scrollHeight, clientHeight } =
+        messagesContainerRef.current;
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
+
+      setShowScrollButton(!isNearBottom);
+      scrollThrottleRef.current = null;
+    }, 100); // Throttle to max 10 calls per second
+  }, []);
 
   // Scroll to bottom function
   const scrollToBottom = () => {
@@ -123,39 +144,18 @@ const CoachMessagesPage: React.FC = () => {
     markedAsReadRef.current.clear();
   }, [selectedRecipientId]);
 
-  // Scroll to bottom on new messages (only if already near bottom)
+  // Auto-scroll to bottom on new messages (only if already near bottom)
   useEffect(() => {
     if (!messagesContainerRef.current) return;
 
-    const container = messagesContainerRef.current;
-    const isNearBottom =
-      container.scrollHeight - container.scrollTop - container.clientHeight <
-      150;
+    const { scrollTop, scrollHeight, clientHeight } =
+      messagesContainerRef.current;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 100;
 
     if (isNearBottom) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      scrollToBottom();
     }
   }, [messages]);
-
-  // Handle scroll detection (throttled for performance)
-  const handleScroll = useCallback(() => {
-    if (scrollThrottleRef.current) return;
-
-    scrollThrottleRef.current = setTimeout(() => {
-      if (!messagesContainerRef.current) {
-        scrollThrottleRef.current = null;
-        return;
-      }
-
-      const container = messagesContainerRef.current;
-      const isNearBottom =
-        container.scrollHeight - container.scrollTop - container.clientHeight <
-        150;
-
-      setShowScrollButton(!isNearBottom);
-      scrollThrottleRef.current = null;
-    }, 100); // Throttle to max 10 calls per second
-  }, []);
 
   // Filter conversations
   const filteredConversations = conversations.filter((conv) => {
@@ -227,7 +227,7 @@ const CoachMessagesPage: React.FC = () => {
 
   if (!isSupabaseConfigured) {
     return (
-      <CoachAppLayout>
+      <StudentAppLayout>
         <div className="flex items-center justify-center h-screen">
           <div className="text-center max-w-md">
             <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
@@ -238,12 +238,12 @@ const CoachMessagesPage: React.FC = () => {
             </p>
           </div>
         </div>
-      </CoachAppLayout>
+      </StudentAppLayout>
     );
   }
 
   return (
-    <CoachAppLayout>
+    <StudentAppLayout>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -252,7 +252,7 @@ const CoachMessagesPage: React.FC = () => {
               Messages
             </h1>
             <p className="text-slate-600 dark:text-dark-text-secondary">
-              Chat with your students
+              Chat with your coaches
             </p>
           </div>
           <button
@@ -270,146 +270,150 @@ const CoachMessagesPage: React.FC = () => {
           style={{ height: "calc(100vh - 250px)" }}
         >
           <div className="w-full md:w-1/3 border-r border-slate-200 dark:border-gray-700 flex flex-col overflow-hidden">
-            {/* Conversations List */}
-            <div className="flex flex-col h-full">
-              {/* Search & Filter */}
-              <div className="p-4 border-b border-slate-200 dark:border-gray-700">
-                <div className="relative mb-3">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    placeholder="Search students..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-background text-slate-900 dark:text-dark-text-primary"
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setFilterTab("all")}
-                    className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                      filterTab === "all"
-                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                        : "text-slate-600 dark:text-dark-text-secondary hover:bg-slate-100 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    All
-                  </button>
-                  <button
-                    onClick={() => setFilterTab("unread")}
-                    className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                      filterTab === "unread"
-                        ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
-                        : "text-slate-600 dark:text-dark-text-secondary hover:bg-slate-100 dark:hover:bg-gray-800"
-                    }`}
-                  >
-                    Unread
-                  </button>
-                </div>
+            {/* Search & Filter */}
+            <div className="p-4 border-b border-slate-200 dark:border-gray-700 flex-shrink-0">
+              <div className="relative mb-3">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Search coaches..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-dark-background text-slate-900 dark:text-dark-text-primary"
+                />
               </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setFilterTab("all")}
+                  className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    filterTab === "all"
+                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                      : "text-slate-600 dark:text-dark-text-secondary hover:bg-slate-100 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setFilterTab("unread")}
+                  className={`flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    filterTab === "unread"
+                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300"
+                      : "text-slate-600 dark:text-dark-text-secondary hover:bg-slate-100 dark:hover:bg-gray-800"
+                  }`}
+                >
+                  Unread
+                </button>
+              </div>
+            </div>
 
-              {/* Conversations List */}
-              <div className="flex-1 overflow-y-auto">
-                {conversationsLoading && conversations.length === 0 && (
+            {/* Conversations List */}
+            <div className="flex-1 overflow-y-auto">
+              {conversationsLoading && conversations.length === 0 && (
+                <div className="p-4 text-center text-slate-500">
+                  Loading conversations...
+                </div>
+              )}
+              {conversationsError && (
+                <div className="p-4 text-center text-red-500">
+                  Error: {conversationsError}
+                </div>
+              )}
+              {!conversationsLoading &&
+                conversations.length > 0 &&
+                filteredConversations.length === 0 && (
                   <div className="p-4 text-center text-slate-500">
-                    Loading conversations...
+                    No conversations found
                   </div>
                 )}
-                {conversationsError && (
-                  <div className="p-4 text-center text-red-500">
-                    Error: {conversationsError}
-                  </div>
-                )}
-                {!conversationsLoading &&
-                  conversations.length > 0 &&
-                  filteredConversations.length === 0 && (
-                    <div className="p-4 text-center text-slate-500">
-                      No conversations found
-                    </div>
-                  )}
-                {filteredConversations.map((conv) => {
-                  const otherUser = conv.other_user_profile;
-                  const displayName = otherUser
-                    ? `${otherUser.first_name || ""} ${otherUser.last_name || ""}`.trim() ||
-                      otherUser.username ||
-                      "Unknown"
-                    : "Unknown User";
+              {filteredConversations.map((conv) => {
+                const otherUser = conv.other_user_profile;
+                const displayName = otherUser
+                  ? `${otherUser.first_name || ""} ${otherUser.last_name || ""}`.trim() ||
+                    otherUser.username ||
+                    "Unknown"
+                  : "Unknown User";
 
-                  return (
-                    <div
-                      key={`${conv.user1_id}-${conv.user2_id}`}
-                      onClick={() => setSelectedRecipientId(conv.other_user_id)}
-                      className={`p-4 border-b border-slate-200 dark:border-gray-700 cursor-pointer transition-colors ${
-                        selectedRecipientId === conv.other_user_id
-                          ? "bg-blue-50 dark:bg-gray-800"
-                          : "hover:bg-slate-50 dark:hover:bg-gray-800"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
-                          {displayName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between mb-1">
-                            <h3
-                              className={`font-semibold truncate ${
-                                (conv.unread_count || 0) > 0
-                                  ? "text-slate-900 dark:text-dark-text-primary"
-                                  : "text-slate-700 dark:text-dark-text-secondary"
-                              }`}
-                            >
-                              {displayName}
-                            </h3>
-                            <span className="text-xs text-slate-500 dark:text-dark-text-muted ml-2">
-                              {formatTimestamp(conv.last_message_at)}
-                            </span>
-                          </div>
-                          <p
-                            className={`text-sm truncate ${
+                return (
+                  <div
+                    key={`${conv.user1_id}-${conv.user2_id}`}
+                    onClick={() => {
+                      setSelectedRecipientId(conv.other_user_id);
+                      setSelectedUserProfile(conv.other_user_profile || null);
+                    }}
+                    className={`p-4 border-b border-slate-200 dark:border-gray-700 cursor-pointer transition-colors ${
+                      selectedRecipientId === conv.other_user_id
+                        ? "bg-blue-50 dark:bg-gray-800"
+                        : "hover:bg-slate-50 dark:hover:bg-gray-800"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold flex-shrink-0">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3
+                            className={`font-semibold truncate ${
                               (conv.unread_count || 0) > 0
-                                ? "text-slate-900 dark:text-dark-text-primary font-medium"
-                                : "text-slate-600 dark:text-dark-text-secondary"
+                                ? "text-slate-900 dark:text-dark-text-primary"
+                                : "text-slate-700 dark:text-dark-text-secondary"
                             }`}
                           >
-                            {conv.last_message}
-                          </p>
-                          {(conv.unread_count || 0) > 0 && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold bg-blue-600 text-white rounded-full">
-                              {conv.unread_count}
-                            </span>
-                          )}
+                            {displayName}
+                          </h3>
+                          <span className="text-xs text-slate-500 dark:text-dark-text-muted ml-2">
+                            {formatTimestamp(conv.last_message_at)}
+                          </span>
                         </div>
+                        <p
+                          className={`text-sm truncate ${
+                            (conv.unread_count || 0) > 0
+                              ? "text-slate-900 dark:text-dark-text-primary font-medium"
+                              : "text-slate-600 dark:text-dark-text-secondary"
+                          }`}
+                        >
+                          {conv.last_message}
+                        </p>
+                        {(conv.unread_count || 0) > 0 && (
+                          <span className="inline-block mt-1 px-2 py-0.5 text-xs font-semibold bg-blue-600 text-white rounded-full">
+                            {conv.unread_count}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
           {/* Message Thread */}
           <div className="w-full md:w-2/3 flex flex-col overflow-hidden relative">
-            {selectedConversation && selectedRecipientId ? (
+            {selectedRecipientId ? (
               <>
                 {/* Thread Header */}
                 <div className="p-6 bg-white dark:bg-dark-background-card border-b border-slate-200 dark:border-gray-700 flex-shrink-0">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
                       {(
-                        selectedConversation.other_user_profile?.first_name ||
+                        selectedConversation?.other_user_profile?.first_name ||
+                        selectedUserProfile?.first_name ||
                         "U"
                       ).charAt(0)}
                     </div>
                     <div>
                       <h2 className="text-xl font-bold text-slate-900 dark:text-dark-text-primary">
-                        {selectedConversation.other_user_profile?.first_name ||
+                        {selectedConversation?.other_user_profile?.first_name ||
+                          selectedUserProfile?.first_name ||
                           ""}{" "}
-                        {selectedConversation.other_user_profile?.last_name ||
+                        {selectedConversation?.other_user_profile?.last_name ||
+                          selectedUserProfile?.last_name ||
                           ""}
                       </h2>
                       <p className="text-sm text-slate-600 dark:text-dark-text-secondary">
-                        {selectedConversation.other_user_profile?.role ||
-                          "Student"}
+                        {selectedConversation?.other_user_profile?.role ||
+                          selectedUserProfile?.role ||
+                          "Coach"}
                       </p>
                     </div>
                   </div>
@@ -511,7 +515,7 @@ const CoachMessagesPage: React.FC = () => {
                     Select a conversation
                   </h3>
                   <p className="text-slate-600 dark:text-dark-text-secondary">
-                    Choose a student from the list to start messaging
+                    Choose a coach from the list to start messaging
                   </p>
                 </div>
               </div>
@@ -527,30 +531,31 @@ const CoachMessagesPage: React.FC = () => {
                 Start New Conversation
               </h2>
               <p className="text-slate-600 dark:text-dark-text-secondary mb-4">
-                Select a student to start messaging:
+                Select a coach to start messaging:
               </p>
 
               <div className="space-y-2 max-h-60 overflow-y-auto">
-                {availableStudents.map((student) => (
+                {availableCoaches.map((coach) => (
                   <button
-                    key={student.id}
+                    key={coach.id}
                     onClick={() => {
-                      setSelectedRecipientId(student.id);
+                      setSelectedRecipientId(coach.id);
+                      setSelectedUserProfile(coach);
                       setShowNewConversationModal(false);
                     }}
                     className="w-full p-3 text-left hover:bg-slate-50 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-3"
                   >
                     <div className="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-semibold">
-                      {(student.first_name || student.username || "S")
+                      {(coach.first_name || coach.username || "C")
                         .charAt(0)
                         .toUpperCase()}
                     </div>
                     <div>
                       <p className="font-medium text-slate-900 dark:text-dark-text-primary">
-                        {student.first_name} {student.last_name}
+                        {coach.first_name} {coach.last_name}
                       </p>
                       <p className="text-sm text-slate-600 dark:text-dark-text-secondary">
-                        @{student.username}
+                        @{coach.username}
                       </p>
                     </div>
                   </button>
@@ -569,8 +574,8 @@ const CoachMessagesPage: React.FC = () => {
           </div>
         )}
       </div>
-    </CoachAppLayout>
+    </StudentAppLayout>
   );
 };
 
-export default CoachMessagesPage;
+export default StudentMessagesPage;
