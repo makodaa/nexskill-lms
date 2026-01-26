@@ -10,9 +10,10 @@ import CoursePricingForm from '../../components/coach/CoursePricingForm';
 import CoursePublishWorkflow from '../../components/coach/CoursePublishWorkflow';
 import CoursePreviewPane from '../../components/coach/CoursePreviewPane';
 import LessonEditorPanel from '../../components/coach/LessonEditorPanel';
+import LiveSessionManager from '../../components/coach/LiveSessionManager';
 import { supabase } from '../../lib/supabaseClient';
 
-type SectionKey = 'settings' | 'curriculum' | 'lessons' | 'quizzes' | 'drip' | 'pricing' | 'publish' | 'preview';
+type SectionKey = 'settings' | 'curriculum' | 'lessons' | 'live-sessions' | 'quizzes' | 'drip' | 'pricing' | 'publish' | 'preview';
 
 interface CourseSettings {
   title: string;
@@ -22,8 +23,8 @@ interface CourseSettings {
   language: string;
   shortDescription: string;
   longDescription: string;
-  tags: string;
   visibility: 'public' | 'unlisted' | 'private';
+  topics: number[];
 }
 
 interface Lesson {
@@ -91,8 +92,8 @@ const CourseBuilder: React.FC = () => {
     language: initialData?.language || 'English',
     shortDescription: '',
     longDescription: '',
-    tags: '',
     visibility: 'public',
+    topics: [],
   });
 
   useEffect(() => {
@@ -103,7 +104,8 @@ const CourseBuilder: React.FC = () => {
         .from('courses')
         .select(`
           *,
-          category:categories(name)
+          category:categories(name),
+          course_topics(topic_id)
         `)
         .eq('id', courseId)
         .single();
@@ -117,13 +119,15 @@ const CourseBuilder: React.FC = () => {
           subtitle: data.subtitle || '',
           shortDescription: data.short_description || '',
           longDescription: data.long_description || '',
-          tags: data.tags || '',
           visibility: data.visibility || 'public',
           language: data.language || 'English',
           level: data.level,
-          category: data.category?.name || '', // Assuming relationship or manual join
+          category: data.category?.name || '',
+          topics: data.course_topics?.map((ct: any) => ct.topic_id) || [],
         }));
-        // Update other states if needed
+
+        // Sync courseStatus with visibility
+        setCourseStatus(data.visibility === 'public' ? 'published' : 'draft');
       }
     };
 
@@ -220,7 +224,6 @@ const CourseBuilder: React.FC = () => {
           subtitle: settings.subtitle,
           short_description: settings.shortDescription,
           long_description: settings.longDescription,
-          tags: settings.tags,
           visibility: settings.visibility,
           language: settings.language,
           category_id: categoryId,
@@ -230,6 +233,40 @@ const CourseBuilder: React.FC = () => {
         .eq('id', courseId);
 
       if (error) throw error;
+
+      // Handle Topics Sync
+      const newTopicIds = settings.topics || [];
+
+      // 1. Fetch current topics to determine deltas (safer than relying on potentially stale state)
+      const { data: currentCT } = await supabase
+        .from('course_topics')
+        .select('topic_id')
+        .eq('course_id', courseId);
+
+      const currentIds = currentCT?.map((ct: any) => ct.topic_id) || [];
+
+      const toAdd = newTopicIds.filter(id => !currentIds.includes(id));
+      const toRemove = currentIds.filter((id: number) => !newTopicIds.includes(id));
+
+      if (toAdd.length > 0) {
+        const { error: addError } = await supabase
+          .from('course_topics')
+          .insert(toAdd.map(id => ({ course_id: courseId, topic_id: id })));
+        if (addError) console.error('Error adding topics:', addError);
+      }
+
+      if (toRemove.length > 0) {
+        const { error: removeError } = await supabase
+          .from('course_topics')
+          .delete()
+          .eq('course_id', courseId)
+          .in('topic_id', toRemove);
+        if (removeError) console.error('Error removing topics:', removeError);
+      }
+
+      // Sync local status
+      setCourseStatus(settings.visibility === 'public' ? 'published' : 'draft');
+      window.alert('Settings saved successfully');
 
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -265,6 +302,8 @@ const CourseBuilder: React.FC = () => {
             </button>
           </div>
         );
+      case 'live-sessions':
+        return <LiveSessionManager />;
       case 'quizzes':
         return <QuizBuilderPanel questions={questions} onChange={setQuestions} />;
       case 'drip':

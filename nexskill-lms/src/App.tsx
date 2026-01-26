@@ -7,7 +7,7 @@ import SignUp from "./pages/auth/SignUp";
 import EmailVerification from "./pages/auth/EmailVerification";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
-import OnboardingPreferences from "./pages/auth/OnboardingPreferences";
+import OnboardingPreferences from "./pages/student/OnboardingPreferences";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import CourseCatalog from "./pages/student/CourseCatalog";
 import CourseDetail from "./pages/student/CourseDetailRefactored";
@@ -35,6 +35,7 @@ import StudentMessagesPage from "./pages/student/StudentMessagesPage";
 import MembershipPlans from "./pages/student/MembershipPlans";
 import MembershipManage from "./pages/student/MembershipManage";
 import MembershipConfirmation from "./pages/student/MembershipConfirmation";
+import StudentMessages from "./pages/student/StudentMessages";
 import LiveClassRoom from "./pages/student/LiveClassRoom";
 import LiveClasses from "./pages/student/LiveClasses";
 import CoachDashboard from "./pages/coach/CoachDashboard";
@@ -69,7 +70,6 @@ import Error500Page from "./pages/system/Error500Page";
 import MaintenanceModePage from "./pages/system/MaintenanceModePage";
 import SecurityCenterPage from "./pages/admin/security/SecurityCenterPage";
 import CookieConsentBanner from "./components/system/CookieConsentBanner";
-
 // New role-based placeholder dashboards
 import PlatformOwnerDashboardPage from "./pages/owner/PlatformOwnerDashboardPage";
 import UsersRolesPage from "./pages/owner/UsersRolesPage";
@@ -85,7 +85,6 @@ import SubCoachGroupsPage from "./pages/subcoach/SubCoachGroupsPage";
 import SubCoachCommunityPage from "./pages/subcoach/SubCoachCommunityPage";
 import SubCoachNotificationsPage from "./pages/subcoach/SubCoachNotificationsPage";
 import SubCoachProfilePage from "./pages/subcoach/SubCoachProfilePage";
-
 // Support Staff Pages
 import SupportDashboardPage from "./pages/support/SupportDashboardPage";
 import SupportTicketsPage from "./pages/support/SupportTicketsPage";
@@ -94,16 +93,17 @@ import SupportTechStatusPage from "./pages/support/SupportTechStatusPage";
 import SupportCertificatesPage from "./pages/support/SupportCertificatesPage";
 import SupportKnowledgeBasePage from "./pages/support/SupportKnowledgeBasePage";
 import SupportProfilePage from "./pages/support/SupportProfilePage";
-
 // Community Manager Pages
 import CommunityDashboardPage from "./pages/community/CommunityDashboardPage";
 import CommunityOverviewPage from "./pages/community/CommunityOverviewPage";
+// Coach Application Pages
+import CoachApplicationPage from "./pages/coach/CoachApplicationPage";
+import VerificationPending from "./pages/auth/VerificationPending";
 import CommunityGroupsPage from "./pages/community/CommunityGroupsPage";
 import CommunityApprovalQueuePage from "./pages/community/CommunityApprovalQueuePage";
 import CommunityAnnouncementsPage from "./pages/community/CommunityAnnouncementsPage";
 import CommunityEngagementPage from "./pages/community/CommunityEngagementPage";
 import CommunityProfilePage from "./pages/community/CommunityProfilePage";
-
 // Organization Owner Pages
 import OrgDashboardPage from "./pages/org/OrgDashboardPage";
 import OrgTeamPage from "./pages/org/OrgTeamPage";
@@ -115,7 +115,6 @@ import OrgLicensesPage from "./pages/org/OrgLicensesPage";
 import OrgBillingPage from "./pages/org/OrgBillingPage";
 import OrgBrandingPage from "./pages/org/OrgBrandingPage";
 import OrgSettingsPage from "./pages/org/OrgSettingsPage";
-
 // Content Editor Pages
 import ContentEditorDashboardPage from "./pages/content/ContentEditorDashboardPage";
 import ContentReviewQueuePage from "./pages/content/ContentReviewQueuePage";
@@ -125,10 +124,8 @@ import TranslationReviewPage from "./pages/content/TranslationReviewPage";
 import ContentSuggestionsPage from "./pages/content/ContentSuggestionsPage";
 import ContentEditorProfilePage from "./pages/content/ContentEditorProfilePage";
 import { UserProvider } from "./context/UserContext";
-
 // Role Guard (temporarily disabled for testing)
 // import RoleGuard from './components/auth/RoleGuard';
-
 function App() {
   return (
     <UiPreferencesProvider>
@@ -528,5 +525,4 @@ function App() {
     </UiPreferencesProvider>
   );
 }
-
 export default App;

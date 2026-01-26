@@ -1,215 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
-import StudentAppLayout from "../../layouts/StudentAppLayout";
-import { supabase } from "../../lib/supabaseClient";
-import { useAuth } from "../../context/AuthContext";
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import StudentAppLayout from '../../layouts/StudentAppLayout';
+import { supabase } from '../../lib/supabaseClient';
+import { useAuth } from '../../context/AuthContext';
 
-// Course display interface (combination of DB and mock data)
-interface CourseDisplay {
-  id: string;
-  title: string;
-  category: string;
-  level: string;
-  rating: number;
-  reviewCount: number;
-  studentsCount: number;
-  duration: string;
-  price: number;
-  originalPrice?: number;
-  description: string;
-  whatYouLearn?: string[];
-  tools?: string[];
-  curriculum?: unknown[];
-  reviews?: unknown[];
-  coach?: unknown;
-  includes?: string[];
-}
-
-// Dummy course detail data (used as fallback if DB fetch fails)
-const coursesData: Record<string, CourseDisplay> = {
-  "1": {
-    id: "1",
-    title: "Complete UI/UX Design Bootcamp",
-    category: "Design",
-    level: "Beginner",
-    rating: 4.8,
-    reviewCount: 1240,
-    studentsCount: 12450,
-    duration: "24h 30m",
-    price: 49,
-    originalPrice: 99,
-    description:
-      "Dive deep into the world of UI/UX design with this comprehensive bootcamp. Learn industry-standard tools, design thinking methodologies, and create stunning user interfaces. This course covers everything from wireframing to high-fidelity prototyping, user research, and usability testing.",
-    whatYouLearn: [
-      "Master Figma, Sketch, and Adobe XD from scratch",
-      "Create wireframes and interactive prototypes",
-      "Conduct user research and usability testing",
-      "Apply design thinking methodology to solve problems",
-      "Build a professional portfolio with real-world projects",
-      "Understand color theory, typography, and layout principles",
-    ],
-    tools: ["Figma", "Sketch", "Adobe XD", "InVision", "Principle"],
-    curriculum: [
-      {
-        id: 1,
-        title: "Module 1: Design Foundations",
-        lessons: [
-          { id: 1, title: "Introduction to UI/UX Design", duration: "15:30" },
-          { id: 2, title: "Design Thinking Process", duration: "22:45" },
-          { id: 3, title: "Color Theory Fundamentals", duration: "18:20" },
-          { id: 4, title: "Typography Best Practices", duration: "25:10" },
-        ],
-      },
-      {
-        id: 2,
-        title: "Module 2: Wireframing & Prototyping",
-        lessons: [
-          { id: 1, title: "Low-Fidelity Wireframing", duration: "28:15" },
-          { id: 2, title: "High-Fidelity Mockups", duration: "32:40" },
-          { id: 3, title: "Interactive Prototyping", duration: "35:25" },
-          {
-            id: 4,
-            title: "Micro-interactions & Animations",
-            duration: "30:50",
-          },
-        ],
-      },
-      {
-        id: 3,
-        title: "Module 3: User Research & Testing",
-        lessons: [
-          { id: 1, title: "User Personas & Journey Maps", duration: "20:30" },
-          { id: 2, title: "Conducting User Interviews", duration: "24:15" },
-          { id: 3, title: "Usability Testing Methods", duration: "27:45" },
-          {
-            id: 4,
-            title: "Analyzing & Implementing Feedback",
-            duration: "22:30",
-          },
-        ],
-      },
-    ],
-    reviews: [
-      {
-        id: 1,
-        userName: "Emily Rodriguez",
-        avatar: "👩",
-        rating: 5,
-        date: "Nov 28, 2025",
-        comment:
-          "Absolutely amazing course! The instructor explains complex concepts in a very simple way. The projects are practical and helped me build a strong portfolio.",
-      },
-      {
-        id: 2,
-        userName: "James Chen",
-        avatar: "👨",
-        rating: 5,
-        date: "Nov 15, 2025",
-        comment:
-          "Best investment I made for my career. Went from knowing nothing about UI/UX to landing my first design job in 3 months!",
-      },
-      {
-        id: 3,
-        userName: "Sarah Williams",
-        avatar: "👩",
-        rating: 4,
-        date: "Nov 10, 2025",
-        comment:
-          "Great content and well-structured. Would love to see more advanced topics covered in future updates.",
-      },
-    ],
-    coach: {
-      name: "Alexandra Morgan",
-      avatar: "👩‍🏫",
-      bio: "Senior Product Designer with 10+ years of experience at leading tech companies. Passionate about teaching and helping aspiring designers break into the industry.",
-      studentsCount: 45000,
-      coursesCount: 8,
-      rating: 4.9,
-    },
-    includes: [
-      "24.5 hours of on-demand video",
-      "45 downloadable resources",
-      "Lifetime access",
-      "Certificate of completion",
-      "Access on mobile and desktop",
-      "Community support",
-    ],
-  },
-  "2": {
-    id: "2",
-    title: "Advanced React & TypeScript",
-    category: "Development",
-    level: "Advanced",
-    rating: 4.9,
-    reviewCount: 892,
-    studentsCount: 8920,
-    duration: "18h 15m",
-    price: 79,
-    originalPrice: 129,
-    description:
-      "Take your React skills to the next level with advanced patterns, performance optimization, and TypeScript integration. Build production-ready applications with best practices used by industry leaders.",
-    whatYouLearn: [
-      "Master advanced React patterns and hooks",
-      "Write type-safe code with TypeScript",
-      "Optimize performance and bundle size",
-      "Implement state management with Redux Toolkit",
-      "Build scalable application architecture",
-      "Testing strategies with Jest and React Testing Library",
-    ],
-    tools: ["React", "TypeScript", "Redux", "Jest", "Webpack"],
-    curriculum: [
-      {
-        id: 1,
-        title: "Module 1: Advanced React Patterns",
-        lessons: [
-          { id: 1, title: "Custom Hooks Deep Dive", duration: "32:15" },
-          { id: 2, title: "Compound Components", duration: "28:40" },
-          { id: 3, title: "Render Props vs HOCs", duration: "25:30" },
-        ],
-      },
-      {
-        id: 2,
-        title: "Module 2: TypeScript Integration",
-        lessons: [
-          { id: 1, title: "TypeScript Fundamentals", duration: "35:20" },
-          { id: 2, title: "Typing React Components", duration: "30:45" },
-          { id: 3, title: "Generics and Utility Types", duration: "27:15" },
-        ],
-      },
-    ],
-    reviews: [
-      {
-        id: 1,
-        userName: "Michael Tech",
-        avatar: "👨‍💻",
-        rating: 5,
-        date: "Dec 1, 2025",
-        comment:
-          "The most comprehensive React course I've taken. Really helped me understand advanced patterns.",
-      },
-    ],
-    coach: {
-      name: "David Kim",
-      avatar: "👨‍💼",
-      bio: "Full-stack developer and tech lead with experience at Google and Facebook. Love sharing knowledge about modern web development.",
-      studentsCount: 32000,
-      coursesCount: 6,
-      rating: 4.9,
-    },
-    includes: [
-      "18 hours of on-demand video",
-      "30 coding exercises",
-      "Lifetime access",
-      "Certificate of completion",
-      "GitHub repository access",
-    ],
-  },
+// Keep dummy data for fallback or development if DB is empty
+const coursesData: Record<string, any> = {
+  // ... (keeping structure minimal or compatible if needed, or largely ignoring if we fully switch)
+  // For now, let's assume if ID doesn't match DB, we show not found, 
+  // but if we want to suppress errors for demo purposes we could keep it. 
+  // I will focus on the REAL implementation.
 };
 
 const CourseDetail: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'reviews' | 'coach'>('overview');
+  const [expandedModules, setExpandedModules] = useState<number[]>([1]);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [course, setCourse] = useState<CourseDisplay | null>(null);
   const [loading, setLoading] = useState(true);
@@ -246,58 +55,140 @@ const CourseDetail: React.FC = () => {
     checkEnrollment();
   }, [user, courseId]);
 
-  // Fetch course from Supabase
+  // Fetch course and enrollment status
   useEffect(() => {
-    const fetchCourse = async () => {
+    const fetchCourseAndEnrollment = async () => {
       if (!courseId) return;
 
       try {
         setLoading(true);
-        const { data, error } = await supabase
-          .from("courses")
-          .select("*")
-          .eq("id", courseId)
+
+        // 1. Fetch Course Details
+        const { data: courseData, error: courseError } = await supabase
+          .from('courses')
+          .select(`
+            *,
+            category:categories(name),
+            coach:profiles!courses_coach_id_fkey(first_name, last_name)
+          `)
+          .eq('id', courseId)
           .single();
 
-        if (error) {
-          console.error("Error fetching course:", error);
-          // Fallback to mock data if available
-          setCourse(coursesData[courseId] || null);
-        } else if (data) {
-          // Map DB data to component format (limited view)
+        if (courseError) throw courseError;
+
+        if (courseData) {
+          // Transform
           setCourse({
-            id: data.id,
-            title: data.title,
-            category: "General", // TODO: Join with categories
-            level: data.level,
-            rating: 0, // TODO: Calculate from reviews
+            id: courseData.id,
+            title: courseData.title,
+            category: courseData.category?.name || 'General',
+            level: courseData.level || 'Beginner',
+            rating: 0, // Mock for now
             reviewCount: 0,
-            studentsCount: 0, // TODO: Count from enrollments
-            duration: `${data.duration_hours}h`,
-            price: data.price,
-            description:
-              data.long_description ||
-              data.short_description ||
-              "No description available",
-            // Temporarily disabled sections (no data available)
-            whatYouLearn: [],
+            studentsCount: 0,
+            duration: courseData.duration_hours ? `${courseData.duration_hours}h` : 'N/A',
+            price: courseData.price || 0,
+            originalPrice: undefined, // Column not in standard schema yet
+            description: courseData.long_description || courseData.short_description || 'No description available',
+            // Temporarily placeholder arrays until tables are populated
+            whatYouLearn: [
+              'Master key concepts and practical skills',
+              'Apply methodologies to real-world problems',
+              'Build a professional portfolio'
+            ],
             tools: [],
-            curriculum: [],
+            curriculum: [], // We could fetch modules/lessons here with a join
             reviews: [],
-            coach: null,
-            includes: [],
+            coach: courseData.coach ? {
+              name: `${courseData.coach.first_name} ${courseData.coach.last_name || ''}`,
+              avatar: '👨‍🏫',
+              bio: courseData.coach.bio || 'Expert Instructor',
+              studentsCount: 0,
+              coursesCount: 0,
+              rating: 5.0
+            } : null,
+            includes: ['Lifetime access', 'Certificate of completion']
           });
         }
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        setCourse(coursesData[courseId] || null);
+
+        // 2. Check Enrollment (if logged in)
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: enrollment } = await supabase
+            .from('enrollments')
+            .select('enrolled_at')
+            .eq('profile_id', user.id)
+            .eq('course_id', courseId)
+            .maybeSingle();
+
+          if (enrollment) {
+            setIsEnrolled(true);
+          }
+        }
+
+      } catch (err: any) {
+        console.error('Error fetching course/enrollment:', err);
+        // Fallback or just set null
+        setCourse(null);
+        // Debugging Helper: Alert the actual error if in dev
+        // if (process.env.NODE_ENV === 'development') alert('Debug Error: ' + JSON.stringify(err));
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCourse();
+    fetchCourseAndEnrollment();
   }, [courseId]);
+
+  const toggleModule = (moduleId: number) => {
+    setExpandedModules((prev) =>
+      prev.includes(moduleId) ? prev.filter((id) => id !== moduleId) : [...prev, moduleId]
+    );
+  };
+
+  const handleEnroll = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        alert("Please log in to enroll.");
+        navigate('/login');
+        return;
+      }
+
+      if (!course) return;
+
+      // Insert enrollment
+      const { error } = await supabase
+        .from('enrollments')
+        .insert({
+          profile_id: user.id,
+          course_id: course.id
+        });
+
+      if (error) {
+        // Check for duplicate key error (already enrolled)
+        if (error.code === '23505') {
+          setIsEnrolled(true);
+          alert("You are already enrolled!");
+        } else {
+          throw error;
+        }
+      } else {
+        alert(`✅ Successfully enrolled in ${course.title}!\n\n🎉 Welcome to the course! You can now access all lessons and materials.`);
+        setIsEnrolled(true);
+        // Optionally redirect
+      }
+
+    } catch (err: any) {
+      console.error('Error enrolling:', err);
+      alert('Failed to enroll: ' + err.message);
+    }
+  };
+
+  const handleAddToWishlist = () => {
+    console.log('Added to wishlist:', course ? course.id : '');
+    alert(`❤️ Added to wishlist!\n\n${course ? course.title : 'Course'} has been saved to your wishlist.`);
+  };
 
   if (loading) {
     return (
@@ -335,87 +226,6 @@ const CourseDetail: React.FC = () => {
       </StudentAppLayout>
     );
   }
-
-  const handleEnroll = async () => {
-    if (!user || !courseId) {
-      alert("⚠️ Please log in to enroll in courses");
-      navigate("/login");
-      return;
-    }
-
-    try {
-      setEnrolling(true);
-
-      const { error } = await supabase.from("enrollments").insert({
-        profile_id: user.id,
-        course_id: courseId,
-      });
-
-      if (error) {
-        console.error("Error enrolling in course:", error);
-        alert(`❌ Failed to enroll: ${error.message}`);
-        return;
-      }
-
-      setIsEnrolled(true);
-      alert(
-        `✅ Successfully enrolled in ${course.title}!\n\n🎉 Welcome to the course! You can now access the course circle and connect with other students.`,
-      );
-    } catch (err) {
-      console.error("Unexpected error during enrollment:", err);
-      alert("❌ An unexpected error occurred. Please try again.");
-    } finally {
-      setEnrolling(false);
-    }
-  };
-
-  const handleUnenroll = async () => {
-    if (!user || !courseId) return;
-
-    const confirmed = window.confirm(
-      `Are you sure you want to leave ${course.title}?\n\n` +
-        "You will lose access to:\n" +
-        "• Course circle discussions\n" +
-        "• Progress tracking\n" +
-        "• Community features\n\n" +
-        "You can re-enroll at any time.",
-    );
-
-    if (!confirmed) return;
-
-    try {
-      setEnrolling(true);
-
-      const { error } = await supabase
-        .from("enrollments")
-        .delete()
-        .eq("profile_id", user.id)
-        .eq("course_id", courseId);
-
-      if (error) {
-        console.error("Error unenrolling from course:", error);
-        alert(`❌ Failed to unenroll: ${error.message}`);
-        return;
-      }
-
-      setIsEnrolled(false);
-      alert(
-        `✓ You have been unenrolled from ${course.title}\n\nYou can re-enroll at any time from the course catalog.`,
-      );
-    } catch (err) {
-      console.error("Unexpected error during unenrollment:", err);
-      alert("❌ An unexpected error occurred. Please try again.");
-    } finally {
-      setEnrolling(false);
-    }
-  };
-
-  const handleAddToWishlist = () => {
-    console.log("Added to wishlist:", course.id);
-    alert(
-      `❤️ Added to wishlist!\n\n${course.title} has been saved to your wishlist.`,
-    );
-  };
 
   return (
     <StudentAppLayout>
@@ -484,14 +294,18 @@ const CourseDetail: React.FC = () => {
           <div className="flex-1 min-w-0">
             {/* Tab Bar - Only Overview */}
             <div className="flex gap-2 mb-6 border-b border-[#EDF0FB] dark:border-gray-700">
-              <button className="px-6 py-3 text-sm font-medium capitalize text-brand-primary border-b-2 border-brand-primary">
-                Overview
-              </button>
-              <div className="flex-1 flex items-center justify-end gap-2 text-sm text-text-muted dark:text-dark-text-muted pb-3">
-                <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs">
-                  📚 Curriculum coming soon
-                </span>
-              </div>
+              {(['overview', 'curriculum', 'reviews', 'coach'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-3 text-sm font-medium capitalize transition-all ${activeTab === tab
+                    ? 'text-brand-primary border-b-2 border-brand-primary'
+                    : 'text-text-secondary hover:text-brand-primary'
+                    }`}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
 
             {/* Tab Content */}
@@ -520,45 +334,155 @@ const CourseDetail: React.FC = () => {
                               {item}
                             </span>
                           </div>
-                        ),
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {course.tools && course.tools.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">Tools & Technologies</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {course.tools.map((tool: string) => (
+                          <span
+                            key={tool}
+                            className="px-4 py-2 bg-[#F5F7FF] dark:bg-gray-800 text-brand-primary rounded-full text-sm font-medium"
+                          >
+                            {tool}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'curriculum' && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">Course curriculum</h3>
+                  {course.curriculum && course.curriculum.length > 0 ? course.curriculum.map((module: any) => (
+                    <div key={module.id} className="border border-[#EDF0FB] dark:border-gray-700 rounded-2xl overflow-hidden">
+                      <button
+                        onClick={() => toggleModule(module.id)}
+                        className="w-full flex items-center justify-between p-4 hover:bg-[#F5F7FF] dark:hover:bg-gray-800 dark:bg-gray-800 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <svg
+                            className={`w-5 h-5 text-text-muted transition-transform ${expandedModules.includes(module.id) ? 'rotate-90' : ''
+                              }`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                          <span className="font-medium text-text-primary dark:text-dark-text-primary">{module.title}</span>
+                        </div>
+                        <span className="text-sm text-text-muted dark:text-dark-text-muted">{module.lessons?.length || 0} lessons</span>
+                      </button>
+
+                      {expandedModules.includes(module.id) && (
+                        <div className="bg-[#FAFBFF] p-4 space-y-2">
+                          {module.lessons && module.lessons.map((lesson: any) => (
+                            <div
+                              key={lesson.id}
+                              className="flex items-center justify-between py-2 px-3 hover:bg-white dark:bg-dark-background-card rounded-lg transition-colors"
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="text-text-muted dark:text-dark-text-muted">▶️</span>
+                                <span className="text-sm text-text-secondary dark:text-dark-text-secondary">{lesson.title}</span>
+                              </div>
+                              <span className="text-xs text-text-muted dark:text-dark-text-muted">{lesson.duration}</span>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
-                  </div>
-                )}
+                  )) : (
+                    <div className="text-center py-8 text-gray-500">No content available yet.</div>
+                  )}
+                </div>
+              )}
 
-                {course.tools && course.tools.length > 0 && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-text-primary dark:text-dark-text-primary mb-4">
-                      Tools & Technologies
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {course.tools.map((tool: string) => (
-                        <span
-                          key={tool}
-                          className="px-4 py-2 bg-[#F5F7FF] dark:bg-gray-800 text-brand-primary rounded-full text-sm font-medium"
-                        >
-                          {tool}
-                        </span>
-                      ))}
+              {activeTab === 'reviews' && (
+                <div className="space-y-6">
+                  {course.reviews && course.reviews.length > 0 ? (
+                    <>
+                      <div className="flex items-center gap-8 pb-6 border-b border-[#EDF0FB] dark:border-gray-700">
+                        <div className="text-center">
+                          <div className="text-4xl font-bold text-text-primary dark:text-dark-text-primary mb-1">{course.rating}</div>
+                          <div className="text-yellow-500 text-xl mb-1">★★★★★</div>
+                          <div className="text-sm text-text-muted dark:text-dark-text-muted">{course.reviewCount} reviews</div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-6">
+                        {course.reviews.map((review: any) => (
+                          <div key={review.id} className="pb-6 border-b border-[#EDF0FB] dark:border-gray-700 last:border-0">
+                            <div className="flex items-start gap-4">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-2xl flex-shrink-0">
+                                {review.avatar}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-2">
+                                  <div>
+                                    <p className="font-medium text-text-primary dark:text-dark-text-primary">{review.userName}</p>
+                                    <p className="text-xs text-text-muted dark:text-dark-text-muted">{review.date}</p>
+                                  </div>
+                                  <div className="text-yellow-500">
+                                    {'★'.repeat(review.rating)}
+                                  </div>
+                                </div>
+                                <p className="text-sm text-text-secondary dark:text-dark-text-secondary">{review.comment}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="text-4xl mb-4">⭐</div>
+                      <p className="text-text-muted">No reviews yet. Be the first to review this course!</p>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+              )}
 
-                {/* Information about hidden features */}
-                <div className="mt-8 p-6 bg-blue-50 dark:bg-gray-800 rounded-2xl border border-blue-200 dark:border-gray-700">
-                  <h4 className="font-semibold text-text-primary dark:text-dark-text-primary mb-2 flex items-center gap-2">
-                    <span>🚧</span>
-                    <span>Course Content Under Development</span>
-                  </h4>
-                  <p className="text-sm text-text-secondary dark:text-dark-text-secondary mb-3">
-                    Lessons, quizzes, and detailed curriculum are currently
-                    being prepared by the instructor.
-                  </p>
-                  {isEnrolled && (
-                    <p className="text-sm text-brand-primary font-medium">
-                      💬 Meanwhile, join the Course Circle to connect with other
-                      enrolled students and the instructor!
-                    </p>
+              {activeTab === 'coach' && (
+                <div className="space-y-6">
+                  {course.coach ? (
+                    <>
+                      <div className="flex items-start gap-6">
+                        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-primary to-brand-primary-light flex items-center justify-center text-5xl flex-shrink-0">
+                          {course.coach.avatar}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-xl font-bold text-text-primary dark:text-dark-text-primary mb-2">{course.coach.name}</h3>
+                          <p className="text-text-secondary dark:text-dark-text-secondary mb-4">{course.coach.bio}</p>
+
+                          <div className="flex gap-6">
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.coach.studentsCount.toLocaleString()}</div>
+                              <div className="text-xs text-text-muted dark:text-dark-text-muted">Students</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.coach.coursesCount}</div>
+                              <div className="text-xs text-text-muted dark:text-dark-text-muted">Courses</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-text-primary dark:text-dark-text-primary">{course.coach.rating}</div>
+                              <div className="text-xs text-text-muted dark:text-dark-text-muted">Rating</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-12">
+                      <div className="text-4xl mb-4">👨‍🏫</div>
+                      <p className="text-text-muted">Instructor information coming soon</p>
+                    </div>
                   )}
                 </div>
               </div>

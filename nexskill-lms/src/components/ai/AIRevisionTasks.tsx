@@ -44,7 +44,7 @@ const AIRevisionTasks: React.FC = () => {
   const completedCount = tasks.filter((t) => t.completed).length;
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-5 transition-colors h-full flex flex-col">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-5 transition-colors max-h-[300px] flex flex-col">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div>
@@ -80,8 +80,8 @@ const AIRevisionTasks: React.FC = () => {
           <div
             key={task.id}
             className={`group flex items-start gap-3 p-3 rounded-xl border transition-all cursor-pointer ${task.completed
-                ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700/50'
-                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#304DB5] hover:shadow-md'
+              ? 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700/50'
+              : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-[#304DB5] hover:shadow-md'
               }`}
             onClick={() => handleToggleTask(task.id)}
           >
@@ -109,8 +109,8 @@ const AIRevisionTasks: React.FC = () => {
                   {task.duration}
                 </span>
                 <span className={`px-2 py-0.5 rounded-full font-medium ${task.completed
-                    ? 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
-                    : 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                  ? 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-400'
+                  : 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                   }`}>
                   {task.course}
                 </span>
