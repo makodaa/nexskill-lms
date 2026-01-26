@@ -31,9 +31,18 @@ export interface Module {
 export interface Course {
     id: string;
     title: string;
+    level?: CourseLevel;
+    duration_hours?: number;
+    price?: number;
+    category_id?: number;
     coach_id?: string;
     created_at: string;
     updated_at: string;
+    subtitle?: string;
+    short_description?: string;
+    long_description?: string;
+    language?: string;
+    visibility?: 'public' | 'unlisted' | 'private';
     modules?: Module[]; // Relation
 }
 export interface CoachProfile {
@@ -68,7 +77,7 @@ export interface Profile {
     role: UserRole;
 }
 
-export type SessionStatus = 'scheduled' | 'live' | 'completed' | 'cancelled';
+export type SessionStatus = 'scheduled' | 'in_progress' | 'live' | 'completed' | 'cancelled';
 
 export interface LiveSession {
     id: string;
@@ -82,6 +91,19 @@ export interface LiveSession {
     is_live: boolean;
     status: SessionStatus;
     recording_url?: string;
-    created_at?: string;
-    updated_at?: string;
+    created_at: string;
+    updated_at: string;
+    // Joined fields
+    courses?: {
+        title: string;
+        category?: {
+            name: string;
+        };
+    };
+    coach?: {
+        first_name: string;
+        last_name: string;
+        username?: string;
+    };
+    participants_count?: number;
 }
