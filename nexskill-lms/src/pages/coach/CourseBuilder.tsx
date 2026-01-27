@@ -5,6 +5,7 @@ import CoachAppLayout from '../../layouts/CoachAppLayout';
 import CourseBuilderSidebar from '../../components/coach/course-builder/CourseBuilderSidebar';
 import CourseSettingsForm from '../../components/coach/course-builder/CourseSettingsForm';
 import CurriculumEditor from '../../components/coach/course-builder/CurriculumEditor';
+import CourseMediaLibrary from '../../components/coach/course-builder/CourseMediaLibrary';
 import QuizBuilderPanel from '../../components/coach/quiz-builder/QuizBuilderPanel';
 import DripSchedulePanel from '../../components/coach/course-builder/DripSchedulePanel';
 import CoursePricingForm from '../../components/coach/course-builder/CoursePricingForm';
@@ -33,6 +34,7 @@ interface Module {
   id: string;
   title: string;
   lessons: Lesson[];
+  is_published?: boolean;
 }
 
 interface FileUploadConfig {
@@ -168,7 +170,7 @@ const CourseBuilder: React.FC = () => {
               return lesson;
             }).filter(lesson => lesson.id !== null) as Lesson[];
 
-            return { ...module, lessons };
+            return { ...module, lessons, is_published: module.is_published ?? false };
           }));
 
           setCurriculum(modulesWithLessons);
@@ -525,6 +527,42 @@ const CourseBuilder: React.FC = () => {
     }
   };
 
+  const handleToggleModulePublish = async (moduleId: string, isPublished: boolean) => {
+    // Resolve temporary module ID to actual UUID if needed
+    let resolvedModuleId = moduleId;
+    try {
+      resolvedModuleId = await resolveModuleId(moduleId);
+    } catch (error) {
+      console.error('Error resolving module ID:', error);
+      alert(`Error resolving module: ${(error as Error).message}`);
+      return;
+    }
+
+    try {
+      // Update the module's is_published status in the database
+      const { error } = await supabase
+        .from('modules')
+        .update({ is_published: isPublished })
+        .eq('id', resolvedModuleId);
+
+      if (error) {
+        console.error('Error toggling module publish status:', error);
+        alert(`Error updating module: ${error.message}`);
+        return;
+      }
+
+      // Update the local state
+      setCurriculum(prev => prev.map(module => 
+        module.id === moduleId ? { ...module, is_published: isPublished } : module
+      ));
+
+      console.log(`Module ${resolvedModuleId} is now ${isPublished ? 'published' : 'unpublished'}`);
+    } catch (err) {
+      console.error('Unexpected error toggling module publish:', err);
+      alert('An unexpected error occurred while updating the module');
+    }
+  };
+
   const handleEditLesson = (moduleId: string, lessonId: string) => {
     const module = curriculum.find((m) => m.id === moduleId);
     const lesson = module?.lessons.find((l) => l.id === lessonId);
@@ -691,24 +729,11 @@ const CourseBuilder: React.FC = () => {
             onAddLesson={handleAddLesson}
             onDeleteLesson={handleDeleteLesson}
             onMoveLesson={handleMoveLesson}
+            onToggleModulePublish={handleToggleModulePublish}
           />
         );
       case 'lessons':
-        return (
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">🎬</div>
-            <p className="text-xl font-semibold text-slate-900 dark:text-dark-text-primary mb-2">Lesson content</p>
-            <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
-              Edit individual lessons from the Curriculum section
-            </p>
-            <button
-              onClick={() => setActiveSection('curriculum')}
-              className="px-6 py-3 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-semibold rounded-full hover:shadow-lg transition-all"
-            >
-              Go to Curriculum
-            </button>
-          </div>
-        );
+        return courseId ? <CourseMediaLibrary courseId={courseId} /> : null;
       case 'live-sessions':
         return <LiveSessionManager />;
       case 'quizzes':

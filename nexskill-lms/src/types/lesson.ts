@@ -1,6 +1,6 @@
 export interface LessonContentBlock {
   id: string;
-  type: 'text' | 'image' | 'video' | 'code' | 'heading' | 'list' | 'quote' | 'divider' | 'embed';
+  type: 'text' | 'image' | 'video' | 'code' | 'heading' | 'list' | 'quote' | 'divider' | 'embed' | 'document';
   content: string; // HTML content for text blocks, URL for media
   attributes?: Record<string, any>; // Additional attributes for the block
   position: number;

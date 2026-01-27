@@ -84,11 +84,13 @@ export const useCourseCurriculum = (courseId: string | undefined) => {
 
                 if (courseError) throw courseError;
 
-                // 2. Fetch all modules for this course (ordered by position)
+                // 2. Fetch all PUBLISHED modules for this course (ordered by position)
+                // Only show published modules to students
                 const { data: modulesData, error: modulesError } = await supabase
                     .from('modules')
                     .select('id, title, description, position, is_published')
                     .eq('course_id', courseId)
+                    .eq('is_published', true)
                     .order('position', { ascending: true });
 
                 if (modulesError) throw modulesError;
@@ -100,11 +102,12 @@ export const useCourseCurriculum = (courseId: string | undefined) => {
                 let totalDurationMinutes = 0;
 
                 for (const module of modulesData || []) {
-                    // Fetch content items for this module
+                    // Fetch PUBLISHED content items for this module
                     const { data: contentItems, error: contentError } = await supabase
                         .from('module_content_items')
                         .select('id, content_type, content_id, position, is_published')
                         .eq('module_id', module.id)
+                        .eq('is_published', true)
                         .order('position', { ascending: true });
 
                     if (contentError) throw contentError;
@@ -113,11 +116,12 @@ export const useCourseCurriculum = (courseId: string | undefined) => {
 
                     for (const item of contentItems || []) {
                         if (item.content_type === 'lesson') {
-                            // Fetch lesson details
+                            // Fetch PUBLISHED lesson details
                             const { data: lesson, error: lessonError } = await supabase
                                 .from('lessons')
                                 .select('id, title, description, estimated_duration_minutes, is_published')
                                 .eq('id', item.content_id)
+                                .eq('is_published', true)
                                 .single();
 
                             if (!lessonError && lesson) {
@@ -129,11 +133,12 @@ export const useCourseCurriculum = (courseId: string | undefined) => {
                                 totalDurationMinutes += lesson.estimated_duration_minutes || 0;
                             }
                         } else if (item.content_type === 'quiz') {
-                            // Fetch quiz details
+                            // Fetch PUBLISHED quiz details
                             const { data: quiz, error: quizError } = await supabase
                                 .from('quizzes')
                                 .select('id, title, description, passing_score, time_limit_minutes, is_published')
                                 .eq('id', item.content_id)
+                                .eq('is_published', true)
                                 .single();
 
                             if (!quizError && quiz) {

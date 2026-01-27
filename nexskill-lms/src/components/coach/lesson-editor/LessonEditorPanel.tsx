@@ -13,6 +13,7 @@ import {
     Eye,
     EyeOff,
     MonitorPlay,
+    File,
 } from "lucide-react";
 import LessonPreview from "./LessonPreview";
 import LessonHeader from "./LessonHeader";
@@ -336,6 +337,7 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                             icon: FileText,
                                             label: "Video",
                                         },
+                                        document: { icon: File, label: "Document" },
                                     };
                                     const blockConfig = config[block.type] || {
                                         icon: FileText,
@@ -650,6 +652,17 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                                             spellCheck={false}
                                                         />
                                                     </div>
+                                                ) : block.type === "document" ? (
+                                                    <div className="space-y-4">
+                                                        <MediaUploader
+                                                            resourceType="document"
+                                                            currentUrl={block.content}
+                                                            currentMetadata={block.attributes?.media_metadata}
+                                                            onUploadComplete={(metadata) =>
+                                                                handleMediaUpload(block.id, metadata)
+                                                            }
+                                                        />
+                                                    </div>
                                                 ) : (
                                                     <div className="text-sm text-slate-500 dark:text-slate-400 p-2 bg-slate-50 dark:bg-gray-700 rounded">
                                                         {block.type} block
@@ -731,6 +744,18 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                                     <Code className="w-4 h-4 text-gray-500" />
                                                     <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                                                         Code
+                                                    </span>
+                                                </button>
+
+                                                <button
+                                                    onClick={() =>
+                                                        addContentBlock("document")
+                                                    }
+                                                    className="w-full px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-3"
+                                                >
+                                                    <File className="w-4 h-4 text-gray-500" />
+                                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                                        PDF/Document
                                                     </span>
                                                 </button>
                                             </div>

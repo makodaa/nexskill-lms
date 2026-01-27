@@ -130,6 +130,10 @@ import ContentEditorProfilePage from "./pages/content/ContentEditorProfilePage";
 import { UserProvider } from "./context/UserContext";
 // Role Guard (temporarily disabled for testing)
 // import RoleGuard from './components/auth/RoleGuard';
+import LandingPage from "./pages/LandingPage";
+
+// ... existing imports
+
 function App() {
   return (
     <UiPreferencesProvider>
@@ -138,8 +142,8 @@ function App() {
           <ErrorBoundary>
             <BrowserRouter>
               <Routes>
-                {/* Redirect root to student login */}
-                <Route path="/" element={<Navigate to="/student/login" replace />} />
+                {/* Root Route */}
+                <Route path="/" element={<LandingPage />} />
 
                 {/* Auth Routes - /login redirects to student login */}
                 <Route path="/login" element={<Navigate to="/student/login" replace />} />

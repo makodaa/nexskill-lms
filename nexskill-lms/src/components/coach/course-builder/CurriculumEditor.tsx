@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { Eye, EyeOff } from 'lucide-react';
 import type { Lesson } from '../../../types/lesson';
 
 interface Module {
   id: string;
   title: string;
   lessons: Lesson[];
+  is_published?: boolean;
 }
 
 interface CurriculumEditorProps {
@@ -14,9 +16,10 @@ interface CurriculumEditorProps {
   onAddLesson?: (moduleId: string, newLesson: Lesson) => Promise<void>;
   onDeleteLesson?: (moduleId: string, lessonId: string) => Promise<void>;
   onMoveLesson?: (moduleId: string, lessonId: string, direction: 'up' | 'down') => Promise<void>;
+  onToggleModulePublish?: (moduleId: string, isPublished: boolean) => Promise<void>;
 }
 
-const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChange, onEditLesson, onAddLesson, onDeleteLesson, onMoveLesson }) => {
+const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChange, onEditLesson, onAddLesson, onDeleteLesson, onMoveLesson, onToggleModulePublish }) => {
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(curriculum.map((m) => m.id)));
 
   const toggleModule = (moduleId: string) => {
@@ -29,6 +32,17 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
       }
       return next;
     });
+  };
+
+  const handleToggleModulePublish = async (moduleId: string, currentStatus: boolean) => {
+    if (onToggleModulePublish) {
+      await onToggleModulePublish(moduleId, !currentStatus);
+    }
+    // Update local state
+    const updatedCurriculum = curriculum.map((module) =>
+      module.id === moduleId ? { ...module, is_published: !currentStatus } : module
+    );
+    onChange(updatedCurriculum);
   };
 
   const handleAddModule = () => {
@@ -175,6 +189,18 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChang
                   onChange={(e) => handleModuleTitleChange(module.id, e.target.value)}
                   className="flex-1 px-3 py-1.5 bg-white dark:bg-dark-background-card rounded-lg border border-slate-200 dark:border-gray-700 font-semibold text-slate-900 dark:text-dark-text-primary focus:border-[#304DB5] focus:outline-none"
                 />
+                <button
+                  onClick={() => handleToggleModulePublish(module.id, module.is_published ?? false)}
+                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
+                    module.is_published 
+                      ? 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20' 
+                      : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
+                  }`}
+                  title={module.is_published ? 'Module is published (visible to students)' : 'Module is unpublished (hidden from students)'}
+                >
+                  {module.is_published ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  {module.is_published ? 'Published' : 'Unpublished'}
+                </button>
                 <button
                   onClick={() => handleAddLesson(module.id)}
                   className="px-4 py-2 text-sm font-medium text-[#304DB5] hover:bg-blue-50 rounded-lg transition-colors"

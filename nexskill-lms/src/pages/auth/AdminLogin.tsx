@@ -98,26 +98,32 @@ const AdminLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#304DB5] via-[#5E7BFF] to-[#7C3AED] flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-[#121212] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-brand-neon/10 rounded-full blur-[100px] animate-pulse"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-brand-electric/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
+      </div>
+
+      <div className="w-full max-w-md relative z-10">
         {/* Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8">
+        <div className="bg-white/5 border border-white/10 rounded-3xl shadow-2xl p-8 backdrop-blur-xl">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-gradient-to-br from-[#304DB5] to-[#5E7BFF] rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-lg">
+            <div className="w-16 h-16 bg-gradient-to-br from-brand-electric/20 to-brand-neon/20 border border-white/10 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4 shadow-[0_0_15px_rgba(0,123,255,0.3)]">
               🛡️
             </div>
-            <h1 className="text-3xl font-bold text-[#111827] mb-2">Admin Access</h1>
-            <p className="text-[#5F6473]">NexSkill Platform Administration</p>
+            <h1 className="text-3xl font-bold text-white mb-2">Admin Access</h1>
+            <p className="text-gray-400">NexSkill Platform Administration</p>
           </div>
 
           {/* Security Notice */}
-          <div className="mb-6 p-4 bg-[#FEF3C7] border border-[#FCD34D] rounded-xl">
+          <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl">
             <div className="flex gap-3">
               <span className="text-xl">⚠️</span>
               <div>
-                <p className="text-sm font-semibold text-[#92400E] mb-1">Restricted Area</p>
-                <p className="text-xs text-[#92400E]">
+                <p className="text-sm font-semibold text-yellow-500 mb-1">Restricted Area</p>
+                <p className="text-xs text-yellow-500/80">
                   This login is for authorized platform administrators only. All access is logged and monitored.
                 </p>
               </div>
@@ -127,13 +133,13 @@ const AdminLogin: React.FC = () => {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {error && (
-              <div className="p-3 bg-red-100 border border-red-200 text-red-700 text-sm rounded-lg">
+              <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg backdrop-blur-sm">
                 {error}
               </div>
             )}
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-[#111827] mb-2">
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
                 Admin Email
               </label>
               <input
@@ -143,13 +149,13 @@ const AdminLogin: React.FC = () => {
                 onChange={handleChange}
                 placeholder="admin@nexskill.com"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] focus:ring-2 focus:ring-[#304DB5] focus:border-transparent outline-none"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-1 focus:ring-brand-electric focus:border-brand-electric outline-none transition-all text-white placeholder-gray-500"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-[#111827] mb-2">
+              <label className="block text-sm font-semibold text-gray-300 mb-2">
                 Password
               </label>
               <input
@@ -159,7 +165,7 @@ const AdminLogin: React.FC = () => {
                 onChange={handleChange}
                 placeholder="Enter your password"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] focus:ring-2 focus:ring-[#304DB5] focus:border-transparent outline-none"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl focus:ring-1 focus:ring-brand-electric focus:border-brand-electric outline-none transition-all text-white placeholder-gray-500"
               />
             </div>
 
@@ -170,13 +176,13 @@ const AdminLogin: React.FC = () => {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-[#304DB5] border-[#E5E7EB] rounded focus:ring-[#304DB5]"
+                  className="w-4 h-4 bg-white/5 border-white/10 rounded text-brand-electric focus:ring-brand-electric"
                 />
-                <span className="text-sm text-[#5F6473]">Remember me</span>
+                <span className="text-sm text-gray-400">Remember me</span>
               </label>
               <Link
                 to="/admin/forgot-password"
-                className="text-sm font-semibold text-[#304DB5] hover:text-[#5E7BFF]"
+                className="text-sm font-semibold text-brand-electric hover:text-brand-neon transition-colors"
               >
                 Forgot password?
               </Link>
@@ -187,8 +193,8 @@ const AdminLogin: React.FC = () => {
               type="submit"
               disabled={isLoading}
               className={`w-full py-3 rounded-full font-semibold transition-all ${isLoading
-                ? 'bg-[#E5E7EB] text-[#9CA3B5] cursor-not-allowed'
-                : 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white hover:shadow-lg'
+                ? 'bg-white/10 text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-brand-electric to-brand-neon text-black hover:shadow-[0_0_20px_rgba(0,123,255,0.4)] hover:scale-[1.02]'
                 }`}
             >
               {isLoading ? 'Authenticating...' : 'Sign In to Admin Console'}
@@ -197,22 +203,22 @@ const AdminLogin: React.FC = () => {
 
           {/* Divider */}
           <div className="my-6 flex items-center gap-4">
-            <div className="flex-1 border-t border-[#E5E7EB]" />
-            <span className="text-sm text-[#9CA3B5]">Other Portals</span>
-            <div className="flex-1 border-t border-[#E5E7EB]" />
+            <div className="flex-1 border-t border-white/10" />
+            <span className="text-sm text-gray-500">Other Portals</span>
+            <div className="flex-1 border-t border-white/10" />
           </div>
 
           {/* Links to Other Portals */}
           <div className="space-y-3">
             <Link
               to="/student/login"
-              className="block w-full py-3 text-center bg-[#F5F7FF] text-[#304DB5] font-semibold rounded-full hover:bg-[#EDF0FB] transition-colors"
+              className="block w-full py-3 text-center bg-white/5 text-gray-300 font-semibold rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5 hover:border-white/20"
             >
               👨‍🎓 Student Access
             </Link>
             <Link
               to="/coach/login"
-              className="block w-full py-3 text-center bg-[#F5F7FF] text-[#304DB5] font-semibold rounded-full hover:bg-[#EDF0FB] transition-colors"
+              className="block w-full py-3 text-center bg-white/5 text-gray-300 font-semibold rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/5 hover:border-white/20"
             >
               🎓 Coach Access
             </Link>
@@ -220,7 +226,7 @@ const AdminLogin: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-white/80 text-sm mt-6">
+        <p className="text-center text-gray-500 text-sm mt-6">
           Protected by enterprise-grade security
         </p>
       </div>

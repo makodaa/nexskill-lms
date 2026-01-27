@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import StudentAppLayout from '../../layouts/StudentAppLayout';
 import { useUser } from '../../context/UserContext';
-// test changes
+import EnrolledCoursesOverview from '../../components/student/EnrolledCoursesOverview';
 // Dummy data
 const courses = [
   { 
@@ -227,7 +227,18 @@ const StudentDashboard: React.FC = () => {
           {/* Recommended Courses Section */}
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">Recommended courses for you</h2>
+              <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">Your courses</h2>
+              <Link to="/student/courses" className="text-sm font-medium text-brand-primary hover:text-brand-primary-light transition-colors">
+                View all →
+              </Link>
+            </div>
+            <EnrolledCoursesOverview maxCourses={5} />
+          </div>
+
+          {/* Recommended Courses Section */}
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-text-primary dark:text-dark-text-primary">Recommended for you</h2>
               <Link to="/student/courses" className="text-sm font-medium text-brand-primary hover:text-brand-primary-light transition-colors">
                 View all →
               </Link>
