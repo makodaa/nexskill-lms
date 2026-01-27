@@ -76,6 +76,26 @@ const CourseBuilder: React.FC = () => {
 
   const [activeSection, setActiveSection] = useState<SectionKey>('settings');
   const [courseStatus, setCourseStatus] = useState<'draft' | 'published'>('draft');
+  const [verificationStatus, setVerificationStatus] = useState<string>('draft');
+
+  const handleSubmitForReview = async () => {
+    if (!courseId) return;
+
+    try {
+      const { error } = await supabase
+        .from('courses')
+        .update({ verification_status: 'pending_review' })
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+      setVerificationStatus('pending_review');
+      window.alert('Course submitted for review successfully!');
+    } catch (err) {
+      console.error('Error submitting for review:', err);
+      window.alert('Failed to submit for review');
+    }
+  };
 
   // Settings state
   const [settings, setSettings] = useState<CourseSettings>({
@@ -107,6 +127,7 @@ const CourseBuilder: React.FC = () => {
       if (courseError) {
         console.error('Error fetching course:', courseError);
       } else if (courseData) {
+        setVerificationStatus(courseData.verification_status || 'draft');
         setSettings((prev) => ({
           ...prev,
           title: courseData.title,
@@ -119,6 +140,14 @@ const CourseBuilder: React.FC = () => {
           category: courseData.category?.name || '',
           topics: courseData.course_topics?.map((ct: any) => ct.topic_id) || [],
         }));
+
+        // Determine effective status
+        // Only show as "Published" if verified AND public
+        if (courseData.verification_status === 'approved' && courseData.visibility === 'public') {
+          setCourseStatus('published');
+        } else {
+          setCourseStatus('draft');
+        }
 
         // Fetch modules and their associated lessons
         const { data: modulesData, error: modulesError } = await supabase
@@ -595,14 +624,70 @@ const CourseBuilder: React.FC = () => {
     }
   };
 
-  const handlePublish = () => {
-    setCourseStatus('published');
-    window.alert(`🚀 Course Published Successfully\n\nCourse ID: ${courseId}\nStatus: Live\n\n✅ Publishing Checklist Completed:\n• Course content: Complete\n• Pricing: Set\n• Thumbnail: Uploaded\n• Description: Added\n• Learning objectives: Defined\n\n🌍 Course Visibility:\n• Public course catalog: Yes\n• Search engines: Indexed\n• Course page: Active\n• Enrollment: Open\n\n📊 What's Next:\n• Monitor enrollments\n• Engage with students\n• Respond to questions\n• Gather feedback\n• Update content as needed\n\n🎉 Congratulations on launching your course!`);
+  const handlePublish = async () => {
+    try {
+      if (verificationStatus !== 'approved') {
+        window.alert('Cannot publish unverified course.');
+        return;
+      }
+
+      const { error } = await supabase
+        .from('courses')
+        .update({ visibility: 'public' })
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+      setCourseStatus('published');
+      window.alert(`🚀 Course Published Successfully\n\nCourse ID: ${courseId}\nStatus: Live`);
+    } catch (error) {
+      console.error('Error publishing course:', error);
+      window.alert('Failed to publish course');
+    }
   };
 
-  const handleUnpublish = () => {
-    setCourseStatus('draft');
-    window.alert(`📝 Course Unpublished\n\nCourse ID: ${courseId}\nStatus: Draft\n\n⚠️ Impact of Unpublishing:\n• Course removed from catalog\n• New enrollments: Disabled\n• Existing students: Still have access\n• Course page: Private\n• Search visibility: Hidden\n\n✅ Current Students:\n• Can continue learning\n• Access to all materials maintained\n• Progress preserved\n\n🔄 To Re-publish:\n• Review and update content\n• Check settings and pricing\n• Click 'Publish' when ready\n\n💡 Use draft mode to make major updates without affecting student experience.`);
+  const handleUnpublish = async () => {
+    try {
+      // Unpublish AND reset verification to draft so they can resubmit if needed
+      // Or just unpublish visibility?
+      // User wants "Submit for Review" option. If we just unpublish visibility, they are still 'approved'.
+      // To allow re-review, we must set status to 'draft' or similar.
+      // Let's set it to 'draft' to force the full flow again if they want to.
+
+      const { error } = await supabase
+        .from('courses')
+        .update({
+          visibility: 'private',
+          verification_status: 'draft'
+        })
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+      setCourseStatus('draft');
+      setVerificationStatus('draft'); // Update local state
+      window.alert(`📝 Course Unpublished & Reset to Draft\n\nYou can now make changes and Submit for Review again.`);
+    } catch (error) {
+      console.error('Error unpublishing course:', error);
+      window.alert('Failed to unpublish course');
+    }
+  };
+
+  const handleDeleteCourse = async () => {
+    try {
+      const { error } = await supabase
+        .from('courses')
+        .delete()
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+      window.alert('Course deleted successfully');
+      navigate('/coach/courses');
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      window.alert('Failed to delete course');
+    }
   };
 
   const handleSaveSettings = async () => {
@@ -670,7 +755,12 @@ const CourseBuilder: React.FC = () => {
 
       // Sync local status
       setCourseStatus(settings.visibility === 'public' ? 'published' : 'draft');
-      window.alert('Settings saved successfully');
+
+      if (verificationStatus === 'changes_requested') {
+        window.alert('Settings saved. \n\n⚠️ Since changes were requested, please remember to click "Submit for Review" in the Publish tab when you are done with all edits.');
+      } else {
+        window.alert('Settings saved successfully');
+      }
 
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -681,7 +771,8 @@ const CourseBuilder: React.FC = () => {
   const renderSection = () => {
     switch (activeSection) {
       case 'settings':
-        return <CourseSettingsForm settings={settings} onChange={setSettings} onSave={handleSaveSettings} />;
+        return <CourseSettingsForm settings={settings} onChange={setSettings} onSave={handleSaveSettings} onDelete={handleDeleteCourse} />;
+
       case 'curriculum':
         return (
           <CurriculumEditor
@@ -721,8 +812,10 @@ const CourseBuilder: React.FC = () => {
         return (
           <CoursePublishWorkflow
             courseStatus={courseStatus}
+            verificationStatus={verificationStatus}
             onPublish={handlePublish}
             onUnpublish={handleUnpublish}
+            onSubmitForReview={handleSubmitForReview}
           />
         );
       case 'preview':
