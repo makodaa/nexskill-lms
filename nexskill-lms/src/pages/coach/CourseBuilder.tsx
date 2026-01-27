@@ -5,7 +5,6 @@ import CoachAppLayout from "../../layouts/CoachAppLayout";
 import CourseBuilderSidebar from "../../components/coach/course-builder/CourseBuilderSidebar";
 import CourseSettingsForm from "../../components/coach/course-builder/CourseSettingsForm";
 import CurriculumEditor from "../../components/coach/course-builder/CurriculumEditor";
-import QuizBuilderPanel from "../../components/coach/quiz-builder/QuizBuilderPanel";
 import DripSchedulePanel from "../../components/coach/course-builder/DripSchedulePanel";
 import CoursePricingForm from "../../components/coach/course-builder/CoursePricingForm";
 import CoursePublishWorkflow from "../../components/coach/course-builder/CoursePublishWorkflow";
@@ -47,21 +46,6 @@ interface Module {
     lessons: ContentItem[]; // Changed to accept both lessons and quizzes
 }
 
-interface FileUploadConfig {
-    allowedTypes: string[];
-    maxFileSizeMB: number;
-    rubric: string;
-    maxPoints: number;
-}
-
-interface Question {
-    id: string;
-    type: "multiple-choice" | "true-false" | "image-choice" | "file-upload";
-    question: string;
-    options: Array<{ id: string; text: string; isCorrect: boolean }>;
-    explanation: string;
-    fileUploadConfig?: FileUploadConfig;
-}
 
 interface ModuleDrip {
     moduleId: string;
@@ -262,9 +246,6 @@ const CourseBuilder: React.FC = () => {
         quiz: Quiz;
         questions: QuizQuestion[];
     } | null>(null);
-
-    // Quiz state
-    const [questions, setQuestions] = useState<Question[]>([]);
 
     // Drip schedule state (derived from curriculum modules)
     const dripModules: ModuleDrip[] = curriculum.map((mod) => ({
@@ -1292,10 +1273,21 @@ const CourseBuilder: React.FC = () => {
                 return <LiveSessionManager />;
             case "quizzes":
                 return (
-                    <QuizBuilderPanel
-                        questions={questions}
-                        onChange={setQuestions}
-                    />
+                    <div className="text-center py-16">
+                        <div className="text-6xl mb-4">📝</div>
+                        <p className="text-xl font-semibold text-slate-900 dark:text-dark-text-primary mb-2">
+                            Quiz management
+                        </p>
+                        <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
+                            Manage quizzes from the Curriculum section
+                        </p>
+                        <button
+                            onClick={() => setActiveSection("curriculum")}
+                            className="px-6 py-3 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-semibold rounded-full hover:shadow-lg transition-all"
+                        >
+                            Go to Curriculum
+                        </button>
+                    </div>
                 );
             case "drip":
                 return <DripSchedulePanel modules={drip} onChange={setDrip} />;

@@ -16,9 +16,7 @@ interface CourseBuilderSidebarProps {
 const sections: Section[] = [
   { key: 'settings', label: 'Overview & settings', icon: '⚙️' },
   { key: 'curriculum', label: 'Curriculum', icon: '📚' },
-  { key: 'lessons', label: 'Lessons & media', icon: '🎬' },
   { key: 'live-sessions', label: 'Live Sessions', icon: '📹' },
-  { key: 'quizzes', label: 'Quizzes', icon: '📝' },
   { key: 'drip', label: 'Drip schedule', icon: '📅' },
   { key: 'pricing', label: 'Pricing', icon: '💰' },
   { key: 'publish', label: 'Publish', icon: '🚀' },
