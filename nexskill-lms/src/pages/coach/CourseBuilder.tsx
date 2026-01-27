@@ -14,6 +14,8 @@ import LessonEditorPanel from '../../components/coach/lesson-editor/LessonEditor
 import LiveSessionManager from '../../components/coach/live-sessions/LiveSessionManager';
 import type { Lesson } from '../../types/lesson';
 import { supabase } from '../../lib/supabaseClient';
+import CourseFeedbackAlert from '../../components/coach/course-builder/CourseFeedbackAlert';
+
 
 type SectionKey = 'settings' | 'curriculum' | 'lessons' | 'live-sessions' | 'quizzes' | 'drip' | 'pricing' | 'publish' | 'preview';
 
@@ -77,6 +79,7 @@ const CourseBuilder: React.FC = () => {
   const [activeSection, setActiveSection] = useState<SectionKey>('settings');
   const [courseStatus, setCourseStatus] = useState<'draft' | 'published'>('draft');
   const [verificationStatus, setVerificationStatus] = useState<string>('draft');
+  const [adminFeedback, setAdminFeedback] = useState<{ content: string; created_at: string; is_resolved: boolean } | null>(null);
 
   const handleSubmitForReview = async () => {
     if (!courseId) return;
@@ -147,6 +150,24 @@ const CourseBuilder: React.FC = () => {
           setCourseStatus('published');
         } else {
           setCourseStatus('draft');
+        }
+
+        // Fetch admin feedback if status is rejected or changes_requested
+        if (courseData.verification_status === 'changes_requested' || courseData.verification_status === 'rejected') {
+          const { data: feedbackData, error: feedbackError } = await supabase
+            .from('admin_verification_feedback')
+            .select('*')
+            .eq('course_id', courseId)
+            .eq('is_resolved', false) // Only show unresolved feedback
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (!feedbackError && feedbackData) {
+            setAdminFeedback(feedbackData);
+          }
+        } else {
+          setAdminFeedback(null);
         }
 
         // Fetch modules and their associated lessons
@@ -859,6 +880,14 @@ const CourseBuilder: React.FC = () => {
 
           {/* Main content area */}
           <div className="flex-1">
+            {/* Show feedback alert if exists */}
+            {adminFeedback && (
+              <CourseFeedbackAlert
+                status={verificationStatus}
+                feedback={adminFeedback.content}
+                timestamp={adminFeedback.created_at}
+              />
+            )}
             <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-lg p-8">{renderSection()}</div>
           </div>
         </div>
