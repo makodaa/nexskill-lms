@@ -21,10 +21,14 @@ export interface MediaMetadata {
     format: string;
     width?: number;
     height?: number;
-    duration?: number;
+    duration?: number; // Video duration in seconds
     thumbnail_url?: string;
     bytes?: number;
     original_filename?: string;
+    // Video-specific fields
+    bit_rate?: number;
+    frame_rate?: number;
+    codec?: string;
 }
 
 export interface CloudinaryUploadOptions {
@@ -58,6 +62,7 @@ export interface CloudinaryUploadEvent {
         | "upload-added"
         | "queues-start"
         | "progress"
+        | "upload-progress"
         | "abort"
         | "close";
     info?: CloudinaryUploadResult & { percent?: number };
@@ -82,4 +87,41 @@ declare global {
             ) => CloudinaryWidget;
         };
     }
+}
+
+// Type guards for runtime validation
+export function isMediaMetadata(obj: any): obj is MediaMetadata {
+    return (
+        obj &&
+        typeof obj === "object" &&
+        typeof obj.url === "string" &&
+        typeof obj.public_id === "string" &&
+        (obj.resource_type === "image" || obj.resource_type === "video") &&
+        obj.url.length > 0 &&
+        obj.public_id.length > 0 &&
+        !obj.url.includes("undefined")
+    );
+}
+
+export function isValidUrl(url?: string): boolean {
+    return Boolean(
+        url &&
+            url !== "https://example.com/media-url" &&
+            !url.includes("undefined") &&
+            url.length > 0
+    );
+}
+
+export function isCloudinaryUploadResult(
+    obj: any
+): obj is CloudinaryUploadResult {
+    return (
+        obj &&
+        typeof obj === "object" &&
+        typeof obj.public_id === "string" &&
+        typeof obj.secure_url === "string" &&
+        typeof obj.resource_type === "string" &&
+        obj.public_id.length > 0 &&
+        obj.secure_url.length > 0
+    );
 }

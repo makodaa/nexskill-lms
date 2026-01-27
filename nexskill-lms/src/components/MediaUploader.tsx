@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useCloudinaryUpload } from "../hooks/useCloudinaryUpload";
 import type { MediaMetadata } from "../types/media.types";
+import { isValidUrl } from "../types/media.types";
 
 interface MediaUploaderProps {
     resourceType: "image" | "video";
@@ -46,9 +47,20 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
         }
     };
 
-    const hasMedia =
-        currentUrl && currentUrl !== "https://example.com/media-url";
+    const hasMedia = isValidUrl(currentUrl);
     const Icon = resourceType === "image" ? ImageIcon : VideoIcon;
+
+    // Safe metadata access with defaults
+    const safeMetadata = {
+        original_filename: currentMetadata?.original_filename ?? "Unknown",
+        bytes: currentMetadata?.bytes ?? 0,
+        width: currentMetadata?.width,
+        height: currentMetadata?.height,
+        duration: currentMetadata?.duration,
+        thumbnail_url: currentMetadata?.thumbnail_url,
+    };
+
+    const hasValidThumbnail = isValidUrl(safeMetadata.thumbnail_url);
 
     return (
         <div className={`space-y-3 ${className}`}>
@@ -108,11 +120,25 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
 
             {/* Upload Progress */}
             {isUploading && uploadProgress > 0 && (
-                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                    <div
-                        className="bg-blue-600 dark:bg-blue-500 h-full transition-all duration-300 ease-out"
-                        style={{ width: `${uploadProgress}%` }}
-                    />
+                <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">
+                            {uploadProgress < 90
+                                ? "Uploading..."
+                                : uploadProgress < 100
+                                ? "Processing..."
+                                : "Complete!"}
+                        </span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                            {Math.round(uploadProgress)}%
+                        </span>
+                    </div>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                        <div
+                            className="bg-blue-600 dark:bg-blue-500 h-full transition-all duration-300 ease-out"
+                            style={{ width: `${uploadProgress}%` }}
+                        />
+                    </div>
                 </div>
             )}
 
@@ -131,18 +157,54 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
                         />
                     ) : (
                         <div className="w-full aspect-video bg-black">
-                            {currentMetadata?.thumbnail_url ? (
+                            {hasValidThumbnail ? (
                                 <div className="relative w-full h-full">
                                     <img
-                                        src={currentMetadata.thumbnail_url}
+                                        src={safeMetadata.thumbnail_url!}
                                         alt="Video thumbnail"
                                         className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            console.error(
+                                                "Thumbnail load error:",
+                                                {
+                                                    thumbnail_url:
+                                                        safeMetadata.thumbnail_url,
+                                                    public_id:
+                                                        currentMetadata?.public_id,
+                                                    video_url: currentUrl,
+                                                    error: e,
+                                                }
+                                            );
+                                            // Fallback: hide image and show video player below
+                                            e.currentTarget.style.display =
+                                                "none";
+
+                                            // Try to show video player as fallback
+                                            const videoContainer =
+                                                e.currentTarget.closest(
+                                                    ".bg-black"
+                                                );
+                                            if (videoContainer && currentUrl) {
+                                                const video =
+                                                    document.createElement(
+                                                        "video"
+                                                    );
+                                                video.src = currentUrl;
+                                                video.controls = true;
+                                                video.className =
+                                                    "w-full h-full object-contain";
+                                                videoContainer.innerHTML = "";
+                                                videoContainer.appendChild(
+                                                    video
+                                                );
+                                            }
+                                        }}
                                     />
                                     <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                                         <VideoIcon className="w-12 h-12 text-white opacity-80" />
                                     </div>
                                 </div>
-                            ) : (
+                            ) : currentUrl ? (
                                 <video
                                     src={currentUrl}
                                     className="w-full h-full object-contain"
@@ -151,6 +213,10 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
                                         console.error("Video load error:", e);
                                     }}
                                 />
+                            ) : (
+                                <div className="flex items-center justify-center w-full h-full">
+                                    <VideoIcon className="w-12 h-12 text-gray-500" />
+                                </div>
                             )}
                         </div>
                     )}
@@ -160,13 +226,13 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
                         <div className="p-2 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                                 <span className="truncate">
-                                    {currentMetadata.original_filename ||
+                                    {safeMetadata.original_filename ||
                                         currentMetadata.public_id}
                                 </span>
-                                {currentMetadata.bytes && (
+                                {safeMetadata.bytes > 0 && (
                                     <span className="ml-2 flex-shrink-0">
                                         {(
-                                            currentMetadata.bytes /
+                                            safeMetadata.bytes /
                                             1024 /
                                             1024
                                         ).toFixed(2)}{" "}
@@ -174,26 +240,24 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
                                     </span>
                                 )}
                             </div>
-                            {(currentMetadata.width ||
-                                currentMetadata.duration) && (
+                            {(safeMetadata.width || safeMetadata.duration) && (
                                 <div className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                                    {currentMetadata.width &&
-                                        currentMetadata.height && (
+                                    {safeMetadata.width &&
+                                        safeMetadata.height && (
                                             <span>
-                                                {currentMetadata.width} ×{" "}
-                                                {currentMetadata.height}
+                                                {safeMetadata.width} ×{" "}
+                                                {safeMetadata.height}
                                             </span>
                                         )}
-                                    {currentMetadata.duration && (
+                                    {safeMetadata.duration && (
                                         <span className="ml-2">
                                             {Math.floor(
-                                                currentMetadata.duration / 60
+                                                safeMetadata.duration / 60
                                             )}
                                             :
                                             {String(
                                                 Math.floor(
-                                                    currentMetadata.duration %
-                                                        60
+                                                    safeMetadata.duration % 60
                                                 )
                                             ).padStart(2, "0")}
                                         </span>

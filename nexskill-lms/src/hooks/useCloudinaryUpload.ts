@@ -6,6 +6,10 @@ import type {
     CloudinaryError,
     CloudinaryUploadEvent,
 } from "../types/media.types";
+import {
+    isCloudinaryUploadResult,
+    isMediaMetadata,
+} from "../types/media.types";
 
 interface UseCloudinaryUploadReturn {
     uploadMedia: (
@@ -26,6 +30,94 @@ export function useCloudinaryUpload(): UseCloudinaryUploadReturn {
         setError(null);
     }, []);
 
+    const handleUploadCallback = useCallback(
+        (
+            uploadError: CloudinaryError | null,
+            result: CloudinaryUploadEvent | null,
+            cleanup: () => void,
+            resolve: (value: MediaMetadata | null) => void
+        ) => {
+            if (uploadError) {
+                console.error("Upload error:", uploadError);
+                setError(
+                    uploadError.message || "Upload failed. Please try again."
+                );
+                cleanup();
+                resolve(null);
+                return;
+            }
+
+            if (!result) {
+                cleanup();
+                resolve(null);
+                return;
+            }
+
+            // Handle upload progress
+            if (result.event === "upload-added") {
+                setUploadProgress(10);
+            } else if (result.event === "queues-start") {
+                setUploadProgress(20);
+            } else if (
+                result.event === "progress" ||
+                result.event === "upload-progress"
+            ) {
+                // Update progress based on upload percentage
+                const progress = Math.min(
+                    90,
+                    20 + (result.info?.percent || 0) * 0.7
+                );
+                setUploadProgress(progress);
+            } else if (result.event === "success") {
+                setUploadProgress(100);
+
+                try {
+                    if (!result.info) {
+                        throw new Error("Upload result missing info");
+                    }
+
+                    // Validate result structure using type guard
+                    if (!isCloudinaryUploadResult(result.info)) {
+                        throw new Error("Invalid upload result structure");
+                    }
+
+                    // Validate result has required fields
+                    if (!result.info.secure_url || !result.info.public_id) {
+                        throw new Error(
+                            "Upload response missing required fields (secure_url or public_id)"
+                        );
+                    }
+
+                    const metadata = CloudinaryService.convertToMediaMetadata(
+                        result.info
+                    );
+
+                    // Validate generated metadata using type guard
+                    if (!isMediaMetadata(metadata)) {
+                        throw new Error(
+                            "Invalid metadata generated from upload result"
+                        );
+                    }
+
+                    cleanup();
+                    resolve(metadata);
+                } catch (conversionError) {
+                    console.error(
+                        "Error converting upload result:",
+                        conversionError
+                    );
+                    setError("Failed to process upload result");
+                    cleanup();
+                    resolve(null);
+                }
+            } else if (result.event === "abort" || result.event === "close") {
+                cleanup();
+                resolve(null);
+            }
+        },
+        []
+    );
+
     const uploadMedia = useCallback(
         async (
             resourceType: "image" | "video" | "auto" = "auto"
@@ -45,89 +137,59 @@ export function useCloudinaryUpload(): UseCloudinaryUploadReturn {
                     setUploadProgress(0);
                 };
 
-                CloudinaryService.openUploadWidget(
-                    {
-                        resourceType,
-                        maxFileSize:
-                            resourceType === "video" ? 104857600 : 10485760, // 100MB for video, 10MB for images
-                        clientAllowedFormats:
-                            resourceType === "image"
-                                ? ["jpg", "jpeg", "png", "gif", "webp", "svg"]
-                                : resourceType === "video"
-                                ? ["mp4", "mov", "avi", "wmv", "flv", "webm"]
-                                : undefined,
-                        cropping: resourceType === "image",
-                        showSkipCropButton: true,
-                        multiple: false,
-                        maxFiles: 1,
-                    },
-                    (
-                        uploadError: CloudinaryError | null,
-                        result: CloudinaryUploadEvent | null
-                    ) => {
-                        if (uploadError) {
-                            console.error("Upload error:", uploadError);
-                            setError(
-                                uploadError.message ||
-                                    "Upload failed. Please try again."
-                            );
-                            cleanup();
-                            resolve(null);
-                            return;
-                        }
+                // Use video-specific widget for video uploads
+                const widgetPromise =
+                    resourceType === "video"
+                        ? CloudinaryService.openUploadWidgetForVideo(
+                              (
+                                  uploadError: CloudinaryError | null,
+                                  result: CloudinaryUploadEvent | null
+                              ) => {
+                                  handleUploadCallback(
+                                      uploadError,
+                                      result,
+                                      cleanup,
+                                      resolve
+                                  );
+                              }
+                          )
+                        : CloudinaryService.openUploadWidget(
+                              {
+                                  resourceType,
+                                  maxFileSize:
+                                      resourceType === "image"
+                                          ? 10485760
+                                          : 104857600, // 10MB for images, 100MB otherwise
+                                  clientAllowedFormats:
+                                      resourceType === "image"
+                                          ? [
+                                                "jpg",
+                                                "jpeg",
+                                                "png",
+                                                "gif",
+                                                "webp",
+                                                "svg",
+                                            ]
+                                          : undefined,
+                                  cropping: resourceType === "image",
+                                  showSkipCropButton: true,
+                                  multiple: false,
+                                  maxFiles: 1,
+                              },
+                              (
+                                  uploadError: CloudinaryError | null,
+                                  result: CloudinaryUploadEvent | null
+                              ) => {
+                                  handleUploadCallback(
+                                      uploadError,
+                                      result,
+                                      cleanup,
+                                      resolve
+                                  );
+                              }
+                          );
 
-                        if (!result) {
-                            cleanup();
-                            resolve(null);
-                            return;
-                        }
-
-                        // Handle upload progress
-                        if (result.event === "upload-added") {
-                            setUploadProgress(10);
-                        } else if (result.event === "queues-start") {
-                            setUploadProgress(20);
-                        } else if (result.event === "progress") {
-                            // Update progress based on upload percentage
-                            const progress = Math.min(
-                                90,
-                                20 + (result.info?.percent || 0) * 0.7
-                            );
-                            setUploadProgress(progress);
-                        } else if (result.event === "success") {
-                            setUploadProgress(100);
-
-                            try {
-                                if (result.info) {
-                                    const metadata =
-                                        CloudinaryService.convertToMediaMetadata(
-                                            result.info
-                                        );
-                                    cleanup();
-                                    resolve(metadata);
-                                } else {
-                                    throw new Error(
-                                        "Upload result missing info"
-                                    );
-                                }
-                            } catch (conversionError) {
-                                console.error(
-                                    "Error converting upload result:",
-                                    conversionError
-                                );
-                                setError("Failed to process upload result");
-                                cleanup();
-                                resolve(null);
-                            }
-                        } else if (
-                            result.event === "abort" ||
-                            result.event === "close"
-                        ) {
-                            cleanup();
-                            resolve(null);
-                        }
-                    }
-                ).then((widgetInstance) => {
+                widgetPromise.then((widgetInstance) => {
                     widget = widgetInstance;
                     if (widget) {
                         widget.open();
@@ -139,7 +201,7 @@ export function useCloudinaryUpload(): UseCloudinaryUploadReturn {
                 });
             });
         },
-        []
+        [handleUploadCallback]
     );
 
     return {
