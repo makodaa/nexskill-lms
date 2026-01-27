@@ -110,6 +110,38 @@ export class CloudinaryService {
     }
 
     /**
+     * Open the Cloudinary upload widget specifically optimized for videos
+     */
+    static async openUploadWidgetForVideo(
+        callback: (
+            error: CloudinaryError | null,
+            result: CloudinaryUploadEvent | null
+        ) => void
+    ): Promise<CloudinaryWidget | null> {
+        const videoOptions: Partial<CloudinaryUploadOptions> = {
+            resourceType: "video",
+            maxFileSize: 104857600, // 100MB for videos
+            maxVideoFileSize: 104857600,
+            clientAllowedFormats: [
+                "mp4",
+                "mov",
+                "avi",
+                "webm",
+                "mkv",
+                "flv",
+                "wmv",
+            ],
+            sources: ["local", "url", "camera"],
+            cropping: false,
+            showSkipCropButton: true,
+            folder: "nexskill-lms/lessons/videos",
+            tags: ["lesson-video"],
+        };
+
+        return this.openUploadWidget(videoOptions, callback);
+    }
+
+    /**
      * Convert Cloudinary upload result to MediaMetadata
      */
     static convertToMediaMetadata(
@@ -134,19 +166,49 @@ export class CloudinaryService {
         if (result.height) metadata.height = result.height;
         if (result.duration) metadata.duration = result.duration;
 
-        // Generate thumbnail for videos
+        // Generate thumbnail for videos using proper video thumbnail transformation
         if (resourceType === "video") {
-            metadata.thumbnail_url = this.generateThumbnail(
+            const thumbnailUrl = this.generateVideoThumbnail(
                 result.public_id,
                 400
             );
+            metadata.thumbnail_url = thumbnailUrl;
+            console.log("[Cloudinary] Generated video thumbnail:", {
+                public_id: result.public_id,
+                thumbnail_url: thumbnailUrl,
+                video_url: result.secure_url,
+            });
         }
 
         return metadata;
     }
 
     /**
-     * Generate a Cloudinary transformation URL
+     * Generate a video thumbnail URL (first frame)
+     */
+    static generateVideoThumbnail(publicId: string, width = 400): string {
+        if (!this.cloudName) {
+            console.warn("Cloudinary cloud name not configured");
+            return "";
+        }
+
+        // Remove file extension from public_id if present (Cloudinary handles this)
+        // The public_id should NOT include the file extension for transformation URLs
+        const cleanPublicId = publicId.replace(
+            /\.(mp4|mov|avi|webm|mkv|flv|wmv)$/i,
+            ""
+        );
+
+        // Use video thumbnail transformation
+        // so_0 = start offset 0 (first frame)
+        // f_jpg = format as JPEG
+        // q_auto = automatic quality
+        // The extension (.jpg) is not needed when using f_jpg transformation
+        return `https://res.cloudinary.com/${this.cloudName}/video/upload/so_0/w_${width},c_fill,f_jpg,q_auto/${cleanPublicId}`;
+    }
+
+    /**
+     * Generate a standard image thumbnail URL
      */
     static generateThumbnail(publicId: string, width = 400): string {
         if (!this.cloudName) {
@@ -215,6 +277,60 @@ export class CloudinaryService {
         const transformString = transformations.join(",");
 
         return `https://res.cloudinary.com/${this.cloudName}/video/upload/${transformString}/${publicId}`;
+    }
+
+    /**
+     * Validate video file before upload
+     */
+    static validateVideo(file: File): { valid: boolean; error?: string } {
+        const maxSize = 100 * 1024 * 1024; // 100MB
+        const allowedTypes = [
+            "video/mp4",
+            "video/quicktime",
+            "video/x-msvideo",
+            "video/webm",
+            "video/x-matroska",
+            "video/x-flv",
+            "video/x-ms-wmv",
+        ];
+
+        if (file.size > maxSize) {
+            return {
+                valid: false,
+                error: "Video file is too large (max 100MB)",
+            };
+        }
+
+        if (!allowedTypes.includes(file.type)) {
+            return {
+                valid: false,
+                error: "Invalid video format. Allowed: MP4, MOV, AVI, WebM, MKV, FLV, WMV",
+            };
+        }
+
+        return { valid: true };
+    }
+
+    /**
+     * Get video duration from file
+     */
+    static getVideoDuration(file: File): Promise<number> {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement("video");
+            video.preload = "metadata";
+
+            video.onloadedmetadata = () => {
+                window.URL.revokeObjectURL(video.src);
+                resolve(video.duration);
+            };
+
+            video.onerror = () => {
+                window.URL.revokeObjectURL(video.src);
+                reject(new Error("Failed to load video metadata"));
+            };
+
+            video.src = URL.createObjectURL(file);
+        });
     }
 
     /**
