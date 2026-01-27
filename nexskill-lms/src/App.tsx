@@ -2,13 +2,16 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UiPreferencesProvider } from "./context/UiPreferencesContext";
 import { AuthProvider } from "./context/AuthContext";
 import ErrorBoundary from "./components/system/ErrorBoundary";
-import Login from "./pages/auth/Login";
+import StudentLogin from "./pages/auth/StudentLogin";
+import CoachLogin from "./pages/auth/CoachLogin";
 import SignUp from "./pages/auth/SignUp";
 import EmailVerification from "./pages/auth/EmailVerification";
+
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import OnboardingPreferences from "./pages/student/OnboardingPreferences";
 import StudentDashboard from "./pages/student/StudentDashboard";
+
 import CourseCatalog from "./pages/student/CourseCatalog";
 import CourseDetail from "./pages/student/CourseDetailRefactored";
 import CoursePlayer from "./pages/student/CoursePlayer";
@@ -35,7 +38,7 @@ import StudentMessagesPage from "./pages/student/StudentMessagesPage";
 import MembershipPlans from "./pages/student/MembershipPlans";
 import MembershipManage from "./pages/student/MembershipManage";
 import MembershipConfirmation from "./pages/student/MembershipConfirmation";
-import StudentMessages from "./pages/student/StudentMessages";
+// import StudentMessages from "./pages/student/StudentMessages";
 import LiveClassRoom from "./pages/student/LiveClassRoom";
 import LiveClasses from "./pages/student/LiveClasses";
 import CoachDashboard from "./pages/coach/CoachDashboard";
@@ -98,7 +101,7 @@ import CommunityDashboardPage from "./pages/community/CommunityDashboardPage";
 import CommunityOverviewPage from "./pages/community/CommunityOverviewPage";
 // Coach Application Pages
 import CoachApplicationPage from "./pages/coach/CoachApplicationPage";
-import VerificationPending from "./pages/auth/VerificationPending";
+// import VerificationPending from "./pages/auth/VerificationPending";
 import CommunityGroupsPage from "./pages/community/CommunityGroupsPage";
 import CommunityApprovalQueuePage from "./pages/community/CommunityApprovalQueuePage";
 import CommunityAnnouncementsPage from "./pages/community/CommunityAnnouncementsPage";
@@ -134,12 +137,16 @@ function App() {
           <ErrorBoundary>
             <BrowserRouter>
               <Routes>
-                {/* Redirect root to login */}
-                <Route path="/" element={<Navigate to="/login" replace />} />
+                {/* Redirect root to student login */}
+                <Route path="/" element={<Navigate to="/student/login" replace />} />
 
-                {/* Auth Routes */}
-                <Route path="/login" element={<Login />} />
+                {/* Auth Routes - /login redirects to student login */}
+                <Route path="/login" element={<Navigate to="/student/login" replace />} />
+                <Route path="/student/login" element={<StudentLogin />} />
+                <Route path="/coach/login" element={<CoachLogin />} />
+
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/coach/apply" element={<CoachApplicationPage />} />
                 <Route
                   path="/email-verification"
                   element={<EmailVerification />}
@@ -151,6 +158,7 @@ function App() {
                   element={<OnboardingPreferences />}
                 />
                 <Route path="/admin/login" element={<AdminLogin />} />
+
 
                 {/* Role-based Dashboard Routes */}
                 {/* Platform Owner Routes */}

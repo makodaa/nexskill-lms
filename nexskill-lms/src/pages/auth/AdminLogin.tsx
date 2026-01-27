@@ -205,16 +205,16 @@ const AdminLogin: React.FC = () => {
           {/* Links to Other Portals */}
           <div className="space-y-3">
             <Link
-              to="/login"
+              to="/student/login"
               className="block w-full py-3 text-center bg-[#F5F7FF] text-[#304DB5] font-semibold rounded-full hover:bg-[#EDF0FB] transition-colors"
             >
-              👨‍🎓 Student Portal
+              👨‍🎓 Student Access
             </Link>
             <Link
-              to="/login"
+              to="/coach/login"
               className="block w-full py-3 text-center bg-[#F5F7FF] text-[#304DB5] font-semibold rounded-full hover:bg-[#EDF0FB] transition-colors"
             >
-              🎓 Coach Portal
+              🎓 Coach Access
             </Link>
           </div>
         </div>
