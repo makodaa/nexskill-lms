@@ -14,6 +14,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 
 import CourseCatalog from "./pages/student/CourseCatalog";
 import CourseDetail from "./pages/student/CourseDetailRefactored";
+import CourseCurriculumPage from "./pages/student/CourseCurriculumPage";
 import CoursePlayer from "./pages/student/CoursePlayer";
 import QuizStart from "./pages/student/QuizStart";
 import QuizSession from "./pages/student/QuizSession";
@@ -402,6 +403,10 @@ function App() {
                 <Route
                   path="/student/courses/:courseId"
                   element={<CourseDetail />}
+                />
+                <Route
+                  path="/student/courses/:courseId/curriculum"
+                  element={<CourseCurriculumPage />}
                 />
                 <Route
                   path="/student/courses/:courseId/lessons/:lessonId"

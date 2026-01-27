@@ -49,11 +49,11 @@ const CourseDetailRefactored: React.FC = () => {
   const handleUnenroll = async () => {
     const confirmed = window.confirm(
       `Are you sure you want to leave ${course?.title}?\n\n` +
-        "You will lose access to:\n" +
-        "• Course circle discussions\n" +
-        "• Progress tracking\n" +
-        "• Community features\n\n" +
-        "You can re-enroll at any time.",
+      "You will lose access to:\n" +
+      "• Course circle discussions\n" +
+      "• Progress tracking\n" +
+      "• Community features\n\n" +
+      "You can re-enroll at any time.",
     );
 
     if (!confirmed) return;
@@ -184,10 +184,19 @@ const CourseDetailRefactored: React.FC = () => {
               <button className="px-6 py-3 text-sm font-medium capitalize text-brand-primary border-b-2 border-brand-primary">
                 Overview
               </button>
-              <div className="flex-1 flex items-center justify-end gap-2 text-sm text-text-muted dark:text-dark-text-muted pb-3">
-                <span className="px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs">
-                  📚 Curriculum coming soon
-                </span>
+              <div className="flex-1 flex items-center justify-end gap-2 text-sm pb-3">
+                {isEnrolled ? (
+                  <button
+                    onClick={() => navigate(`/student/courses/${courseId}/curriculum`)}
+                    className="px-4 py-2 bg-brand-primary text-white rounded-full text-sm font-medium hover:bg-brand-primary-dark transition-colors flex items-center gap-2"
+                  >
+                    📚 View Curriculum
+                  </button>
+                ) : (
+                  <span className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-text-muted dark:text-dark-text-muted rounded-full text-xs">
+                    Enroll to access curriculum
+                  </span>
+                )}
               </div>
             </div>
 
