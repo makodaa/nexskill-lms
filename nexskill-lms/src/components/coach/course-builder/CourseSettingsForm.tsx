@@ -17,9 +17,10 @@ interface CourseSettingsFormProps {
   settings: CourseSettings;
   onChange: (updatedSettings: CourseSettings) => void;
   onSave: () => Promise<void>;
+  onDelete: () => Promise<void>;
 }
 
-const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onChange, onSave }) => {
+const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onChange, onSave, onDelete }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
 
@@ -304,6 +305,26 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
                 </p>
               </button>
             ))}
+          </div>
+        </div>
+        {/* Danger Zone */}
+        <div className="pt-6 border-t border-slate-200 dark:border-gray-700">
+          <h3 className="text-lg font-bold text-red-600 mb-4">Danger Zone</h3>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <p className="font-semibold text-red-900">Delete this course</p>
+              <p className="text-sm text-red-700">Once deleted, it cannot be recovered.</p>
+            </div>
+            <button
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
+                  onDelete();
+                }
+              }}
+              className="px-4 py-2 bg-white border border-red-200 text-red-600 font-semibold rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors"
+            >
+              Delete Course
+            </button>
           </div>
         </div>
       </div>

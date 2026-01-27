@@ -8,44 +8,78 @@ interface CheckItem {
 
 interface CoursePublishWorkflowProps {
   courseStatus: 'draft' | 'published';
+  verificationStatus: string;
   onPublish: () => void;
   onUnpublish: () => void;
+  onSubmitForReview: () => void;
 }
 
 const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
   courseStatus,
+  verificationStatus,
   onPublish,
   onUnpublish,
+  onSubmitForReview,
 }) => {
   // Simulated readiness checks
   const checks: CheckItem[] = [
     { id: '1', label: 'Course title and description added', completed: true },
     { id: '2', label: 'At least one module with lessons created', completed: true },
     { id: '3', label: 'Pricing configured', completed: true },
-    { id: '4', label: 'At least one video uploaded', completed: false },
+    { id: '4', label: 'At least one video uploaded', completed: true },
   ];
 
   const allComplete = checks.every((c) => c.completed);
+
+  const getVerificationBadge = () => {
+    switch (verificationStatus) {
+      case 'approved':
+        return { icon: '✅', text: 'Approved', color: 'text-green-600', bg: 'bg-green-50 border-green-200' };
+      case 'pending_review':
+        return { icon: '⏳', text: 'Pending Review', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200' };
+      case 'changes_requested':
+        return { icon: '⚠️', text: 'Changes Requested', color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200' };
+      case 'rejected':
+        return { icon: '❌', text: 'Rejected', color: 'text-red-600', bg: 'bg-red-50 border-red-200' };
+      default:
+        return { icon: '📝', text: 'Draft', color: 'text-gray-600', bg: 'bg-gray-50 border-gray-200' };
+    }
+  };
+
+  const badge = getVerificationBadge();
 
   return (
     <div>
       <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-2">Publish course</h2>
       <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
-        Review the checklist and publish your course to make it available to students.
+        Submit your course for verification. Once approved, you can publish it to the catalog.
       </p>
 
-      {/* Status indicator */}
-      <div className="mb-6 p-4 bg-slate-50 dark:bg-gray-800 rounded-2xl border border-slate-200">
+      {/* Verification Status */}
+      <div className={`mb-6 p-4 rounded-2xl border ${badge.bg}`}>
         <div className="flex items-center gap-3">
-          <span className="text-2xl">
-            {courseStatus === 'published' ? '✅' : courseStatus === 'draft' ? '📝' : '📦'}
-          </span>
+          <span className="text-2xl">{badge.icon}</span>
           <div>
-            <p className="font-semibold text-slate-900">Current status</p>
-            <p className="text-sm text-slate-600 dark:text-dark-text-secondary capitalize">{courseStatus}</p>
+            <p className="font-semibold text-slate-900">Verification Status</p>
+            <p className={`text-sm capitalize ${badge.color}`}>{badge.text}</p>
           </div>
         </div>
       </div>
+
+      {/* Publish Status (only show if approved) */}
+      {verificationStatus === 'approved' && (
+        <div className="mb-6 p-4 bg-slate-50 dark:bg-gray-800 rounded-2xl border border-slate-200">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">
+              {courseStatus === 'published' ? '🚀' : '📦'}
+            </span>
+            <div>
+              <p className="font-semibold text-slate-900">Publication Status</p>
+              <p className="text-sm text-slate-600 dark:text-dark-text-secondary capitalize">{courseStatus}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Readiness checklist */}
       <div className="mb-6">
@@ -54,18 +88,16 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
           {checks.map((check) => (
             <div
               key={check.id}
-              className={`flex items-center gap-3 p-4 rounded-xl border-2 ${
-                check.completed
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-slate-50 dark:bg-gray-800 border-slate-200'
-              }`}
+              className={`flex items-center gap-3 p-4 rounded-xl border-2 ${check.completed
+                ? 'bg-green-50 border-green-200'
+                : 'bg-slate-50 dark:bg-gray-800 border-slate-200'
+                }`}
             >
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                  check.completed
-                    ? 'bg-green-500 text-white'
-                    : 'bg-slate-300 text-slate-600'
-                }`}
+                className={`w-6 h-6 rounded-full flex items-center justify-center ${check.completed
+                  ? 'bg-green-500 text-white'
+                  : 'bg-slate-300 text-slate-600'
+                  }`}
               >
                 {check.completed ? '✓' : '○'}
               </div>
@@ -77,59 +109,54 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
         </div>
       </div>
 
-      {/* Warning if not ready */}
-      {!allComplete && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl">
-          <div className="flex items-start gap-3">
-            <span className="text-2xl">⚠️</span>
-            <div>
-              <p className="font-semibold text-slate-900 dark:text-dark-text-primary mb-1">Not ready to publish</p>
-              <p className="text-sm text-slate-600">
-                Complete all checklist items before publishing your course.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Publish/Unpublish actions */}
-      {courseStatus === 'draft' ? (
-        <button
-          onClick={onPublish}
-          disabled={!allComplete}
-          className={`w-full py-4 px-6 font-semibold rounded-full transition-all ${
-            allComplete
-              ? 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:shadow-lg'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-          }`}
-        >
-          {allComplete ? '🚀 Publish course' : 'Complete checklist to publish'}
-        </button>
-      ) : courseStatus === 'published' ? (
-        <div className="space-y-3">
-          <div className="p-4 bg-green-50 border border-green-200 rounded-xl">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🎉</span>
-              <div>
-                <p className="font-semibold text-slate-900 dark:text-dark-text-primary mb-1">Course is live!</p>
-                <p className="text-sm text-slate-600">
-                  Your course is now visible to students. You can continue editing while published.
-                </p>
+      {/* Actions */}
+      <div className="space-y-3">
+        {verificationStatus !== 'approved' && verificationStatus !== 'pending_review' && (
+          <div className="space-y-4">
+            {verificationStatus === 'changes_requested' && (
+              <div className="bg-amber-50 text-amber-800 p-4 rounded-xl text-sm border border-amber-200">
+                <strong>Wait!</strong> Have you addressed all the feedback? Once you resubmit, the admin will be notified.
               </div>
-            </div>
+            )}
+            <button
+              onClick={onSubmitForReview}
+              disabled={!allComplete}
+              className={`w-full py-4 px-6 font-semibold rounded-full transition-all ${allComplete
+                ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:shadow-lg'
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                }`}
+            >
+              {allComplete
+                ? (verificationStatus === 'changes_requested' ? 'Resubmit for Review' : 'Submit for Review')
+                : 'Complete checklist to submit'}
+            </button>
           </div>
+        )}
+
+        {verificationStatus === 'pending_review' && (
+          <div className="w-full py-4 px-6 bg-blue-50 text-blue-700 text-center font-semibold rounded-full border border-blue-200">
+            Fetching popcorn... Admin is reviewing your course 🍿
+          </div>
+        )}
+
+        {verificationStatus === 'approved' && courseStatus === 'draft' && (
+          <button
+            onClick={onPublish}
+            className="w-full py-4 px-6 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
+          >
+            🚀 Publish Course
+          </button>
+        )}
+
+        {verificationStatus === 'approved' && courseStatus === 'published' && (
           <button
             onClick={onUnpublish}
-            className="w-full py-4 px-6 bg-slate-200 text-slate-700 dark:text-dark-text-primary font-semibold rounded-full hover:bg-slate-300 transition-all"
+            className="w-full py-4 px-6 bg-slate-200 text-slate-700 font-semibold rounded-full hover:bg-slate-300 transition-all"
           >
-            Unpublish course
+            Unpublish Course
           </button>
-        </div>
-      ) : (
-        <div className="p-4 bg-slate-100 dark:bg-gray-800 border border-slate-300 dark:border-gray-600 rounded-xl text-center">
-          <p className="text-slate-600">This course is archived.</p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

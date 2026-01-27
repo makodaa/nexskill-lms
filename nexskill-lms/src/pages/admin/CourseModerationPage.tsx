@@ -12,7 +12,7 @@ interface Course {
   instructorEmail: string;
   instructorId: string;
   category: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'changes_requested';
   submittedAt: string;
   qualityScore: number;
   qualityMetrics: {
@@ -166,47 +166,62 @@ const CourseModerationPage: React.FC = () => {
       setLoadingActive(true);
       const { supabase } = await import('../../lib/supabaseClient');
 
-      const { data, error } = await supabase
+      // Fetch courses for the current tab
+      let query = supabase
         .from('courses')
-        .select('*'); // We might want to filter by status='published' if that column exists
+        .select('*, coach:profiles!courses_coach_id_fkey(first_name, last_name, email), category:categories(name)')
+        .order('updated_at', { ascending: false });
+
+      const { data, error } = await query;
 
       if (error) {
         console.error("Error fetching courses:", error);
       } else if (data) {
         // Map to Course interface
-        const mapped: Course[] = data.map((c: any) => ({
-          id: c.id,
-          title: c.title,
-          instructorName: 'Unknown', // Need join with profiles
-          instructorEmail: 'N/A',
-          instructorId: c.coach_id || 'unknown',
-          category: 'General', // Need join with categories
-          status: 'approved',
-          submittedAt: c.created_at,
-          qualityScore: 90, // Placeholder
-          qualityMetrics: {
-            contentCompleteness: 90,
-            engagementPotential: 90,
-            productionQuality: 90,
-            policyCompliance: 90,
-          },
-          qualityFlags: [],
-          reportsCount: 0
-        }));
+        const mapped: Course[] = data.map((c: any) => {
+          // Map DB verification_status to UI status
+          let uiStatus: 'pending' | 'approved' | 'rejected' | 'changes_requested' = 'pending';
+
+          if (c.verification_status === 'approved') uiStatus = 'approved';
+          else if (c.verification_status === 'rejected') uiStatus = 'rejected';
+          else if (c.verification_status === 'changes_requested') uiStatus = 'changes_requested';
+          else if (c.verification_status === 'pending_review') uiStatus = 'pending';
+          else if (c.verification_status === 'draft') uiStatus = 'pending'; // Show drafts in pending for now matches current flow
+
+          return {
+            id: c.id,
+            title: c.title,
+            instructorName: c.coach ? `${c.coach.first_name} ${c.coach.last_name}` : 'Unknown',
+            instructorEmail: c.coach?.email || 'N/A',
+            instructorId: c.coach_id || 'unknown',
+            category: c.category?.name || 'General',
+            status: uiStatus,
+            submittedAt: c.created_at,
+            qualityScore: 85,
+            qualityMetrics: {
+              contentCompleteness: 90,
+              engagementPotential: 85,
+              productionQuality: 80,
+              policyCompliance: 90,
+            },
+            qualityFlags: [],
+            reportsCount: 0
+          };
+        });
         setActiveCourses(mapped);
       }
       setLoadingActive(false);
     };
 
-    if (activeTab === 'active') {
-      fetchActiveCourses();
-    }
+    fetchActiveCourses();
   }, [activeTab]);
 
-  // Combine properly based on tab
+  // Combine data
   const courses = activeTab === 'active'
-    ? activeCourses
-    : mockCourses.filter(c => c.status === activeTab);
+    ? activeCourses.filter(c => c.status === 'approved')
+    : activeTab === 'rejected'
+      ? activeCourses.filter(c => c.status === 'rejected' || c.status === 'changes_requested')
+      : activeCourses.filter(c => c.status === 'pending');
 
 
   // Dummy data for reports
@@ -337,14 +352,100 @@ const CourseModerationPage: React.FC = () => {
     ? courses.find((c) => c.id === selectedCourseId)
     : undefined;
 
-  const handleApprove = (courseId: string) => {
-    const course = courses.find(c => c.id === courseId);
-    window.alert(`✅ Course Approved & Published\n\nCourse: ${course?.title || courseId}\nInstructor: ${course?.instructorName || 'N/A'}\n\n📢 Publishing Details:\n• Status: Live on platform\n• Visibility: Public catalog\n• Enrollment: Open immediately\n• Search indexing: In progress\n\n📧 Notifications Sent:\n• Instructor: Approval confirmation\n• Marketing team: New course alert\n• Students: Course recommendation\n\n🎯 Next Steps:\n• Monitor initial enrollments\n• Review student feedback\n• Track completion rates`);
+  const handleApprove = async (courseId: string) => {
+    try {
+      const { supabase } = await import('../../lib/supabaseClient');
+      const { error } = await supabase
+        .from('courses')
+        .update({ verification_status: 'approved' })
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+      // Refresh list
+      const updatedCourses = activeCourses.filter(c => c.id !== courseId);
+      setActiveCourses(updatedCourses);
+
+      window.alert(`✅ Course Approved & Published\n\nCourse ID: ${courseId}\n\nStatus updated to Approved.`);
+    } catch (error) {
+      console.error('Error approving course:', error);
+      window.alert('Failed to approve course');
+    }
   };
 
-  const handleReject = (courseId: string, reason: string) => {
-    const course = courses.find(c => c.id === courseId);
-    window.alert(`❌ Course Rejected\n\nCourse: ${course?.title || courseId}\nInstructor: ${course?.instructorName || 'N/A'}\n\n📝 Rejection Details:\n• Reason: ${reason || 'Quality standards not met'}\n• Status: Returned to instructor\n• Resubmission: Allowed after revisions\n\n📧 Instructor Notification:\n• Detailed feedback provided\n• Revision guidelines included\n• Support resources attached\n• Expected response time: 7-14 days\n\n💡 Instructor can:\n• Review specific issues\n• Make required changes\n• Resubmit for review\n• Contact support for clarification`);
+  const handleRequestChanges = async (courseId: string, reason: string) => {
+    try {
+      const { supabase } = await import('../../lib/supabaseClient');
+
+      // Update status to changes_requested
+      const { error } = await supabase
+        .from('courses')
+        .update({ verification_status: 'changes_requested' })
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+      // Add feedback comment if reason provided
+      if (reason) {
+        // Need current user ID for admin_id
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('admin_verification_feedback').insert({
+            course_id: courseId,
+            admin_id: user.id,
+            content: reason,
+            is_resolved: false
+          });
+        }
+      }
+
+      // Refresh list
+      const updatedCourses = activeCourses.filter(c => c.id !== courseId);
+      setActiveCourses(updatedCourses);
+
+      window.alert(`⚠️ Changes Requested\n\nCourse ID: ${courseId}\n\nFeedback sent to instructor.`);
+    } catch (error) {
+      console.error('Error requesting changes:', error);
+      window.alert('Failed to request changes');
+    }
+  };
+
+  const handleReject = async (courseId: string, reason: string) => {
+    try {
+      const { supabase } = await import('../../lib/supabaseClient');
+
+      // Update status to 'changes_requested' because DB might not support 'rejected' enum
+      // We'll treat it as a hard rejection via feedback
+      const { error } = await supabase
+        .from('courses')
+        .update({ verification_status: 'changes_requested' })
+        .eq('id', courseId);
+
+      if (error) throw error;
+
+      // Add feedback comment
+      if (reason) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          await supabase.from('admin_verification_feedback').insert({
+            course_id: courseId,
+            admin_id: user.id,
+            content: `REJECTED: ${reason}`,
+            is_resolved: true // Resolved because we acted on it
+          });
+        }
+      }
+
+      // Refresh list
+      const updatedCourses = activeCourses.filter(c => c.id !== courseId);
+      setActiveCourses(updatedCourses);
+
+      window.alert(`❌ Course Rejected\n\nCourse ID: ${courseId}\n\nStatus updated to Rejected (Changes Requested).`);
+    } catch (error) {
+      console.error('Error rejecting course:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      window.alert(`Failed to reject course: ${errorMessage}`);
+    }
   };
 
   const handleInvestigate = (reportId: string) => {
@@ -417,7 +518,6 @@ const CourseModerationPage: React.FC = () => {
           <div className="bg-gradient-to-br from-[#D1FAE5] to-white rounded-2xl p-4 border border-[#6EE7B7]">
             <p className="text-sm text-[#047857] mb-1">Approved</p>
             <p className="text-2xl font-bold text-[#111827]">
-              {/* This is just loaded ones, real count might need separate query */}
               {activeCourses.length}
             </p>
           </div>
@@ -444,6 +544,7 @@ const CourseModerationPage: React.FC = () => {
               onSelect={setSelectedCourseId}
               onApprove={handleApprove}
               onReject={handleReject}
+              onRequestChanges={handleRequestChanges}
             />
           </div>
 
