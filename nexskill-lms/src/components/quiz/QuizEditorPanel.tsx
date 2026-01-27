@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Plus, X, Eye } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import QuizHeader from "./QuizHeader";
@@ -61,7 +61,7 @@ const getDefaultAnswerConfig = (type: QuestionType): AnswerConfig => {
     }
 };
 
-const QuizEditorPanel: React.FC<QuizEditorPanelProps> = ({
+const QuizEditorPanel: React.FC<QuizEditorPanelProps> = React.memo(({
     quiz,
     questions,
     onChange,
@@ -78,11 +78,18 @@ const QuizEditorPanel: React.FC<QuizEditorPanelProps> = ({
         quiz.instructions || ""
     );
 
-    const handleHeaderBlur = (field: keyof Quiz, value: string) => {
-        onChange({ ...quiz, [field]: value });
-    };
+    // Memoize the total points calculation
+    const totalPoints = useMemo(() => {
+        return questions.reduce((sum, q) => sum + q.points, 0);
+    }, [questions]);
 
-    const addQuestion = async () => {
+    // Memoize header blur handler
+    const handleHeaderBlur = useCallback((field: keyof Quiz, value: string) => {
+        onChange({ ...quiz, [field]: value });
+    }, [quiz, onChange]);
+
+    // Memoize add question handler
+    const addQuestion = useCallback(async () => {
         const newQuestion: QuizQuestion = {
             quiz_id: quiz.id,
             position: questions.length,
@@ -108,9 +115,10 @@ const QuizEditorPanel: React.FC<QuizEditorPanelProps> = ({
         } catch (error) {
             console.error("[QuizEditorPanel] Error adding question:", error);
         }
-    };
+    }, [quiz, questions, onQuestionsChange]);
 
-    const updateQuestion = (
+    // Memoize update question handler
+    const updateQuestion = useCallback((
         questionId: string,
         updated: Partial<QuizQuestion>
     ) => {
@@ -119,16 +127,18 @@ const QuizEditorPanel: React.FC<QuizEditorPanelProps> = ({
                 q.id === questionId ? { ...q, ...updated } : q
             )
         );
-    };
+    }, [questions, onQuestionsChange]);
 
-    const removeQuestion = (questionId: string) => {
+    // Memoize remove question handler
+    const removeQuestion = useCallback((questionId: string) => {
         const updatedQuestions = questions
             .filter((q) => q.id !== questionId)
             .map((q, index) => ({ ...q, position: index }));
         onQuestionsChange(updatedQuestions);
-    };
+    }, [questions, onQuestionsChange]);
 
-    const moveQuestion = (questionId: string, direction: "up" | "down") => {
+    // Memoize move question handler
+    const moveQuestion = useCallback((questionId: string, direction: "up" | "down") => {
         const questionsCopy = [...questions];
         const index = questionsCopy.findIndex((q) => q.id === questionId);
 
@@ -153,9 +163,7 @@ const QuizEditorPanel: React.FC<QuizEditorPanelProps> = ({
             }));
             onQuestionsChange(updatedQuestions);
         }
-    };
-
-    const totalPoints = questions.reduce((sum, q) => sum + q.points, 0);
+    }, [questions, onQuestionsChange]);
 
     if (isPreviewMode) {
         return (
@@ -296,6 +304,6 @@ const QuizEditorPanel: React.FC<QuizEditorPanelProps> = ({
             </div>
         </div>
     );
-};
+});
 
 export default QuizEditorPanel;

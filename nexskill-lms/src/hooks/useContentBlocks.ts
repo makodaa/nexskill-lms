@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback } from "react";
 import type { ContentBlock } from "../types/quiz";
 import type { MediaMetadata } from "../types/media.types";
 
@@ -32,7 +32,7 @@ export const useContentBlocks = (
     /**
      * Updates content for a specific block or creates a new text block
      */
-    const handleContentUpdate = (content: string, blockId?: string) => {
+    const handleContentUpdate = useCallback((content: string, blockId?: string) => {
         let updatedBlocks: ContentBlock[];
 
         if (blockId) {
@@ -73,12 +73,12 @@ export const useContentBlocks = (
         }
 
         onChange(updatedBlocks);
-    };
+    }, [blocks, onChange]);
 
     /**
      * Adds a new content block of the specified type
      */
-    const addContentBlock = (type: ContentBlock["type"]) => {
+    const addContentBlock = useCallback((type: ContentBlock["type"]) => {
         const newBlock: ContentBlock = {
             id: generateBlockId(),
             type,
@@ -88,23 +88,23 @@ export const useContentBlocks = (
         };
 
         onChange([...blocks, newBlock]);
-    };
+    }, [blocks, onChange]);
 
     /**
      * Removes a content block and updates positions
      */
-    const removeContentBlock = (blockId: string) => {
+    const removeContentBlock = useCallback((blockId: string) => {
         const updatedBlocks = blocks
             .filter((block) => block.id !== blockId)
             .map((block, index) => ({ ...block, position: index }));
 
         onChange(updatedBlocks);
-    };
+    }, [blocks, onChange]);
 
     /**
      * Moves a block up or down in the content order
      */
-    const moveContentBlock = (blockId: string, direction: "up" | "down") => {
+    const moveContentBlock = useCallback((blockId: string, direction: "up" | "down") => {
         const blocksCopy = [...blocks];
         const index = blocksCopy.findIndex((b) => b.id === blockId);
 
@@ -129,12 +129,12 @@ export const useContentBlocks = (
 
             onChange(updatedBlocks);
         }
-    };
+    }, [blocks, onChange]);
 
     /**
      * Handles media upload for image/video blocks
      */
-    const handleMediaUpload = (blockId: string, metadata: MediaMetadata) => {
+    const handleMediaUpload = useCallback((blockId: string, metadata: MediaMetadata) => {
         const updatedBlocks = blocks.map((block) =>
             block.id === blockId
                 ? {
@@ -148,12 +148,12 @@ export const useContentBlocks = (
                 : block
         );
         onChange(updatedBlocks);
-    };
+    }, [blocks, onChange]);
 
     /**
      * Updates attributes for a specific block
      */
-    const updateBlockAttributes = (
+    const updateBlockAttributes = useCallback((
         blockId: string,
         attributes: Partial<ContentBlock["attributes"]>
     ) => {
@@ -169,7 +169,7 @@ export const useContentBlocks = (
                 : block
         );
         onChange(updatedBlocks);
-    };
+    }, [blocks, onChange]);
 
     return {
         handleContentUpdate,

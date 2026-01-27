@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { useContentBlocks } from "../../hooks/useContentBlocks";
 import ContentBlockRenderer from "../shared/ContentBlockRenderer";
 import AddContentBlockButton from "../shared/AddContentBlockButton";
@@ -62,7 +62,7 @@ const getDefaultAnswerConfig = (type: QuestionType): AnswerConfig => {
     }
 };
 
-const QuestionBlock: React.FC<QuestionBlockProps> = ({
+const QuestionBlock: React.FC<QuestionBlockProps> = React.memo(({
     question,
     position,
     totalQuestions,
@@ -75,12 +75,12 @@ const QuestionBlock: React.FC<QuestionBlockProps> = ({
         (blocks: ContentBlock[]) => onChange({ question_content: blocks })
     );
 
-    const handleTypeChange = (newType: QuestionType) => {
+    const handleTypeChange = useCallback((newType: QuestionType) => {
         onChange({
             question_type: newType,
             answer_config: getDefaultAnswerConfig(newType),
         });
-    };
+    }, [onChange]);
 
     return (
         <div className="bg-white dark:bg-slate-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 space-y-6">
@@ -233,6 +233,6 @@ const QuestionBlock: React.FC<QuestionBlockProps> = ({
             </div>
         </div>
     );
-};
+});
 
 export default QuestionBlock;
