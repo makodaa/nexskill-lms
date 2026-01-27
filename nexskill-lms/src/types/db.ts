@@ -1,9 +1,9 @@
 export type CourseLevel = 'Beginner' | 'Intermediate' | 'Advanced';
 export interface Category {
-  id: number;
-  name: string;
-  slug: string;
-  created_at?: string;
+    id: number;
+    name: string;
+    slug: string;
+    created_at?: string;
 }
 export interface Topic {
     id: number;
@@ -28,6 +28,9 @@ export interface Module {
     lessons?: Lesson[];
     created_at?: string;
 }
+// Course Verification Types
+export type CourseVerificationStatus = 'draft' | 'pending_review' | 'changes_requested' | 'approved' | 'rejected';
+
 export interface Course {
     id: string;
     title: string;
@@ -43,7 +46,24 @@ export interface Course {
     long_description?: string;
     language?: string;
     visibility?: 'public' | 'unlisted' | 'private';
+    verification_status?: CourseVerificationStatus;
     modules?: Module[]; // Relation
+}
+
+export interface AdminVerificationFeedback {
+    id: string;
+    course_id: string;
+    lesson_id?: string | null;
+    admin_id: string;
+    content: string;
+    is_resolved: boolean;
+    created_at: string;
+    // Joined fields
+    admin?: Profile;
+    lesson?: {
+        id: string;
+        title: string;
+    };
 }
 export interface CoachProfile {
     id: string; // References Profile.id
@@ -110,30 +130,30 @@ export interface LiveSession {
 
 // Chat & Messaging Types
 export interface Message {
-  id: string;
-  sender_id: string;
-  recipient_id: string;
-  course_id?: string;
-  content: string;
-  read_at?: string;
-  created_at: string;
-  updated_at: string;
+    id: string;
+    sender_id: string;
+    recipient_id: string;
+    course_id?: string;
+    content: string;
+    read_at?: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface MessageWithProfiles extends Message {
-  sender_profile?: Profile;
-  recipient_profile?: Profile;
-  course?: Course;
+    sender_profile?: Profile;
+    recipient_profile?: Profile;
+    course?: Course;
 }
 
 export interface Conversation {
-  user1_id: string;
-  user2_id: string;
-  course_id?: string;
-  last_message: string;
-  last_message_at: string;
-  last_sender_id: string;
-  other_user_id: string;
-  other_user_profile?: Profile;
-  unread_count?: number;
+    user1_id: string;
+    user2_id: string;
+    course_id?: string;
+    last_message: string;
+    last_message_at: string;
+    last_sender_id: string;
+    other_user_id: string;
+    other_user_profile?: Profile;
+    unread_count?: number;
 }
