@@ -22,7 +22,6 @@ const sections: Section[] = [
   { key: 'drip', label: 'Drip schedule', icon: '📅' },
   { key: 'pricing', label: 'Pricing', icon: '💰' },
   { key: 'publish', label: 'Publish', icon: '🚀' },
-  { key: 'preview', label: 'Preview', icon: '👁️' },
 ];
 
 const CourseBuilderSidebar: React.FC<CourseBuilderSidebarProps> = ({
@@ -54,8 +53,8 @@ const CourseBuilderSidebar: React.FC<CourseBuilderSidebarProps> = ({
             key={section.key}
             onClick={() => onChangeSection(section.key)}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left ${activeSection === section.key
-                ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium shadow-md'
-                : 'text-slate-700 dark:text-dark-text-primary hover:bg-slate-100'
+              ? 'bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-medium shadow-md'
+              : 'text-slate-700 dark:text-dark-text-primary hover:bg-slate-100'
               }`}
           >
             <span className="text-lg">{section.icon}</span>

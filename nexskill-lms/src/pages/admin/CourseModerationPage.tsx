@@ -377,15 +377,17 @@ const CourseModerationPage: React.FC = () => {
     try {
       const { supabase } = await import('../../lib/supabaseClient');
 
-      // Update status to changes_requested
+      // Update status and save admin_feedback
       const { error } = await supabase
         .from('courses')
-        .update({ verification_status: 'changes_requested' })
+        .update({
+          verification_status: 'changes_requested'
+        })
         .eq('id', courseId);
 
       if (error) throw error;
 
-      // Add feedback comment if reason provided
+      // Add feedback comment to history log
       if (reason) {
         // Need current user ID for admin_id
         const { data: { user } } = await supabase.auth.getUser();
@@ -414,11 +416,13 @@ const CourseModerationPage: React.FC = () => {
     try {
       const { supabase } = await import('../../lib/supabaseClient');
 
-      // Update status to 'changes_requested' because DB might not support 'rejected' enum
+      // Update status and save admin_feedback
       // We'll treat it as a hard rejection via feedback
       const { error } = await supabase
         .from('courses')
-        .update({ verification_status: 'changes_requested' })
+        .update({
+          verification_status: 'rejected'
+        })
         .eq('id', courseId);
 
       if (error) throw error;

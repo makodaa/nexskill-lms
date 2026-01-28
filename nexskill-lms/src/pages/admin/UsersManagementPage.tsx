@@ -49,7 +49,7 @@ const UsersManagementPage: React.FC = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('updated_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching users:', error);
@@ -61,7 +61,8 @@ const UsersManagementPage: React.FC = () => {
           email: profile.email || 'N/A',
           status: 'active', // Default to active as profile exists
           roles: [profile.role || 'student'],
-          createdAt: profile.created_at,
+          createdAt: profile.updated_at, // Fallback to updated_at since created_at is missing
+
           lastActiveAt: profile.updated_at || new Date().toISOString(), // Using updated_at as proxy
           organizationId: undefined
         }));

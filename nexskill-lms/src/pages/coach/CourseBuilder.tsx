@@ -9,10 +9,11 @@ import QuizBuilderPanel from "../../components/coach/quiz-builder/QuizBuilderPan
 import DripSchedulePanel from "../../components/coach/course-builder/DripSchedulePanel";
 import CoursePricingForm from "../../components/coach/course-builder/CoursePricingForm";
 import CoursePublishWorkflow from "../../components/coach/course-builder/CoursePublishWorkflow";
-import CoursePreviewPane from "../../components/coach/course-builder/CoursePreviewPane";
+import DeleteCourseModal from "../../components/courses/DeleteCourseModal";
 import LessonEditorPanel from "../../components/coach/lesson-editor/LessonEditorPanel";
 import LiveSessionManager from "../../components/coach/live-sessions/LiveSessionManager";
 import QuizEditorPanel from "../../components/quiz/QuizEditorPanel";
+import CourseFeedbackAlert from "../../components/coach/course-builder/CourseFeedbackAlert";
 import type { Lesson } from "../../types/lesson";
 import type { Quiz, QuizQuestion } from "../../types/quiz";
 import type { ContentItem } from "../../types/content-item";
@@ -85,7 +86,7 @@ const CourseBuilder: React.FC = () => {
     const navigate = useNavigate();
 
     // Ref to hold the timeout ID for debouncing
-    const saveQuizQuestionsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const saveQuizQuestionsTimeoutRef = useRef<any>(null);
 
     const initialData = location.state as CourseSettings | undefined;
 
@@ -93,6 +94,9 @@ const CourseBuilder: React.FC = () => {
     const [courseStatus, setCourseStatus] = useState<"draft" | "published">(
         "draft"
     );
+    const [verificationStatus, setVerificationStatus] = useState<string>("draft");
+    const [adminFeedback, setAdminFeedback] = useState<string>("");
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     // Settings state
     const [settings, setSettings] = useState<CourseSettings>({
@@ -117,7 +121,8 @@ const CourseBuilder: React.FC = () => {
                     `
           *,
           category:categories(name),
-          course_topics(topic_id)
+          course_topics(topic_id),
+          admin_verification_feedback(content, created_at, is_resolved)
         `
                 )
                 .eq("id", courseId)
@@ -126,6 +131,10 @@ const CourseBuilder: React.FC = () => {
             if (courseError) {
                 console.error("Error fetching course:", courseError);
             } else if (courseData) {
+                console.log("Course Data Fetch:", {
+                    status: courseData.verification_status,
+                    feedbackRaw: courseData.admin_verification_feedback
+                });
                 setSettings((prev) => ({
                     ...prev,
                     title: courseData.title,
@@ -141,6 +150,18 @@ const CourseBuilder: React.FC = () => {
                             (ct: any) => ct.topic_id
                         ) || [],
                 }));
+
+                // Set status
+                setCourseStatus(courseData.visibility === 'public' ? 'published' : 'draft');
+                setVerificationStatus(courseData.verification_status || 'draft');
+
+                // Get latest feedback if exists
+                const feedbacks = courseData.admin_verification_feedback;
+                const latestFeedback = feedbacks && feedbacks.length > 0
+                    ? feedbacks.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+                    : null;
+
+                setAdminFeedback(latestFeedback?.content || "");
 
                 // Fetch modules and their associated lessons
                 const { data: modulesData, error: modulesError } =
@@ -389,7 +410,7 @@ const CourseBuilder: React.FC = () => {
 
             if (tempModule) {
                 // Check if a module with this title already exists in the database for this course
-                const { data: existingModule, error: fetchError } =
+                const { data: existingModule } =
                     await supabase
                         .from("modules")
                         .select("id")
@@ -529,7 +550,12 @@ const CourseBuilder: React.FC = () => {
             }
 
             // Update the new lesson object with the proper UUID
-            const updatedNewLesson = { ...newLesson, id: lessonId };
+            const updatedNewLesson: ContentItem = {
+                ...newLesson,
+                id: lessonId,
+                type: 'lesson',
+                // Ensure other fields match ContentItem if necessary
+            };
 
             // Update the local state
             const updatedCurriculum = curriculum.map((module) => {
@@ -707,7 +733,7 @@ const CourseBuilder: React.FC = () => {
                                 lessonsError
                             );
                         } else if (lessonsData) {
-                            allContent = allContent.concat(lessonsData);
+                            allContent = allContent.concat(lessonsData.map(l => ({ ...l, type: 'lesson' } as ContentItem)));
                         }
                     }
 
@@ -727,7 +753,7 @@ const CourseBuilder: React.FC = () => {
                                 quizzesError
                             );
                         } else if (quizzesData) {
-                            allContent = allContent.concat(quizzesData);
+                            allContent = allContent.concat(quizzesData.map(q => ({ ...q, type: 'quiz' } as ContentItem)));
                         }
                     }
 
@@ -849,11 +875,13 @@ const CourseBuilder: React.FC = () => {
                 curriculum.map((mod) =>
                     mod.id === editingLesson.moduleId
                         ? {
-                              ...mod,
-                              lessons: mod.lessons.map((l) =>
-                                  l.id === updatedLesson.id ? updatedLesson : l
-                              ),
-                          }
+                            ...mod,
+                            lessons: mod.lessons.map((l) =>
+                                l.id === updatedLesson.id
+                                    ? { ...updatedLesson, type: 'lesson' } as ContentItem
+                                    : l
+                            ),
+                        }
                         : mod
                 )
             );
@@ -955,9 +983,13 @@ const CourseBuilder: React.FC = () => {
             // Update the local state to include the new quiz
             const updatedCurriculum = curriculum.map((module) => {
                 if (module.id === moduleId) {
+                    const newQuizItem: ContentItem = {
+                        ...newQuiz,
+                        type: 'quiz'
+                    };
                     return {
                         ...module,
-                        lessons: [...module.lessons, newQuiz],
+                        lessons: [...module.lessons, newQuizItem],
                     };
                 }
                 return module;
@@ -1031,11 +1063,13 @@ const CourseBuilder: React.FC = () => {
                 curriculum.map((mod) =>
                     mod.id === editingQuiz.moduleId
                         ? {
-                              ...mod,
-                              lessons: mod.lessons.map((l) =>
-                                  l.id === updatedQuiz.id ? updatedQuiz : l
-                              ),
-                          }
+                            ...mod,
+                            lessons: mod.lessons.map((l) =>
+                                l.id === updatedQuiz.id
+                                    ? { ...updatedQuiz, type: 'quiz' } as ContentItem
+                                    : l
+                            ),
+                        }
                         : mod
                 )
             );
@@ -1165,6 +1199,23 @@ const CourseBuilder: React.FC = () => {
         );
     };
 
+    const handleSubmitForReview = async () => {
+        try {
+            const { error } = await supabase
+                .from('courses')
+                .update({ verification_status: 'pending_review' })
+                .eq('id', courseId);
+
+            if (error) throw error;
+
+            setVerificationStatus('pending_review');
+            alert("Course submitted for review successfully!");
+        } catch (error: any) {
+            console.error('Error submitting for review:', error);
+            alert(`Failed to submit: ${error.message}`);
+        }
+    };
+
     const handleSaveSettings = async () => {
         if (!courseId) return;
 
@@ -1247,6 +1298,24 @@ const CourseBuilder: React.FC = () => {
         }
     };
 
+    const handleDeleteCourse = async () => {
+        if (!courseId) return;
+
+        try {
+            const { error } = await supabase
+                .from('courses')
+                .delete()
+                .eq('id', courseId);
+
+            if (error) throw error;
+
+            navigate('/coach/courses');
+        } catch (error) {
+            console.error('Error deleting course:', error);
+            alert('Failed to delete course. Please try again.');
+        }
+    };
+
     const renderSection = () => {
         switch (activeSection) {
             case "settings":
@@ -1255,6 +1324,7 @@ const CourseBuilder: React.FC = () => {
                         settings={settings}
                         onChange={setSettings}
                         onSave={handleSaveSettings}
+                        onDelete={async () => setIsDeleteModalOpen(true)}
                     />
                 );
             case "curriculum":
@@ -1310,17 +1380,11 @@ const CourseBuilder: React.FC = () => {
                 return (
                     <CoursePublishWorkflow
                         courseStatus={courseStatus}
+                        verificationStatus={verificationStatus}
+                        adminFeedback={adminFeedback}
                         onPublish={handlePublish}
                         onUnpublish={handleUnpublish}
-                    />
-                );
-            case "preview":
-                return (
-                    <CoursePreviewPane
-                        courseTitle={settings.title}
-                        courseSubtitle={settings.subtitle}
-                        courseDescription={settings.longDescription}
-                        instructorName="Your Name"
+                        onSubmitForReview={handleSubmitForReview}
                     />
                 );
             default:
@@ -1363,6 +1427,12 @@ const CourseBuilder: React.FC = () => {
                     </button>
                 </div>
 
+                <CourseFeedbackAlert
+                    status={verificationStatus}
+                    feedback={adminFeedback}
+                // timestamp can be added if we fetch updated_at from admin_verification_feedback
+                />
+
                 <div className="flex gap-6">
                     {/* Sidebar */}
                     <CourseBuilderSidebar
@@ -1402,6 +1472,13 @@ const CourseBuilder: React.FC = () => {
                     onClose={handleCloseQuizEditor}
                 />
             )}
+            {/* Delete Course Modal */}
+            <DeleteCourseModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDeleteCourse}
+                courseName={settings.title}
+            />
         </CoachAppLayout>
     );
 };

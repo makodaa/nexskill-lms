@@ -205,6 +205,7 @@ const CourseReviewPage: React.FC = () => {
                             course={course}
                             unresolvedFeedbackCount={unresolvedFeedbackCount}
                             onUpdateStatus={updateVerificationStatus}
+                            onAddFeedback={addFeedback}
                         />
 
                         {/* Feedback Panel */}
