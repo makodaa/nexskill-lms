@@ -6,6 +6,8 @@ interface Course {
   title: string;
   status: 'draft' | 'published' | 'scheduled' | 'pending' | 'changes_requested' | 'rejected';
   enrolledStudents: number;
+  moduleCount: number;
+  lessonCount: number;
   rating: number;
   lastUpdated: string;
   adminFeedback?: {
@@ -66,6 +68,7 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview, o
               <tr>
                 <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Course</th>
                 <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Status</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Modules / Lessons</th>
                 <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Students</th>
                 <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Rating</th>
                 <th className="text-left py-4 px-6 text-sm font-semibold text-slate-700 dark:text-dark-text-primary">Last updated</th>
@@ -97,6 +100,12 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview, o
                     >
                       {course.status.replace('_', ' ').charAt(0).toUpperCase() + course.status.replace('_', ' ').slice(1)}
                     </span>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex flex-col text-sm">
+                      <span className="text-slate-700 dark:text-dark-text-primary font-medium">{course.moduleCount} Modules</span>
+                      <span className="text-slate-500 text-xs">{course.lessonCount} Lessons</span>
+                    </div>
                   </td>
                   <td className="py-4 px-6">
                     <span className="text-sm text-slate-700">{course.enrolledStudents}</span>

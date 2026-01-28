@@ -21,7 +21,7 @@ const CourseList: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('courses')
-          .select('*, admin_verification_feedback(content, created_at, is_resolved)') // Make sure verification_status is selected
+          .select('*, admin_verification_feedback(content, created_at, is_resolved), modules(id, module_content_items(count))')
           .eq('coach_id', profile.id)
           .order('created_at', { ascending: false });
 
@@ -49,11 +49,20 @@ const CourseList: React.FC = () => {
               ? feedbacks.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
               : null;
 
+            // Calculate module and lesson counts
+            const moduleCount = course.modules?.length || 0;
+            const lessonCount = course.modules?.reduce((sum: number, m: any) => {
+              const count = m.module_content_items?.[0]?.count || 0;
+              return sum + count;
+            }, 0) || 0;
+
             return {
               id: course.id,
               title: course.title,
               status: status,
               enrolledStudents: 0, // Placeholder
+              moduleCount,
+              lessonCount,
               rating: 0, // Placeholder
               lastUpdated: new Date(course.updated_at).toLocaleDateString(),
               adminFeedback: latestFeedback
