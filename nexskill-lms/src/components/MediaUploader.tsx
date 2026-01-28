@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
     Upload,
     X,
@@ -6,13 +6,15 @@ import {
     AlertCircle,
     Image as ImageIcon,
     Video as VideoIcon,
+    FileText,
+    File,
 } from "lucide-react";
 import { useCloudinaryUpload } from "../hooks/useCloudinaryUpload";
 import type { MediaMetadata } from "../types/media.types";
 import { isValidUrl } from "../types/media.types";
 
 interface MediaUploaderProps {
-    resourceType: "image" | "video";
+    resourceType: "image" | "video" | "document";
     currentUrl?: string;
     currentMetadata?: MediaMetadata;
     onUploadComplete: (metadata: MediaMetadata) => void;
@@ -30,6 +32,7 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
 }) => {
     const { uploadMedia, isUploading, uploadProgress, error, clearError } =
         useCloudinaryUpload();
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (error) {
@@ -155,7 +158,7 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
                                     "https://via.placeholder.com/400x300?text=Image+Not+Found";
                             }}
                         />
-                    ) : (
+                    ) : resourceType === "video" ? (
                         <div className="w-full aspect-video bg-black">
                             {hasValidThumbnail ? (
                                 <div className="relative w-full h-full">
@@ -218,6 +221,26 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
                                     <VideoIcon className="w-12 h-12 text-gray-500" />
                                 </div>
                             )}
+                        </div>
+                    ) : (
+                        // Document preview
+                        <div className="flex flex-col items-center justify-center p-8 gap-4">
+                            <div className="p-4 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                                <FileText className="w-12 h-12 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div className="text-center">
+                                <p className="font-medium text-gray-900 dark:text-white truncate max-w-xs">
+                                    {currentMetadata?.original_filename || "Document"}
+                                </p>
+                                <a
+                                    href={currentUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-2 inline-block"
+                                >
+                                    Open Document
+                                </a>
+                            </div>
                         </div>
                     )}
 

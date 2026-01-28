@@ -19,7 +19,9 @@ interface AuthContextValue {
         firstName?: string,
         lastName?: string,
         username?: string,
-        role?: string
+        role?: string,
+        middleName?: string,
+        nameExtension?: string
     ) => Promise<{ data: { user: User | null } | null; error: AuthError | null }>;
     signIn: (
         email: string,
@@ -112,12 +114,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         firstName?: string,
         lastName?: string,
         username?: string,
-        role?: string
+        role?: string,
+        middleName?: string,
+        nameExtension?: string
     ) => {
         const metadata = {
             username: username,
             first_name: firstName ?? null,
             last_name: lastName ?? null,
+            middle_name: middleName ?? null,
+            name_extension: nameExtension ?? null,
             role: role ?? null,
         };
 

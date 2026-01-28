@@ -25,7 +25,7 @@ const VerificationPending: React.FC = () => {
                         <li className="flex items-start gap-3">
                             <span className="text-brand-primary mt-1">2</span>
                             <span className="text-sm text-text-secondary dark:text-slate-400">
-                                You'll receive an email with the verification status. If verified, an activation link will be also be given. 
+                                You'll receive an email with the verification status. If verified, an activation link will be also be given.
                             </span>
                         </li>
                         <li className="flex items-start gap-3">
