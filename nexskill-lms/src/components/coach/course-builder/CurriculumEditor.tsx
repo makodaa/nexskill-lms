@@ -1,295 +1,608 @@
-import React, { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
-import type { Lesson } from '../../../types/lesson';
+import React, { useState } from "react";
+import {
+    BookOpen,
+    Plus,
+    ChevronRight,
+    GripVertical,
+    ChevronUp,
+    ChevronDown,
+    Edit2,
+    Trash2,
+    FileText,
+    Image,
+    Video,
+    Code,
+    Heading,
+    FileQuestion,
+} from "lucide-react";
+import type { Lesson } from "../../../types/lesson";
+import type { Quiz } from "../../../types/quiz";
+
+// Define a union type for content items
+type ContentItem = Lesson | Quiz;
 
 interface Module {
-  id: string;
-  title: string;
-  lessons: Lesson[];
-  is_published?: boolean;
+    id: string;
+    title: string;
+    lessons: ContentItem[]; // Changed to accept both lessons and quizzes
 }
 
 interface CurriculumEditorProps {
-  curriculum: Module[];
-  onChange: (updatedCurriculum: Module[]) => void;
-  onEditLesson: (moduleId: string, lessonId: string) => void;
-  onAddLesson?: (moduleId: string, newLesson: Lesson) => Promise<void>;
-  onDeleteLesson?: (moduleId: string, lessonId: string) => Promise<void>;
-  onMoveLesson?: (moduleId: string, lessonId: string, direction: 'up' | 'down') => Promise<void>;
-  onToggleModulePublish?: (moduleId: string, isPublished: boolean) => Promise<void>;
+    curriculum: Module[];
+    onChange: (updatedCurriculum: Module[]) => void;
+    onEditLesson: (moduleId: string, lessonId: string) => void;
+    onEditQuiz?: (moduleId: string, quizId: string) => void; // New handler for quizzes
+    onAddQuiz?: (moduleId: string) => void;
+    onAddLesson?: (moduleId: string, newLesson: Lesson) => Promise<void>;
+    onDeleteLesson?: (moduleId: string, lessonId: string) => Promise<void>;
+    onDeleteModule?: (moduleId: string) => Promise<void>;
+    onMoveLesson?: (
+        moduleId: string,
+        lessonId: string,
+        direction: "up" | "down"
+    ) => Promise<void>;
 }
 
-const CurriculumEditor: React.FC<CurriculumEditorProps> = ({ curriculum, onChange, onEditLesson, onAddLesson, onDeleteLesson, onMoveLesson, onToggleModulePublish }) => {
-  const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set(curriculum.map((m) => m.id)));
-
-  const toggleModule = (moduleId: string) => {
-    setExpandedModules((prev) => {
-      const next = new Set(prev);
-      if (next.has(moduleId)) {
-        next.delete(moduleId);
-      } else {
-        next.add(moduleId);
-      }
-      return next;
-    });
-  };
-
-  const handleToggleModulePublish = async (moduleId: string, currentStatus: boolean) => {
-    if (onToggleModulePublish) {
-      await onToggleModulePublish(moduleId, !currentStatus);
-    }
-    // Update local state
-    const updatedCurriculum = curriculum.map((module) =>
-      module.id === moduleId ? { ...module, is_published: !currentStatus } : module
+const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
+    curriculum,
+    onChange,
+    onEditLesson,
+    onAddQuiz,
+    onAddLesson,
+    onDeleteLesson,
+    onDeleteModule,
+    onMoveLesson,
+}) => {
+    const [expandedModules, setExpandedModules] = useState<Set<string>>(
+        new Set(curriculum.map((m) => m.id))
     );
-    onChange(updatedCurriculum);
-  };
 
-  const handleAddModule = () => {
-    const newModule: Module = {
-      id: `module-${Date.now()}`,
-      title: `Module ${curriculum.length + 1}`,
-      lessons: [],
-    };
-    onChange([...curriculum, newModule]);
-  };
-
-  const handleAddLesson = async (moduleId: string) => {
-    // Find the module to get the lesson count
-    const module = curriculum.find(m => m.id === moduleId);
-
-    // Create a temporary lesson object with a placeholder ID
-    // The actual ID will be generated in the CourseBuilder when saving to DB
-    const newLesson: Lesson = {
-      id: '', // Will be replaced with UUID in CourseBuilder
-      title: `Lesson ${module?.lessons.length + 1 || 1}`,
-      type: 'text',
-      duration: '0 min',
-      summary: '',
-      content_blocks: [],
-      is_published: false
+    const toggleModule = (moduleId: string) => {
+        setExpandedModules((prev) => {
+            const next = new Set(prev);
+            if (next.has(moduleId)) {
+                next.delete(moduleId);
+            } else {
+                next.add(moduleId);
+            }
+            return next;
+        });
     };
 
-    // If onAddLesson callback is provided, use it to create the lesson in the database
-    if (onAddLesson) {
-      await onAddLesson(moduleId, newLesson);
-    } else {
-      // Fallback to local state update only
-      // Generate a temporary ID for local use only
-      const lessonWithTempId = { ...newLesson, id: `lesson-${Date.now()}` };
-      const updatedCurriculum = curriculum.map((module) => {
-        if (module.id === moduleId) {
-          return { ...module, lessons: [...module.lessons, lessonWithTempId] };
+    const handleAddModule = () => {
+        const newModule: Module = {
+            id: `module-${Date.now()}`,
+            title: `Module ${curriculum.length + 1}`,
+            lessons: [],
+        };
+        onChange([...curriculum, newModule]);
+    };
+
+    const handleDeleteModule = async (moduleId: string) => {
+        if (
+            !confirm(
+                "Are you sure you want to delete this module and all its lessons?"
+            )
+        ) {
+            return;
         }
-        return module;
-      });
-      onChange(updatedCurriculum);
-    }
-  };
 
-  const handleModuleTitleChange = (moduleId: string, newTitle: string) => {
-    const updatedCurriculum = curriculum.map((module) =>
-      module.id === moduleId ? { ...module, title: newTitle } : module
-    );
-    onChange(updatedCurriculum);
-  };
-
-  const handleDeleteLesson = async (moduleId: string, lessonId: string) => {
-    // If onDeleteLesson callback is provided, use it to delete the lesson from the database
-    if (onDeleteLesson) {
-      await onDeleteLesson(moduleId, lessonId);
-    } else {
-      // Fallback to local state update only
-      const updatedCurriculum = curriculum.map((module) => {
-        if (module.id === moduleId) {
-          return { ...module, lessons: module.lessons.filter((l) => l.id !== lessonId) };
+        if (onDeleteModule) {
+            await onDeleteModule(moduleId);
+        } else {
+            const updatedCurriculum = curriculum.filter(
+                (m) => m.id !== moduleId
+            );
+            onChange(updatedCurriculum);
         }
-        return module;
-      });
-      onChange(updatedCurriculum);
-    }
-  };
+    };
 
-  const handleMoveLesson = async (moduleId: string, lessonId: string, direction: 'up' | 'down') => {
-    // If onMoveLesson callback is provided, use it to update positions in the database
-    if (onMoveLesson) {
-      await onMoveLesson(moduleId, lessonId, direction);
-    } else {
-      // Fallback to local state update only
-      const updatedCurriculum = curriculum.map((module) => {
-        if (module.id === moduleId) {
-          const lessons = [...module.lessons];
-          const index = lessons.findIndex((l) => l.id === lessonId);
-          if (direction === 'up' && index > 0) {
-            [lessons[index], lessons[index - 1]] = [lessons[index - 1], lessons[index]];
-          } else if (direction === 'down' && index < lessons.length - 1) {
-            [lessons[index], lessons[index + 1]] = [lessons[index + 1], lessons[index]];
-          }
-          return { ...module, lessons };
+    const handleAddLesson = async (moduleId: string) => {
+        // Find the module to get the lesson count
+        const module = curriculum.find((m) => m.id === moduleId);
+
+        // Create a temporary lesson object with a placeholder ID
+        // The actual ID will be generated in the CourseBuilder when saving to DB
+        const newLesson: Lesson = {
+            id: "", // Will be replaced with UUID in CourseBuilder
+            title: `Lesson ${(module?.lessons?.length ?? 0) + 1}`,
+            type: "text",
+            duration: "0 min",
+            summary: "",
+            content_blocks: [],
+            is_published: false,
+        };
+
+        // If onAddLesson callback is provided, use it to create the lesson in the database
+        if (onAddLesson) {
+            await onAddLesson(moduleId, newLesson);
+        } else {
+            // Fallback to local state update only
+            // Generate a temporary ID for local use only
+            const lessonWithTempId = {
+                ...newLesson,
+                id: `lesson-${Date.now()}`,
+            };
+            const updatedCurriculum = curriculum.map((module) => {
+                if (module.id === moduleId) {
+                    return {
+                        ...module,
+                        lessons: [...module.lessons, lessonWithTempId],
+                    };
+                }
+                return module;
+            });
+            onChange(updatedCurriculum);
         }
-        return module;
-      });
-      onChange(updatedCurriculum);
-    }
-  };
+    };
 
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'video':
-        return '🎬';
-      case 'pdf':
-        return '📄';
-      case 'quiz':
-        return '📝';
-      case 'live':
-        return '🎥';
-      default:
-        return '📖';
-    }
-  };
+    const handleModuleTitleChange = (moduleId: string, newTitle: string) => {
+        const updatedCurriculum = curriculum.map((module) =>
+            module.id === moduleId ? { ...module, title: newTitle } : module
+        );
+        onChange(updatedCurriculum);
+    };
 
-  return (
-    <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-slate-900">Curriculum</h2>
-        <button
-          onClick={handleAddModule}
-          className="px-5 py-2 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-semibold rounded-full hover:shadow-lg transition-all flex items-center gap-2"
-        >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add module
-        </button>
-      </div>
+    const handleDeleteLesson = async (moduleId: string, lessonId: string) => {
+        // If onDeleteLesson callback is provided, use it to delete the lesson from the database
+        if (onDeleteLesson) {
+            await onDeleteLesson(moduleId, lessonId);
+        } else {
+            // Fallback to local state update only
+            const updatedCurriculum = curriculum.map((module) => {
+                if (module.id === moduleId) {
+                    return {
+                        ...module,
+                        lessons: module.lessons.filter(
+                            (l) => l.id !== lessonId
+                        ),
+                    };
+                }
+                return module;
+            });
+            onChange(updatedCurriculum);
+        }
+    };
 
-      <div className="space-y-4">
-        {curriculum.map((module, moduleIndex) => (
-          <div key={module.id} className="border border-slate-200 dark:border-gray-700 rounded-xl overflow-hidden">
-            {/* Module Header */}
-            <div className="bg-slate-50 dark:bg-gray-800 p-4">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => toggleModule(module.id)}
-                  className="text-slate-600 dark:text-dark-text-secondary hover:text-slate-900 dark:text-dark-text-primary transition-colors"
-                >
-                  <svg
-                    className={`w-5 h-5 transition-transform ${expandedModules.has(module.id) ? 'rotate-90' : ''}`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-                <span className="text-sm font-medium text-slate-600">Module {moduleIndex + 1}</span>
-                <input
-                  type="text"
-                  value={module.title}
-                  onChange={(e) => handleModuleTitleChange(module.id, e.target.value)}
-                  className="flex-1 px-3 py-1.5 bg-white dark:bg-dark-background-card rounded-lg border border-slate-200 dark:border-gray-700 font-semibold text-slate-900 dark:text-dark-text-primary focus:border-[#304DB5] focus:outline-none"
-                />
-                <button
-                  onClick={() => handleToggleModulePublish(module.id, module.is_published ?? false)}
-                  className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5 ${
-                    module.is_published 
-                      ? 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20' 
-                      : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700'
-                  }`}
-                  title={module.is_published ? 'Module is published (visible to students)' : 'Module is unpublished (hidden from students)'}
-                >
-                  {module.is_published ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  {module.is_published ? 'Published' : 'Unpublished'}
-                </button>
-                <button
-                  onClick={() => handleAddLesson(module.id)}
-                  className="px-4 py-2 text-sm font-medium text-[#304DB5] hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  + Add lesson
-                </button>
-              </div>
-            </div>
+    const handleMoveLesson = async (
+        moduleId: string,
+        lessonId: string,
+        direction: "up" | "down"
+    ) => {
+        // If onMoveLesson callback is provided, use it to update positions in the database
+        if (onMoveLesson) {
+            await onMoveLesson(moduleId, lessonId, direction);
+        } else {
+            // Fallback to local state update only
+            const updatedCurriculum = curriculum.map((module) => {
+                if (module.id === moduleId) {
+                    const lessons = [...module.lessons];
+                    const index = lessons.findIndex((l) => l.id === lessonId);
+                    if (direction === "up" && index > 0) {
+                        [lessons[index], lessons[index - 1]] = [
+                            lessons[index - 1],
+                            lessons[index],
+                        ];
+                    } else if (
+                        direction === "down" &&
+                        index < lessons.length - 1
+                    ) {
+                        [lessons[index], lessons[index + 1]] = [
+                            lessons[index + 1],
+                            lessons[index],
+                        ];
+                    }
+                    return { ...module, lessons };
+                }
+                return module;
+            });
+            onChange(updatedCurriculum);
+        }
+    };
 
-            {/* Lessons List */}
-            {expandedModules.has(module.id) && (
-              <div className="p-4 space-y-2">
-                {module.lessons.length === 0 ? (
-                  <p className="text-sm text-slate-500 dark:text-dark-text-muted text-center py-4">No lessons yet. Click"Add lesson" to start.</p>
-                ) : (
-                  module.lessons.map((lesson, lessonIndex) => (
-                    <div key={lesson.id} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-gray-800 rounded-lg hover:bg-slate-100 dark:hover:bg-gray-700 dark:bg-gray-800 transition-colors">
-                      {/* Drag Handle */}
-                      <div className="flex flex-col gap-0.5">
-                        <button
-                          onClick={() => handleMoveLesson(module.id, lesson.id, 'up')}
-                          disabled={lessonIndex === 0}
-                          className="text-slate-400 hover:text-slate-600 dark:text-dark-text-secondary disabled:opacity-30 disabled:cursor-not-allowed"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={() => handleMoveLesson(module.id, lesson.id, 'down')}
-                          disabled={lessonIndex === module.lessons.length - 1}
-                          className="text-slate-400 hover:text-slate-600 dark:text-dark-text-secondary disabled:opacity-30 disabled:cursor-not-allowed"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </button>
-                      </div>
+    // Calculate content block statistics for a lesson
+    const getContentStats = (item: ContentItem) => {
+        // If it's a quiz, return empty stats or quiz-specific stats
+        if ('instructions' in item) {
+            // This is a quiz
+            return [{
+                label: 'Quiz',
+                icon: <FileQuestion className="w-3 h-3" />,
+                count: 1,
+            }];
+        }
 
-                      {/* Lesson Info */}
-                      <span className="text-lg">{getTypeIcon(lesson.type)}</span>
-                      <div className="flex-1">
-                        <p className="font-medium text-slate-900">{lesson.title}</p>
-                        <p className="text-xs text-slate-600">{lesson.duration || `${lesson.estimated_duration_minutes || 0} min`}</p>
-                      </div>
-                      <span className="px-2 py-1 text-xs font-medium text-slate-600 dark:text-dark-text-secondary bg-white dark:bg-dark-background-card rounded border border-slate-200 dark:border-gray-700 capitalize">
-                        {lesson.type}
-                      </span>
+        // If it's a lesson, calculate stats normally
+        const lesson = item as Lesson;
+        const blocks = lesson.content_blocks || [];
+        const stats: { label: string; icon: React.ReactNode; count: number }[] =
+            [];
 
-                      {/* Actions */}
-                      <button
-                        onClick={() => onEditLesson(module.id, lesson.id)}
-                        className="px-3 py-1.5 text-sm font-medium text-[#304DB5] hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteLesson(module.id, lesson.id)}
-                        className="px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        Delete
-                      </button>
+        // Count text blocks and calculate word count
+        const textBlocks = blocks.filter((b) => b.type === "text");
+        if (textBlocks.length > 0) {
+            const totalWords = textBlocks.reduce((sum, block) => {
+                const text = block.content.replace(/<[^>]*>/g, ""); // Strip HTML
+                const words = text
+                    .trim()
+                    .split(/\s+/)
+                    .filter((w) => w.length > 0);
+                return sum + words.length;
+            }, 0);
+            if (totalWords > 0) {
+                stats.push({
+                    label: `${totalWords} Words`,
+                    icon: <FileText className="w-3 h-3" />,
+                    count: totalWords,
+                });
+            }
+        }
+
+        // Count images
+        const imageCount = blocks.filter((b) => b.type === "image").length;
+        if (imageCount > 0) {
+            stats.push({
+                label: `${imageCount} Image${imageCount > 1 ? "s" : ""}`,
+                icon: <Image className="w-3 h-3" />,
+                count: imageCount,
+            });
+        }
+
+        // Count videos
+        const videoCount = blocks.filter((b) => b.type === "video").length;
+        if (videoCount > 0) {
+            stats.push({
+                label: `${videoCount} Video${videoCount > 1 ? "s" : ""}`,
+                icon: <Video className="w-3 h-3" />,
+                count: videoCount,
+            });
+        }
+
+        // Count code blocks
+        const codeCount = blocks.filter((b) => b.type === "code").length;
+        if (codeCount > 0) {
+            stats.push({
+                label: `${codeCount} Code`,
+                icon: <Code className="w-3 h-3" />,
+                count: codeCount,
+            });
+        }
+
+        // Count headings
+        const headingCount = blocks.filter((b) => b.type === "heading").length;
+        if (headingCount > 0) {
+            stats.push({
+                label: `${headingCount} Heading${headingCount > 1 ? "s" : ""}`,
+                icon: <Heading className="w-3 h-3" />,
+                count: headingCount,
+            });
+        }
+
+        return stats;
+    };
+
+    return (
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-900 border-b border-gray-200 dark:border-gray-700 px-8 py-6">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-white dark:bg-slate-700 rounded-xl shadow-sm">
+                            <BookOpen className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                                Course Curriculum
+                            </h2>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                                {curriculum.length}{" "}
+                                {curriculum.length === 1 ? "Module" : "Modules"}{" "}
+                                •{" "}
+                                {curriculum.reduce(
+                                    (sum, m) => sum + m.lessons.length,
+                                    0
+                                )}{" "}
+                                Items
+                            </p>
+                        </div>
                     </div>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-
-        {curriculum.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-slate-400 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                />
-              </svg>
+                    <button
+                        onClick={handleAddModule}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                        <Plus className="w-5 h-5" />
+                        Add Module
+                    </button>
+                </div>
             </div>
-            <p className="text-lg text-slate-600 dark:text-dark-text-secondary mb-2">No modules yet</p>
-            <p className="text-sm text-slate-500">Start building your course by adding a module</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+
+            {/* Modules List */}
+            <div className="p-6 space-y-4">
+                {curriculum.map((module, moduleIndex) => (
+                    <div
+                        key={module.id}
+                        className="border-2 border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-200"
+                    >
+                        {/* Module Header */}
+                        <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-800 dark:to-slate-900 border-b border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-4 px-5 py-4">
+                                <button
+                                    onClick={() => toggleModule(module.id)}
+                                    className="p-1.5 hover:bg-white dark:hover:bg-slate-700 rounded-lg transition-colors"
+                                    aria-label={
+                                        expandedModules.has(module.id)
+                                            ? "Collapse module"
+                                            : "Expand module"
+                                    }
+                                >
+                                    <ChevronRight
+                                        className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform duration-200 ${
+                                            expandedModules.has(module.id)
+                                                ? "rotate-90"
+                                                : ""
+                                        }`}
+                                    />
+                                </button>
+
+                                <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl text-white font-bold shadow-sm">
+                                    {moduleIndex + 1}
+                                </div>
+
+                                <input
+                                    type="text"
+                                    value={module.title}
+                                    onChange={(e) =>
+                                        handleModuleTitleChange(
+                                            module.id,
+                                            e.target.value
+                                        )
+                                    }
+                                    className="flex-1 px-4 py-2.5 bg-white dark:bg-slate-700 rounded-lg border-2 border-gray-200 dark:border-gray-600 font-semibold text-gray-900 dark:text-white focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900 transition-all"
+                                    placeholder="Module title..."
+                                />
+
+                                <div className="flex items-center gap-2">
+                                    <span className="px-3 py-1.5 bg-white dark:bg-slate-700 border border-gray-200 dark:border-gray-600 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400">
+                                        {module.lessons.length}{" "}
+                                        {module.lessons.length === 1
+                                            ? "Item"
+                                            : "Items"}
+                                    </span>
+
+                                    <button
+                                        onClick={() =>
+                                            handleAddLesson(module.id)
+                                        }
+                                        className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600 text-blue-600 dark:text-blue-400 font-medium rounded-lg transition-all text-sm"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                        Lesson
+                                    </button>
+
+                                    {onAddQuiz && (
+                                        <button
+                                            onClick={() => onAddQuiz(module.id)}
+                                            className="flex items-center gap-1.5 px-3 py-2 bg-white dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 border border-gray-200 dark:border-gray-600 hover:border-purple-300 dark:hover:border-purple-600 text-purple-600 dark:text-purple-400 font-medium rounded-lg transition-all text-sm"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            Quiz
+                                        </button>
+                                    )}
+
+                                    <button
+                                        onClick={() =>
+                                            handleDeleteModule(module.id)
+                                        }
+                                        className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg transition-colors"
+                                        aria-label="Delete module"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Lessons List */}
+                        {expandedModules.has(module.id) && (
+                            <div className="bg-white dark:bg-slate-800">
+                                {module.lessons.length === 0 ? (
+                                    <div className="px-5 py-12 text-center">
+                                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-slate-700 rounded-full mb-4">
+                                            <BookOpen className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                                        </div>
+                                        <p className="text-gray-600 dark:text-gray-400 font-medium mb-1">
+                                            No content yet
+                                        </p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-500">
+                                            Click "Add Lesson" or "Add Quiz" to
+                                            get started
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                        {module.lessons.map(
+                                            (item, itemIndex) => {
+                                                const contentStats =
+                                                    getContentStats(item);
+
+                                                return (
+                                                    <div
+                                                        key={item.id}
+                                                        className="group px-5 py-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+                                                    >
+                                                        <div className="flex items-start gap-4">
+                                                            {/* Reorder Controls */}
+                                                            <div className="flex flex-col gap-0.5 pt-1">
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleMoveLesson(
+                                                                            module.id,
+                                                                            item.id,
+                                                                            "up"
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        itemIndex ===
+                                                                        0
+                                                                    }
+                                                                    className="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                                                    aria-label="Move item up"
+                                                                >
+                                                                    <ChevronUp className="w-4 h-4" />
+                                                                </button>
+                                                                <GripVertical className="w-4 h-4 text-gray-300 dark:text-gray-600" />
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleMoveLesson(
+                                                                            module.id,
+                                                                            item.id,
+                                                                            "down"
+                                                                        )
+                                                                    }
+                                                                    disabled={
+                                                                        itemIndex ===
+                                                                        module
+                                                                            .lessons
+                                                                            .length -
+                                                                            1
+                                                                    }
+                                                                    className="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                                                    aria-label="Move item down"
+                                                                >
+                                                                    <ChevronDown className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+
+                                                            {/* Item Number */}
+                                                            <div className="flex items-center justify-center w-8 h-8 bg-gray-100 dark:bg-slate-700 rounded-lg text-sm font-semibold text-gray-600 dark:text-gray-400 flex-shrink-0 mt-1">
+                                                                {itemIndex +
+                                                                    1}
+                                                            </div>
+
+                                                            {/* Item Content */}
+                                                            <div className="flex-1 min-w-0">
+                                                                <h4 className="font-semibold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                                                    {
+                                                                        item.title
+                                                                    }
+                                                                </h4>
+
+                                                                {/* Content Statistics */}
+                                                                {contentStats.length >
+                                                                    0 && (
+                                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                                        {contentStats.map(
+                                                                            (
+                                                                                stat,
+                                                                                idx
+                                                                            ) => (
+                                                                                <React.Fragment
+                                                                                    key={
+                                                                                        idx
+                                                                                    }
+                                                                                >
+                                                                                    {idx >
+                                                                                        0 && (
+                                                                                        <span className="text-gray-300 dark:text-gray-600">
+                                                                                            •
+                                                                                        </span>
+                                                                                    )}
+                                                                                    <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
+                                                                                        {
+                                                                                            stat.icon
+                                                                                        }
+                                                                                        <span>
+                                                                                            {
+                                                                                                stat.label
+                                                                                            }
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </React.Fragment>
+                                                                            )
+                                                                        )}
+                                                                    </div>
+                                                                )}
+
+                                                                {contentStats.length ===
+                                                                    0 && (
+                                                                    <p className="text-xs text-gray-500 dark:text-gray-500 italic">
+                                                                        No
+                                                                        content
+                                                                        yet
+                                                                    </p>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Actions */}
+                                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        // Check if the item is a quiz or lesson
+                                                                        if ('instructions' in item) {
+                                                                            // This is a quiz
+                                                                            if (onEditQuiz) {
+                                                                                onEditQuiz(module.id, item.id);
+                                                                            }
+                                                                        } else {
+                                                                            // This is a lesson
+                                                                            onEditLesson(module.id, item.id);
+                                                                        }
+                                                                    }}
+                                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700 font-medium rounded-lg transition-all text-sm"
+                                                                >
+                                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                                    Edit
+                                                                </button>
+                                                                <button
+                                                                    onClick={() =>
+                                                                        handleDeleteLesson(
+                                                                            module.id,
+                                                                            item.id
+                                                                        )
+                                                                    }
+                                                                    className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg transition-colors"
+                                                                    aria-label="Delete item"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                ))}
+
+                {/* Empty State */}
+                {curriculum.length === 0 && (
+                    <div className="text-center py-16">
+                        <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-2xl mb-5">
+                            <BookOpen className="w-10 h-10 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            No modules yet
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                            Start building your course curriculum by adding your
+                            first module
+                        </p>
+                        <button
+                            onClick={handleAddModule}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200"
+                        >
+                            <Plus className="w-5 h-5" />
+                            Add Your First Module
+                        </button>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
 };
 
 export default CurriculumEditor;

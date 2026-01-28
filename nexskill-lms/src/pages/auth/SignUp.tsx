@@ -10,7 +10,7 @@ const SignUp: React.FC = () => {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const { getDefaultRoute } = useUser();
-  const [accountType, setAccountType] = useState<AccountType>('STUDENT');
+
   const [formData, setFormData] = useState({
     firstName: '',
     middleName: '',
@@ -116,6 +116,7 @@ const SignUp: React.FC = () => {
         setSubmitError(message);
       } finally {
         setIsSubmitting(false);
+        return;
       }
     } else {
       // Form is invalid, visual cues are now active via hasAttemptedSubmit

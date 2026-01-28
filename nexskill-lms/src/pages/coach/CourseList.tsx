@@ -19,26 +19,37 @@ const CourseList: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('courses')
-          .select('*')
+          .select('*') // Make sure verification_status is selected
           .eq('coach_id', profile.id)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
         if (data) {
-          // Verify if we need to map the status or other fields.
-          // The dummy data had 'status', 'enrolledStudents', 'rating', 'lastUpdated'.
-          // real data has 'created_at', 'updated_at', 'visibility', etc.
-          // We might need to adapt the data for CourseTable or update CourseTable.
-          // For now let's map what we have.
-          const mappedCourses = data.map((course: any) => ({
-            id: course.id,
-            title: course.title,
-            status: course.visibility === 'public' ? 'published' : 'draft', // Map visibility to status
-            enrolledStudents: 0, // Need to count enrollments
-            rating: 0, // Need to calculate ratings
-            lastUpdated: new Date(course.updated_at).toLocaleDateString(),
-          }));
+          const mappedCourses = data.map((course: any) => {
+            let status = 'draft';
+
+            if (course.verification_status === 'approved' && course.visibility === 'public') {
+              status = 'published';
+            } else if (course.verification_status === 'pending_review') {
+              status = 'pending';
+            } else if (course.verification_status === 'changes_requested') {
+              status = 'changes_requested';
+            } else if (course.verification_status === 'rejected') {
+              status = 'rejected';
+            } else {
+              status = 'draft';
+            }
+
+            return {
+              id: course.id,
+              title: course.title,
+              status: status,
+              enrolledStudents: 0, // Placeholder
+              rating: 0, // Placeholder
+              lastUpdated: new Date(course.updated_at).toLocaleDateString(),
+            };
+          });
           setCourses(mappedCourses);
         }
       } catch (error) {

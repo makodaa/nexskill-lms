@@ -60,6 +60,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import UsersManagementPage from "./pages/admin/UsersManagementPage";
 import CoachesManagementPage from "./pages/admin/CoachesManagementPage";
 import CourseModerationPage from "./pages/admin/CourseModerationPage";
+import CourseReviewPage from "./pages/admin/CourseReviewPage";
 import FinancialControlPage from "./pages/admin/FinancialControlPage";
 import AdminCrmMarketingPage from "./pages/admin/AdminCrmMarketingPage";
 import AdminNotificationsPage from "./pages/admin/AdminNotificationsPage";
@@ -196,6 +197,10 @@ function App() {
                 <Route
                   path="/admin/courses/moderation"
                   element={<CourseModerationPage />}
+                />
+                <Route
+                  path="/admin/courses/review/:courseId"
+                  element={<CourseReviewPage />}
                 />
                 <Route
                   path="/admin/funnels"

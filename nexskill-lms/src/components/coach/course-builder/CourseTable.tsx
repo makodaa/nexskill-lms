@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 interface Course {
   id: string;
   title: string;
-  status: 'draft' | 'published' | 'scheduled';
+  status: 'draft' | 'published' | 'scheduled' | 'pending' | 'changes_requested' | 'rejected';
   enrolledStudents: number;
   rating: number;
   lastUpdated: string;
@@ -22,6 +22,12 @@ const CourseTable: React.FC<CourseTableProps> = ({ courses, onEdit, onPreview })
     switch (status) {
       case 'published':
         return 'bg-green-100 text-green-700 border-green-200';
+      case 'pending':
+        return 'bg-amber-100 text-amber-700 border-amber-200'; // User requested Amber for "Pending Review"
+      case 'changes_requested':
+        return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'rejected':
+        return 'bg-red-100 text-red-700 border-red-200';
       case 'draft':
         return 'bg-slate-100 dark:bg-gray-800 text-slate-700 dark:text-dark-text-primary border-slate-200';
       case 'scheduled':

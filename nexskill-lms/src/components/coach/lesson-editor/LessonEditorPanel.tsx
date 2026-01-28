@@ -1,3 +1,4 @@
+// LessonEditorPanel.tsx
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -10,6 +11,7 @@ import {
     Image,
     Code,
     FileText,
+    Video,
     Eye,
     EyeOff,
     MonitorPlay,
@@ -19,6 +21,7 @@ import LessonPreview from "./LessonPreview";
 import LessonHeader from "./LessonHeader";
 import type { Lesson, LessonContentBlock } from "../../../types/lesson";
 import type { MediaMetadata } from "../../../types/media.types";
+import { isMediaMetadata } from "../../../types/media.types";
 import RichTextEditor from "./RichTextEditor";
 import { MediaUploader } from "../../MediaUploader";
 
@@ -199,6 +202,12 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
 
     // Handle media upload completion
     const handleMediaUpload = (blockId: string, metadata: MediaMetadata) => {
+        // Validate metadata using type guard
+        if (!isMediaMetadata(metadata)) {
+            console.error("Invalid media metadata received:", metadata);
+            return;
+        }
+
         const currentBlocks = lesson.content_blocks || [];
         const updatedBlocks = currentBlocks.map((block) =>
             block.id === blockId
@@ -208,7 +217,9 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                       attributes: {
                           ...block.attributes,
                           media_metadata: metadata,
-                          alt: block.attributes?.alt || metadata.original_filename,
+                          alt:
+                              block.attributes?.alt ||
+                              metadata.original_filename,
                           caption: block.attributes?.caption,
                       },
                   }
@@ -299,7 +310,9 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                     <LessonHeader
                         lesson={lesson}
                         isEditing={isEditingHeader}
-                        onToggleEdit={() => setIsEditingHeader(!isEditingHeader)}
+                        onToggleEdit={() =>
+                            setIsEditingHeader(!isEditingHeader)
+                        }
                         title={localTitle}
                         description={localDescription}
                         duration={localDuration}
@@ -334,7 +347,7 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                         image: { icon: Image, label: "Image" },
                                         code: { icon: Code, label: "Code" },
                                         video: {
-                                            icon: FileText,
+                                            icon: Video,
                                             label: "Video",
                                         },
                                         document: { icon: File, label: "Document" },
@@ -523,54 +536,140 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                                     <div className="space-y-4">
                                                         <MediaUploader
                                                             resourceType="image"
-                                                            currentUrl={block.content}
-                                                            currentMetadata={block.attributes?.media_metadata}
-                                                            onUploadComplete={(metadata) =>
-                                                                handleMediaUpload(block.id, metadata)
+                                                            currentUrl={
+                                                                block.content
                                                             }
-                                                            onRemove={() => handleContentUpdate("", block.id)}
+                                                            currentMetadata={
+                                                                block.attributes
+                                                                    ?.media_metadata
+                                                            }
+                                                            onUploadComplete={(
+                                                                metadata
+                                                            ) =>
+                                                                handleMediaUpload(
+                                                                    block.id,
+                                                                    metadata
+                                                                )
+                                                            }
+                                                            onRemove={() => {
+                                                                const currentBlocks =
+                                                                    lesson.content_blocks ||
+                                                                    [];
+                                                                const updatedBlocks =
+                                                                    currentBlocks.map(
+                                                                        (b) =>
+                                                                            b.id ===
+                                                                            block.id
+                                                                                ? {
+                                                                                      ...b,
+                                                                                      content:
+                                                                                          "",
+                                                                                      attributes:
+                                                                                          {
+                                                                                              ...b.attributes,
+                                                                                              media_metadata:
+                                                                                                  undefined,
+                                                                                              thumbnail_url:
+                                                                                                  undefined,
+                                                                                              external_url:
+                                                                                                  undefined,
+                                                                                              is_external:
+                                                                                                  false,
+                                                                                          },
+                                                                                  }
+                                                                                : b
+                                                                    );
+                                                                onChange({
+                                                                    ...lesson,
+                                                                    content_blocks:
+                                                                        updatedBlocks,
+                                                                });
+                                                            }}
                                                         />
-                                                        
+
                                                         {/* Alt text and caption fields */}
                                                         <div className="grid grid-cols-2 gap-3 px-2">
                                                             <input
                                                                 type="text"
-                                                                value={block.attributes?.alt || ""}
-                                                                onChange={(e) => {
-                                                                    const currentBlocks = lesson.content_blocks || [];
-                                                                    const updatedBlocks = currentBlocks.map((b) =>
-                                                                        b.id === block.id
-                                                                            ? {
-                                                                                  ...b,
-                                                                                  attributes: {
-                                                                                      ...b.attributes,
-                                                                                      alt: e.target.value,
-                                                                                  },
-                                                                              }
-                                                                            : b
-                                                                    );
-                                                                    onChange({ ...lesson, content_blocks: updatedBlocks });
+                                                                value={
+                                                                    block
+                                                                        .attributes
+                                                                        ?.alt ||
+                                                                    ""
+                                                                }
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    const currentBlocks =
+                                                                        lesson.content_blocks ||
+                                                                        [];
+                                                                    const updatedBlocks =
+                                                                        currentBlocks.map(
+                                                                            (
+                                                                                b
+                                                                            ) =>
+                                                                                b.id ===
+                                                                                block.id
+                                                                                    ? {
+                                                                                          ...b,
+                                                                                          attributes:
+                                                                                              {
+                                                                                                  ...b.attributes,
+                                                                                                  alt: e
+                                                                                                      .target
+                                                                                                      .value,
+                                                                                              },
+                                                                                      }
+                                                                                    : b
+                                                                        );
+                                                                    onChange({
+                                                                        ...lesson,
+                                                                        content_blocks:
+                                                                            updatedBlocks,
+                                                                    });
                                                                 }}
                                                                 placeholder="Alt text (for accessibility)"
                                                                 className="w-full px-3 py-1.5 bg-transparent border-b border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:outline-none text-xs text-gray-600 dark:text-gray-400 transition-colors"
                                                             />
                                                             <input
                                                                 type="text"
-                                                                value={block.attributes?.caption || ""}
-                                                                onChange={(e) => {
-                                                                    const currentBlocks = lesson.content_blocks || [];
-                                                                    const updatedBlocks = currentBlocks.map((b) =>
-                                                                        b.id === block.id
-                                                                            ? {
-                                                                                  ...b,
-                                                                                  attributes: {
-                                                                                      ...b.attributes,
-                                                                                      caption: e.target.value,
-                                                                                  },
-                                                                              }
-                                                                            : b
-                                                                    );
-                                                                    onChange({ ...lesson, content_blocks: updatedBlocks });
+                                                                value={
+                                                                    block
+                                                                        .attributes
+                                                                        ?.caption ||
+                                                                    ""
+                                                                }
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    const currentBlocks =
+                                                                        lesson.content_blocks ||
+                                                                        [];
+                                                                    const updatedBlocks =
+                                                                        currentBlocks.map(
+                                                                            (
+                                                                                b
+                                                                            ) =>
+                                                                                b.id ===
+                                                                                block.id
+                                                                                    ? {
+                                                                                          ...b,
+                                                                                          attributes:
+                                                                                              {
+                                                                                                  ...b.attributes,
+                                                                                                  caption:
+                                                                                                      e
+                                                                                                          .target
+                                                                                                          .value,
+                                                                                              },
+                                                                                      }
+                                                                                    : b
+                                                                        );
+                                                                    onChange({
+                                                                        ...lesson,
+                                                                        content_blocks:
+                                                                            updatedBlocks,
+                                                                    });
                                                                 }}
                                                                 placeholder="Caption (optional)"
                                                                 className="w-full px-3 py-1.5 bg-transparent border-b border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:outline-none text-xs text-gray-600 dark:text-gray-400 transition-colors"
@@ -579,56 +678,369 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                                     </div>
                                                 ) : block.type === "video" ? (
                                                     <div className="space-y-4">
-                                                        <MediaUploader
-                                                            resourceType="video"
-                                                            currentUrl={block.content}
-                                                            currentMetadata={block.attributes?.media_metadata}
-                                                            onUploadComplete={(metadata) =>
-                                                                handleMediaUpload(block.id, metadata)
-                                                            }
-                                                            onRemove={() => handleContentUpdate("", block.id)}
-                                                        />
-                                                        
-                                                        {/* Video URL input (for YouTube, etc.) */}
-                                                        <div className="px-2">
-                                                            <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                                                Or paste video URL (YouTube, Vimeo, etc.)
+                                                        {/* Upload Section */}
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                                Upload Video
+                                                            </label>
+                                                            <MediaUploader
+                                                                resourceType="video"
+                                                                currentUrl={
+                                                                    block.content
+                                                                }
+                                                                currentMetadata={
+                                                                    block
+                                                                        .attributes
+                                                                        ?.media_metadata
+                                                                }
+                                                                onUploadComplete={(
+                                                                    metadata
+                                                                ) =>
+                                                                    handleMediaUpload(
+                                                                        block.id,
+                                                                        metadata
+                                                                    )
+                                                                }
+                                                                onRemove={() =>
+                                                                    handleContentUpdate(
+                                                                        "",
+                                                                        block.id
+                                                                    )
+                                                                }
+                                                            />
+                                                        </div>
+
+                                                        {/* Divider */}
+                                                        <div className="relative">
+                                                            <div className="absolute inset-0 flex items-center">
+                                                                <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                                                            </div>
+                                                            <div className="relative flex justify-center text-xs">
+                                                                <span className="bg-white dark:bg-gray-800 px-2 text-gray-500">
+                                                                    OR
+                                                                </span>
+                                                            </div>
+                                                        </div>
+
+                                                        {/* External Video URL */}
+                                                        <div>
+                                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                                                Embed Video URL
                                                             </label>
                                                             <input
                                                                 type="text"
-                                                                value={block.content}
-                                                                onChange={(e) =>
-                                                                    handleContentUpdate(e.target.value, block.id)
+                                                                value={
+                                                                    block
+                                                                        .attributes
+                                                                        ?.external_url ||
+                                                                    ""
                                                                 }
-                                                                placeholder="https://youtube.com/watch?v=..."
-                                                                className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none text-sm text-gray-600 dark:text-gray-300"
-                                                            />
-                                                        </div>
-                                                        
-                                                        {/* Caption field */}
-                                                        <div className="px-2">
-                                                            <input
-                                                                type="text"
-                                                                value={block.attributes?.caption || ""}
-                                                                onChange={(e) => {
-                                                                    const currentBlocks = lesson.content_blocks || [];
-                                                                    const updatedBlocks = currentBlocks.map((b) =>
-                                                                        b.id === block.id
-                                                                            ? {
-                                                                                  ...b,
-                                                                                  attributes: {
-                                                                                      ...b.attributes,
-                                                                                      caption: e.target.value,
-                                                                                  },
-                                                                              }
-                                                                            : b
-                                                                    );
-                                                                    onChange({ ...lesson, content_blocks: updatedBlocks });
+                                                                onChange={(
+                                                                    e
+                                                                ) => {
+                                                                    const currentBlocks =
+                                                                        lesson.content_blocks ||
+                                                                        [];
+                                                                    const updatedBlocks =
+                                                                        currentBlocks.map(
+                                                                            (
+                                                                                b
+                                                                            ) =>
+                                                                                b.id ===
+                                                                                block.id
+                                                                                    ? {
+                                                                                          ...b,
+                                                                                          attributes:
+                                                                                              {
+                                                                                                  ...b.attributes,
+                                                                                                  external_url:
+                                                                                                      e
+                                                                                                          .target
+                                                                                                          .value,
+                                                                                                  is_external:
+                                                                                                      true,
+                                                                                              },
+                                                                                      }
+                                                                                    : b
+                                                                        );
+                                                                    onChange({
+                                                                        ...lesson,
+                                                                        content_blocks:
+                                                                            updatedBlocks,
+                                                                    });
                                                                 }}
-                                                                placeholder="Video caption (optional)"
-                                                                className="w-full px-3 py-1.5 bg-transparent border-b border-gray-200 dark:border-gray-700 focus:border-blue-500 focus:outline-none text-xs text-gray-600 dark:text-gray-400 transition-colors"
+                                                                placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
+                                                                className="w-full px-3 py-2 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none text-sm text-gray-900 dark:text-gray-100"
                                                             />
+                                                            <p className="mt-1 text-xs text-gray-500">
+                                                                Supports
+                                                                YouTube, Vimeo,
+                                                                and direct video
+                                                                URLs
+                                                            </p>
                                                         </div>
+
+                                                        {/* Video Settings - Only show if we have valid media */}
+                                                        {((block.content &&
+                                                            block.content !==
+                                                                "https://example.com/media-url" &&
+                                                            !block.content.includes(
+                                                                "undefined"
+                                                            )) ||
+                                                            (block.attributes
+                                                                ?.external_url &&
+                                                                block.attributes
+                                                                    .external_url
+                                                                    .length >
+                                                                    0)) && (
+                                                            <div className="space-y-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+                                                                {/* Caption */}
+                                                                <div>
+                                                                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                                                        Caption
+                                                                    </label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={
+                                                                            block
+                                                                                .attributes
+                                                                                ?.caption ||
+                                                                            ""
+                                                                        }
+                                                                        onChange={(
+                                                                            e
+                                                                        ) => {
+                                                                            const currentBlocks =
+                                                                                lesson.content_blocks ||
+                                                                                [];
+                                                                            const updatedBlocks =
+                                                                                currentBlocks.map(
+                                                                                    (
+                                                                                        b
+                                                                                    ) =>
+                                                                                        b.id ===
+                                                                                        block.id
+                                                                                            ? {
+                                                                                                  ...b,
+                                                                                                  attributes:
+                                                                                                      {
+                                                                                                          ...b.attributes,
+                                                                                                          caption:
+                                                                                                              e
+                                                                                                                  .target
+                                                                                                                  .value,
+                                                                                                      },
+                                                                                              }
+                                                                                            : b
+                                                                                );
+                                                                            onChange(
+                                                                                {
+                                                                                    ...lesson,
+                                                                                    content_blocks:
+                                                                                        updatedBlocks,
+                                                                                }
+                                                                            );
+                                                                        }}
+                                                                        placeholder="Describe the video content"
+                                                                        className="w-full px-3 py-2 bg-transparent border border-gray-200 dark:border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none text-sm text-gray-600 dark:text-gray-300"
+                                                                    />
+                                                                </div>
+
+                                                                {/* Video Controls Options */}
+                                                                <div className="flex items-center gap-4">
+                                                                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={
+                                                                                block
+                                                                                    .attributes
+                                                                                    ?.autoplay ||
+                                                                                false
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {
+                                                                                const currentBlocks =
+                                                                                    lesson.content_blocks ||
+                                                                                    [];
+                                                                                const updatedBlocks =
+                                                                                    currentBlocks.map(
+                                                                                        (
+                                                                                            b
+                                                                                        ) =>
+                                                                                            b.id ===
+                                                                                            block.id
+                                                                                                ? {
+                                                                                                      ...b,
+                                                                                                      attributes:
+                                                                                                          {
+                                                                                                              ...b.attributes,
+                                                                                                              autoplay:
+                                                                                                                  e
+                                                                                                                      .target
+                                                                                                                      .checked,
+                                                                                                          },
+                                                                                                  }
+                                                                                                : b
+                                                                                    );
+                                                                                onChange(
+                                                                                    {
+                                                                                        ...lesson,
+                                                                                        content_blocks:
+                                                                                            updatedBlocks,
+                                                                                    }
+                                                                                );
+                                                                            }}
+                                                                            className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                                                                        />
+                                                                        Autoplay
+                                                                    </label>
+
+                                                                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={
+                                                                                block
+                                                                                    .attributes
+                                                                                    ?.controls !==
+                                                                                false
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {
+                                                                                const currentBlocks =
+                                                                                    lesson.content_blocks ||
+                                                                                    [];
+                                                                                const updatedBlocks =
+                                                                                    currentBlocks.map(
+                                                                                        (
+                                                                                            b
+                                                                                        ) =>
+                                                                                            b.id ===
+                                                                                            block.id
+                                                                                                ? {
+                                                                                                      ...b,
+                                                                                                      attributes:
+                                                                                                          {
+                                                                                                              ...b.attributes,
+                                                                                                              controls:
+                                                                                                                  e
+                                                                                                                      .target
+                                                                                                                      .checked,
+                                                                                                          },
+                                                                                                  }
+                                                                                                : b
+                                                                                    );
+                                                                                onChange(
+                                                                                    {
+                                                                                        ...lesson,
+                                                                                        content_blocks:
+                                                                                            updatedBlocks,
+                                                                                    }
+                                                                                );
+                                                                            }}
+                                                                            className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                                                                        />
+                                                                        Show
+                                                                        controls
+                                                                    </label>
+
+                                                                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={
+                                                                                block
+                                                                                    .attributes
+                                                                                    ?.loop ||
+                                                                                false
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {
+                                                                                const currentBlocks =
+                                                                                    lesson.content_blocks ||
+                                                                                    [];
+                                                                                const updatedBlocks =
+                                                                                    currentBlocks.map(
+                                                                                        (
+                                                                                            b
+                                                                                        ) =>
+                                                                                            b.id ===
+                                                                                            block.id
+                                                                                                ? {
+                                                                                                      ...b,
+                                                                                                      attributes:
+                                                                                                          {
+                                                                                                              ...b.attributes,
+                                                                                                              loop: e
+                                                                                                                  .target
+                                                                                                                  .checked,
+                                                                                                          },
+                                                                                                  }
+                                                                                                : b
+                                                                                    );
+                                                                                onChange(
+                                                                                    {
+                                                                                        ...lesson,
+                                                                                        content_blocks:
+                                                                                            updatedBlocks,
+                                                                                    }
+                                                                                );
+                                                                            }}
+                                                                            className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                                                                        />
+                                                                        Loop
+                                                                    </label>
+
+                                                                    <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={
+                                                                                block
+                                                                                    .attributes
+                                                                                    ?.muted ||
+                                                                                false
+                                                                            }
+                                                                            onChange={(
+                                                                                e
+                                                                            ) => {
+                                                                                const currentBlocks =
+                                                                                    lesson.content_blocks ||
+                                                                                    [];
+                                                                                const updatedBlocks =
+                                                                                    currentBlocks.map(
+                                                                                        (
+                                                                                            b
+                                                                                        ) =>
+                                                                                            b.id ===
+                                                                                            block.id
+                                                                                                ? {
+                                                                                                      ...b,
+                                                                                                      attributes:
+                                                                                                          {
+                                                                                                              ...b.attributes,
+                                                                                                              muted: e
+                                                                                                                  .target
+                                                                                                                  .checked,
+                                                                                                          },
+                                                                                                  }
+                                                                                                : b
+                                                                                    );
+                                                                                onChange(
+                                                                                    {
+                                                                                        ...lesson,
+                                                                                        content_blocks:
+                                                                                            updatedBlocks,
+                                                                                    }
+                                                                                );
+                                                                            }}
+                                                                            className="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                                                                        />
+                                                                        Muted
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 ) : block.type === "code" ? (
                                                     <div className="relative group/code">
@@ -749,13 +1161,13 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
 
                                                 <button
                                                     onClick={() =>
-                                                        addContentBlock("document")
+                                                        addContentBlock("video")
                                                     }
                                                     className="w-full px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center gap-3"
                                                 >
-                                                    <File className="w-4 h-4 text-gray-500" />
+                                                    <Video className="w-4 h-4 text-gray-500" />
                                                     <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                                                        PDF/Document
+                                                        Video
                                                     </span>
                                                 </button>
                                             </div>
