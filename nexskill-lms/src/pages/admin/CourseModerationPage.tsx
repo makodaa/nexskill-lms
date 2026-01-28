@@ -421,7 +421,7 @@ const CourseModerationPage: React.FC = () => {
       const { error } = await supabase
         .from('courses')
         .update({
-          verification_status: 'rejected'
+          verification_status: 'changes_requested'
         })
         .eq('id', courseId);
 
@@ -435,7 +435,7 @@ const CourseModerationPage: React.FC = () => {
             course_id: courseId,
             admin_id: user.id,
             content: `REJECTED: ${reason}`,
-            is_resolved: true // Resolved because we acted on it
+            is_resolved: false // Keep unresolved so it appears prominently
           });
         }
       }
@@ -444,7 +444,7 @@ const CourseModerationPage: React.FC = () => {
       const updatedCourses = activeCourses.filter(c => c.id !== courseId);
       setActiveCourses(updatedCourses);
 
-      window.alert(`❌ Course Rejected\n\nCourse ID: ${courseId}\n\nStatus updated to Rejected (Changes Requested).`);
+      window.alert(`❌ Course Rejected\n\nCourse ID: ${courseId}\n\nStatus updated to Changes Requested (Admin Rejected).`);
     } catch (error) {
       console.error('Error rejecting course:', error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';

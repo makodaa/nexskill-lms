@@ -23,7 +23,6 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
   onUnpublish,
   onSubmitForReview,
 }) => {
-  console.log('CoursePublishWorkflow Props:', { verificationStatus, adminFeedback });
   // Simulated readiness checks
   const checks: CheckItem[] = [
     { id: '1', label: 'Course title and description added', completed: true },
