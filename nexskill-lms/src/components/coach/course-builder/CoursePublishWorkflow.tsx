@@ -64,18 +64,6 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
           <div className="flex-1">
             <p className="font-semibold text-slate-900">Verification Status</p>
             <p className={`text-sm capitalize ${badge.color}`}>{badge.text}</p>
-
-            {/* Admin Feedback Display */}
-            {(verificationStatus === 'changes_requested' || verificationStatus === 'rejected') && adminFeedback && (
-              <div className="mt-3 p-3 bg-white/60 rounded-lg border border-amber-100 dark:border-amber-900/30 dark:bg-amber-900/10">
-                <p className="text-xs font-semibold text-amber-900 dark:text-amber-500 uppercase tracking-wider mb-1">
-                  Feedback from Admin:
-                </p>
-                <p className="text-sm italic text-slate-700 dark:text-slate-300">
-                  "{adminFeedback}"
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>

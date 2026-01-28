@@ -13,7 +13,6 @@ import DeleteCourseModal from "../../components/courses/DeleteCourseModal";
 import LessonEditorPanel from "../../components/coach/lesson-editor/LessonEditorPanel";
 import LiveSessionManager from "../../components/coach/live-sessions/LiveSessionManager";
 import QuizEditorPanel from "../../components/quiz/QuizEditorPanel";
-import CourseFeedbackAlert from "../../components/coach/course-builder/CourseFeedbackAlert";
 import type { Lesson } from "../../types/lesson";
 import type { Quiz, QuizQuestion } from "../../types/quiz";
 import type { ContentItem } from "../../types/content-item";
@@ -1427,12 +1426,6 @@ const CourseBuilder: React.FC = () => {
                     </button>
                 </div>
 
-                <CourseFeedbackAlert
-                    status={verificationStatus}
-                    feedback={adminFeedback}
-                // timestamp can be added if we fetch updated_at from admin_verification_feedback
-                />
-
                 <div className="flex gap-6">
                     {/* Sidebar */}
                     <CourseBuilderSidebar
@@ -1454,24 +1447,28 @@ const CourseBuilder: React.FC = () => {
             </div>
 
             {/* Lesson editor modal */}
-            {editingLesson && (
-                <LessonEditorPanel
-                    lesson={editingLesson.lesson}
-                    onChange={handleSaveLesson}
-                    onClose={() => setEditingLesson(null)}
-                />
-            )}
+            {
+                editingLesson && (
+                    <LessonEditorPanel
+                        lesson={editingLesson.lesson}
+                        onChange={handleSaveLesson}
+                        onClose={() => setEditingLesson(null)}
+                    />
+                )
+            }
 
             {/* Quiz editor modal */}
-            {editingQuiz && (
-                <QuizEditorPanel
-                    quiz={editingQuiz.quiz}
-                    questions={editingQuiz.questions}
-                    onChange={handleSaveQuiz}
-                    onQuestionsChange={handleSaveQuizQuestions}
-                    onClose={handleCloseQuizEditor}
-                />
-            )}
+            {
+                editingQuiz && (
+                    <QuizEditorPanel
+                        quiz={editingQuiz.quiz}
+                        questions={editingQuiz.questions}
+                        onChange={handleSaveQuiz}
+                        onQuestionsChange={handleSaveQuizQuestions}
+                        onClose={handleCloseQuizEditor}
+                    />
+                )
+            }
             {/* Delete Course Modal */}
             <DeleteCourseModal
                 isOpen={isDeleteModalOpen}
@@ -1479,7 +1476,7 @@ const CourseBuilder: React.FC = () => {
                 onConfirm={handleDeleteCourse}
                 courseName={settings.title}
             />
-        </CoachAppLayout>
+        </CoachAppLayout >
     );
 };
 
