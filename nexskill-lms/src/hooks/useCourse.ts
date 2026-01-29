@@ -24,12 +24,20 @@ interface Review {
 }
 
 interface Coach {
+  id: string;
   name: string;
   avatar?: string;
   bio: string;
+  jobTitle?: string;
+  experienceLevel?: string;
+  contentAreas?: string[];
+  tools?: string[];
+  linkedinUrl?: string;
+  portfolioUrl?: string;
   studentsCount: number;
   coursesCount: number;
   rating: number;
+  ratingIsHardcoded?: boolean;
 }
 
 export interface CourseDisplay {
@@ -174,31 +182,72 @@ export const useCourse = (courseId: string | undefined) => {
 
           // 3. Fetch Coach Extra Details
           let coachDetails: Coach | null = null;
+          console.log("[useCourse] Course coach_id:", courseData.coach_id);
+
           if (courseData.coach_id) {
             // First get basic profile
-            const { data: coachProfile } = await supabase
+            const { data: coachProfile, error: profileError } = await supabase
               .from("profiles")
-              .select("id, first_name, last_name, bio")
+              .select("id, first_name, last_name, email, role")
               .eq("id", courseData.coach_id)
               .single();
 
+            console.log("[useCourse] Coach profile result:", coachProfile, "Error:", profileError);
+
             if (coachProfile) {
-              // Get extended coach profile
-              const { data: coachProfileExt } = await supabase
+              // Get extended coach profile (may not exist)
+              const { data: coachProfileExt, error: coachExtError } = await supabase
                 .from("coach_profiles")
                 .select("*")
                 .eq("id", courseData.coach_id)
-                .single();
+                .maybeSingle();
+
+              console.log("[useCourse] Coach extended profile:", coachProfileExt, "Error:", coachExtError);
+
+              // Fetch real course count for this coach
+              const { count: coursesCount } = await supabase
+                .from("courses")
+                .select("*", { count: "exact", head: true })
+                .eq("coach_id", courseData.coach_id);
+
+              // Fetch real student count (enrollments across all coach's courses)
+              const { data: coachCourses } = await supabase
+                .from("courses")
+                .select("id")
+                .eq("coach_id", courseData.coach_id);
+
+              let studentsCount = 0;
+              if (coachCourses && coachCourses.length > 0) {
+                const courseIds = coachCourses.map(c => c.id);
+                const { count: enrollmentCount } = await supabase
+                  .from("enrollments")
+                  .select("*", { count: "exact", head: true })
+                  .in("course_id", courseIds);
+                studentsCount = enrollmentCount || 0;
+              }
 
               coachDetails = {
-                name: `${coachProfile.first_name || ""} ${coachProfile.last_name || ""}`.trim() || "Instructor",
+                id: coachProfile.id,
+                name: `${coachProfile.first_name || ""} ${coachProfile.last_name || ""}`.trim() || coachProfile.email || "Instructor",
                 avatar: undefined,
-                bio: coachProfileExt?.bio || coachProfile.bio || "Expert Instructor",
-                studentsCount: 1250,
-                coursesCount: 5,
+                bio: coachProfileExt?.bio || "Expert Instructor",
+                jobTitle: coachProfileExt?.job_title || undefined,
+                experienceLevel: coachProfileExt?.experience_level || undefined,
+                contentAreas: coachProfileExt?.content_areas || [],
+                tools: coachProfileExt?.tools || [],
+                linkedinUrl: coachProfileExt?.linkedin_url || undefined,
+                portfolioUrl: coachProfileExt?.portfolio_url || undefined,
+                studentsCount: studentsCount,
+                coursesCount: coursesCount || 0,
                 rating: 4.9,
+                ratingIsHardcoded: true,
               };
+            } else {
+              // Profile not found but coach_id exists - create minimal coach from ID
+              console.warn("[useCourse] Coach profile not found for ID:", courseData.coach_id);
             }
+          } else {
+            console.log("[useCourse] Course has no coach_id assigned");
           }
 
           // 3b. Fetch Category name
