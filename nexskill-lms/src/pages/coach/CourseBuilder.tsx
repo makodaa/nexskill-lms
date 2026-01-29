@@ -8,7 +8,7 @@ import CurriculumEditor from "../../components/coach/course-builder/CurriculumEd
 import DripSchedulePanel from "../../components/coach/course-builder/DripSchedulePanel";
 import CoursePricingForm from "../../components/coach/course-builder/CoursePricingForm";
 import CoursePublishWorkflow from "../../components/coach/course-builder/CoursePublishWorkflow";
-// import CoursePreviewPane from "../../components/coach/course-builder/CoursePreviewPane"; // Added import for Preview
+import CoursePreviewPane from "../../components/coach/course-builder/CoursePreviewPane"; // Added import for Preview
 import DeleteCourseModal from "../../components/courses/DeleteCourseModal";
 import LessonEditorPanel from "../../components/coach/lesson-editor/LessonEditorPanel";
 import LiveSessionManager from "../../components/coach/live-sessions/LiveSessionManager";
@@ -37,12 +37,13 @@ interface CourseSettings {
   longDescription: string;
   visibility: "public" | "unlisted" | "private";
   topics: number[];
+  learningObjectives?: string[];
 }
 
 interface Module {
   id: string;
   title: string;
-  lessons: ContentItem[]; 
+  lessons: ContentItem[];
 }
 
 interface ModuleDrip {
@@ -76,6 +77,7 @@ const CourseBuilder: React.FC = () => {
   const [verificationStatus, setVerificationStatus] = useState<string>("draft");
   const [adminFeedback, setAdminFeedback] = useState<string>("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [instructorName, setInstructorName] = useState<string>("Instructor");
 
   // Settings state
   const [settings, setSettings] = useState<CourseSettings>({
@@ -88,11 +90,21 @@ const CourseBuilder: React.FC = () => {
     longDescription: "",
     visibility: "public",
     topics: [],
+    learningObjectives: [],
   });
 
   useEffect(() => {
     const fetchCourse = async () => {
       if (!courseId) return;
+
+      // Fetch current user for instructor name
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('first_name, last_name').eq('id', user.id).single();
+        if (profile) {
+          setInstructorName(`${profile.first_name} ${profile.last_name || ''}`.trim());
+        }
+      }
 
       const { data: courseData, error: courseError } = await supabase
         .from("courses")
@@ -121,6 +133,8 @@ const CourseBuilder: React.FC = () => {
           level: courseData.level,
           category: courseData.category?.name || "",
           topics: courseData.course_topics?.map((ct: any) => ct.topic_id) || [],
+          // Mock data for now since column likely doesn't exist
+          learningObjectives: courseData.what_you_will_learn || [],
         }));
 
         setCourseStatus(courseData.is_published ? "published" : "draft");
@@ -491,7 +505,7 @@ const CourseBuilder: React.FC = () => {
 
         // Re-sort in Javascript to match the IDs order
         const sortedContent = allContentItemsData.map(item => allContent.find(c => c.id === item.content_id)).filter(Boolean) as ContentItem[];
-        
+
         setCurriculum(prev => prev.map(m => m.id === moduleId ? { ...m, lessons: sortedContent } : m));
       }
     } catch (err) {
@@ -611,7 +625,7 @@ const CourseBuilder: React.FC = () => {
     saveQuizQuestionsTimeoutRef.current = setTimeout(async () => {
       try {
         await supabase.from("quiz_questions").delete().eq("quiz_id", editingQuiz.quiz.id);
-        
+
         for (let i = 0; i < updatedQuestions.length; i++) {
           const { id, ...questionWithoutId } = updatedQuestions[i];
           await supabase.from("quiz_questions").insert({ ...questionWithoutId, quiz_id: editingQuiz.quiz.id, position: i });
@@ -681,7 +695,7 @@ const CourseBuilder: React.FC = () => {
       }).eq("id", courseId);
 
       // Topic Sync Logic omitted for brevity but should be here similar to original
-      
+
       setCourseStatus(settings.visibility === "public" ? "published" : "draft");
       alert("Settings saved successfully");
     } catch (error) {
@@ -732,13 +746,14 @@ const CourseBuilder: React.FC = () => {
         );
       case "preview":
         return (
-             
-            <CoursePreviewPane
-                courseTitle={settings.title}
-                courseSubtitle={settings.subtitle}
-                courseDescription={settings.longDescription}
-                instructorName="Your Name"
-            />
+
+          <CoursePreviewPane
+            courseTitle={settings.title}
+            courseSubtitle={settings.subtitle}
+            courseDescription={settings.longDescription}
+            instructorName={instructorName}
+            learningObjectives={settings.learningObjectives}
+          />
         );
       default:
         return null;

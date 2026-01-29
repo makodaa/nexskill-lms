@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CoachAppLayout from '../../layouts/CoachAppLayout';
+import ContentBlockRenderer from '../../components/learning/ContentBlockRenderer';
 
 // Mock Data for Demo Lessons
 const MOCK_LESSONS = [
@@ -13,6 +14,7 @@ const MOCK_LESSONS = [
 const DemoCreateLesson: React.FC = () => {
     const navigate = useNavigate();
     const [view, setView] = useState<'list' | 'create'>('list');
+    const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
 
     // Form State
     const [formData, setFormData] = useState({
@@ -40,6 +42,7 @@ const DemoCreateLesson: React.FC = () => {
         // Return to list after save
         setView('list');
         setFormData({ title: '', content: '' }); // Reset form
+        setActiveTab('edit');
     };
 
     const handleLinkClick = (path: string) => {
@@ -102,10 +105,10 @@ const DemoCreateLesson: React.FC = () => {
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${lesson.status === 'Published'
-                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                : lesson.status === 'Draft'
-                                                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                                    : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                            : lesson.status === 'Draft'
+                                                ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                                             }`}>
                                             {lesson.status}
                                         </span>
@@ -139,74 +142,133 @@ const DemoCreateLesson: React.FC = () => {
     const renderEditorView = () => (
         <div className="p-8 max-w-4xl mx-auto">
             {/* Breadcrumb */}
-            <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-                <button onClick={() => setView('list')} className="hover:text-[#304DB5] transition-colors">Lessons</button>
-                <span>/</span>
-                <span className="text-slate-900 dark:text-dark-text-primary font-medium">New Lesson</span>
-            </div>
-
-            <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-xl p-8 space-y-6">
-
-                {/* Title Input */}
-                <div>
-                    <label htmlFor="title" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
-                        Lesson Title
-                    </label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Introduction to React Hooks"
-                        className="w-full px-5 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all font-medium text-lg"
-                    />
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                    <button onClick={() => setView('list')} className="hover:text-[#304DB5] transition-colors">Lessons</button>
+                    <span>/</span>
+                    <span className="text-slate-900 dark:text-dark-text-primary font-medium">New Lesson</span>
                 </div>
 
-                {/* Content Textarea */}
-                <div>
-                    <label htmlFor="content" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
-                        Lesson Content
-                        <span className="ml-2 text-xs font-normal text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
-                            Text Editor
-                        </span>
-                    </label>
-                    <textarea
-                        id="content"
-                        name="content"
-                        value={formData.content}
-                        onChange={handleInputChange}
-                        placeholder="Write your lesson content here..."
-                        rows={15}
-                        className="w-full px-5 py-4 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all resize-y font-mono text-sm leading-relaxed"
-                    />
-                    <p className="text-xs text-slate-500 dark:text-dark-text-muted mt-2">
-                        This area will be upgraded to a Rich Text Editor in the future.
-                    </p>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-gray-700 mt-6">
+                {/* Switcher */}
+                <div className="flex bg-slate-100 dark:bg-gray-800 rounded-full p-1 border border-slate-200 dark:border-gray-700">
                     <button
-                        type="button"
-                        onClick={() => setView('list')}
-                        className="px-6 py-3 text-slate-700 dark:text-slate-300 font-medium rounded-full border border-slate-200 dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 transition-all"
+                        onClick={() => setActiveTab('edit')}
+                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeTab === 'edit'
+                            ? 'bg-white dark:bg-gray-600 shadow-sm text-slate-900 dark:text-white'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                            }`}
                     >
-                        Cancel
+                        Edit
                     </button>
                     <button
-                        type="button"
-                        onClick={handleSave}
-                        className="px-8 py-3 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-semibold rounded-full hover:shadow-lg shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+                        onClick={() => setActiveTab('preview')}
+                        className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${activeTab === 'preview'
+                            ? 'bg-white dark:bg-gray-600 shadow-sm text-slate-900 dark:text-white'
+                            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+                            }`}
                     >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        Save Lesson
+                        Preview
                     </button>
                 </div>
-
             </div>
+
+            {activeTab === 'edit' ? (
+                <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-xl p-8 space-y-6">
+                    {/* Title Input */}
+                    <div>
+                        <label htmlFor="title" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
+                            Lesson Title
+                        </label>
+                        <input
+                            type="text"
+                            id="title"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleInputChange}
+                            placeholder="e.g., Introduction to React Hooks"
+                            className="w-full px-5 py-3 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all font-medium text-lg"
+                        />
+                    </div>
+
+                    {/* Content Textarea */}
+                    <div>
+                        <label htmlFor="content" className="block text-sm font-semibold text-slate-700 dark:text-dark-text-primary mb-2">
+                            Lesson Content
+                            <span className="ml-2 text-xs font-normal text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                                Text Editor
+                            </span>
+                        </label>
+                        <textarea
+                            id="content"
+                            name="content"
+                            value={formData.content}
+                            onChange={handleInputChange}
+                            placeholder="Write your lesson content here..."
+                            rows={15}
+                            className="w-full px-5 py-4 bg-slate-50 dark:bg-gray-800 rounded-xl border border-slate-200 dark:border-gray-700 focus:border-[#304DB5] focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all resize-y font-mono text-sm leading-relaxed"
+                        />
+                        <p className="text-xs text-slate-500 dark:text-dark-text-muted mt-2">
+                            This area will be upgraded to a Rich Text Editor in the future.
+                        </p>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-gray-700 mt-6">
+                        <button
+                            type="button"
+                            onClick={() => setView('list')}
+                            className="px-6 py-3 text-slate-700 dark:text-slate-300 font-medium rounded-full border border-slate-200 dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-700 transition-all"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleSave}
+                            className="px-8 py-3 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-semibold rounded-full hover:shadow-lg shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg>
+                            Save Lesson
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-xl overflow-hidden border border-slate-200 dark:border-gray-700">
+                    <div className="px-8 py-6 border-b border-slate-100 dark:border-gray-700 bg-slate-50/50 dark:bg-gray-800/50">
+                        <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            Student View Preview
+                        </div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary">
+                            {formData.title || "Untitled Lesson"}
+                        </h1>
+                    </div>
+
+                    <div className="p-8">
+                        {formData.content ? (
+                            <ContentBlockRenderer
+                                contentBlocks={[
+                                    {
+                                        id: 'preview-1',
+                                        type: 'text',
+                                        content: formData.content.replace(/\n/g, '<br />'),
+                                        position: 0
+                                    }
+                                ]}
+                            />
+                        ) : (
+                            <div className="text-center py-12 text-slate-400 italic border-2 border-dashed border-slate-100 dark:border-gray-700 rounded-xl">
+                                Start typing content to see a preview here...
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="px-8 py-4 bg-slate-50 dark:bg-gray-800 border-t border-slate-100 dark:border-gray-700 text-xs text-center text-slate-500">
+                        This is how your lesson will appear to students
+                    </div>
+                </div>
+            )}
         </div>
     );
 
