@@ -1,5 +1,6 @@
 # Devlog - January 29, 2026
 
+
 ## Branch: feat/course-detail-tabs-real-data
 
 ### Overview
