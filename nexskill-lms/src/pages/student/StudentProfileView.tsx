@@ -140,10 +140,10 @@ const StudentProfileView: React.FC = () => {
   const profileData = {
     name: `${profile.first_name} ${profile.last_name}`,
     headline: profile.headline || 'Student',
-    level: profile.current_skill_level || 'Intermediate',
+    level: profile.current_skill_level || null,  // <-- Allow null
     memberSince: new Date(profile.created_at).getFullYear().toString(),
-    streakDays: 12, // TODO: Implement streak tracking in database
-    bio: profile.bio || "I'm a career switcher passionate about creating user-centered digital experiences. Currently learning UI/UX design fundamentals and building my portfolio.",
+    streakDays: 12,
+    bio: profile.bio || "Tell us about yourself! Click 'Edit Profile' to get started.",
     interests: interests,
     goals: goals,
     completedCourses: 8, // TODO: Implement course tracking in database
