@@ -19,7 +19,6 @@ All 15 files have been successfully created and integrated.
 8. **LessonEditorPanel.tsx** - Modal for editing individual lessons
 9. **VideoUploadPanel.tsx** - Video upload dropzone component
 10. **ResourceUploadPanel.tsx** - Resource file management
-11. **QuizBuilderPanel.tsx** - Quiz question authoring interface
 12. **DripSchedulePanel.tsx** - Content release scheduling
 13. **CoursePricingForm.tsx** - Pricing configuration (free/one-time/subscription)
 14. **CoursePublishWorkflow.tsx** - Readiness checklist and publish controls

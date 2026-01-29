@@ -49,7 +49,7 @@ The project currently uses a "Soft-Modern" aesthetic that leans heavily into con
     -   **Course Builder (`CurriculumEditor.tsx`)**:
         -   **Visual Clutter**: Lesson rows are overcrowded with actions (Edit, Delete, Up/Down arrows) and metadata, leading to a "laundry list" feel.
         -   **Inconsistent Inputs**: Module titles use bordered inputs while lesson items use flat backgrounds, creating a mixed interaction language.
-    -   **Quiz Builder (`QuizBuilderPanel.tsx`)**:
+    -   **Quiz Builder**:
         -   **Information Density**: The "File Upload" configuration section is extremely dense, lacking proper whitespace between disparate configuration groups (max points vs. allowed types).
         -   **Hierarchy**: The question number (gradient circle) is visually heavier than the actual question content, distracting the user from the primary task.
     -   **Inconsistent Card Style**: [CoachDashboard](file:///Users/mackenziecerenio/Developer/Web/nexskill-lms/nexskill-lms/src/pages/coach/CoachDashboard.tsx) uses `shadow-xl` and `p-8` for the revenue card, while other cards use `shadow-md` and `p-6`.

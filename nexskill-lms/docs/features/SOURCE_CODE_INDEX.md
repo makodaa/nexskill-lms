@@ -585,7 +585,6 @@ Maintenance mode page.
 - `src/components/coach/CurriculumEditor.tsx` - Drag-and-drop curriculum editor
 - `src/components/coach/LessonEditorPanel.tsx` - Lesson content editor
 - `src/components/coach/VideoUploadPanel.tsx` - Video upload interface
-- `src/components/coach/QuizBuilderPanel.tsx` - Quiz creation tool
 - `src/components/coach/ResourceUploadPanel.tsx` - Resource file uploads
 - `src/components/coach/CoursePreviewPane.tsx` - Course preview
 - `src/components/coach/CourseSettingsForm.tsx` - Course settings form
