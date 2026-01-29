@@ -28,6 +28,13 @@ const CourseList: React.FC = () => {
         if (error) throw error;
 
         if (data) {
+          // DEBUG: Log feedback specifically for rejected/changes_requested courses
+          data.forEach((c: any) => {
+            if (c.verification_status === 'changes_requested' || c.verification_status === 'rejected') {
+              console.log(`[DEBUG] Feedback for ${c.title} (${c.id}):`, c.admin_verification_feedback);
+            }
+          });
+
           const mappedCourses = data.map((course: any) => {
             let status = 'draft';
 

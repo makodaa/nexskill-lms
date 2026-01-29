@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import CoachAppLayout from '../../layouts/CoachAppLayout';
 import { useUser } from '../../context/UserContext';
+import { supabase } from '../../lib/supabaseClient';
 
 // Dummy data
 const revenueData = {
@@ -17,9 +18,10 @@ const revenueData = {
   ],
 };
 
+
+
+
 const studentMetrics = {
-  activeStudents: 126,
-  newThisWeek: 14,
   averageRating: 4.8,
 };
 
@@ -54,44 +56,6 @@ const courses = [
   },
 ];
 
-const upcomingSessions = [
-  {
-    id: 1,
-    dateTime: 'Today, 2:00 PM',
-    studentName: 'Sarah Johnson',
-    sessionType: 'Portfolio review',
-    status: 'Confirmed',
-  },
-  {
-    id: 2,
-    dateTime: 'Tomorrow, 10:00 AM',
-    studentName: 'Michael Chen',
-    sessionType: 'Mock interview',
-    status: 'Confirmed',
-  },
-  {
-    id: 3,
-    dateTime: 'Dec 6, 3:30 PM',
-    studentName: 'Emily Rodriguez',
-    sessionType: 'Career planning',
-    status: 'Reschedule requested',
-  },
-  {
-    id: 4,
-    dateTime: 'Dec 7, 11:00 AM',
-    studentName: 'David Kim',
-    sessionType: 'Technical mentoring',
-    status: 'Confirmed',
-  },
-  {
-    id: 5,
-    dateTime: 'Dec 8, 4:00 PM',
-    studentName: 'Jessica Wang',
-    sessionType: 'Resume review',
-    status: 'Confirmed',
-  },
-];
-
 const aiShortcuts = [
   { id: 1, label: 'Generate lesson outline', icon: '📝' },
   { id: 2, label: 'Analyze quiz results', icon: '📊' },
@@ -101,6 +65,75 @@ const aiShortcuts = [
 
 const CoachDashboard: React.FC = () => {
   const { profile: currentUser } = useUser();
+  const [activeCoursesCount, setActiveCoursesCount] = useState(0);
+  const [activeStudentsCount, setActiveStudentsCount] = useState(0);
+  const [newEnrolleesCount, setNewEnrolleesCount] = useState(0);
+  const [upcomingSessions, setUpcomingSessions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+
+        // 1. Active Courses
+        const { count: courseCount, data: coursesData, error: courseError } = await supabase
+          .from('courses')
+          .select('id', { count: 'exact' })
+          .eq('coach_id', currentUser.id)
+          .eq('verification_status', 'approved');
+
+        if (courseError) throw courseError;
+        setActiveCoursesCount(courseCount || 0);
+
+        const courseIds = coursesData?.map(c => c.id) || [];
+
+
+        if (courseIds.length > 0) {
+          // 2. Active Students & 3. New Enrollees
+          const { data: enrollments, error: enrollError } = await supabase
+            .from('enrollments')
+            .select('profile_id, enrolled_at')
+            .in('course_id', courseIds);
+
+          if (enrollError) throw enrollError;
+
+          const uniqueStudents = new Set(enrollments?.map(e => e.profile_id));
+          setActiveStudentsCount(uniqueStudents.size);
+
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          const newEnrollments = enrollments?.filter(e => new Date(e.enrolled_at) > sevenDaysAgo);
+          setNewEnrolleesCount(newEnrollments?.length || 0);
+        }
+
+        // 4. Upcoming Sessions
+        // DEBUG: Relaxed filter to checked past sessions too, and added logs
+        console.log('Fetching sessions for coach:', currentUser.id);
+        const { data: sessions, error: sessionError } = await supabase
+          .from('live_sessions')
+          .select('*')
+          .eq('coach_id', currentUser.id)
+          // .gte('scheduled_at', new Date().toISOString()) // Commented out strict future filter for debug
+          .order('scheduled_at', { ascending: true }) // Ascending (oldest first) might bury future ones if there are many old ones, but limit is 5. 
+          .limit(10); // Increased limit
+
+        console.log('Sessions fetch result:', { sessions, sessionError });
+
+        if (sessionError) throw sessionError;
+        setUpcomingSessions(sessions || []);
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [currentUser]);
 
   const handleCourseClick = (courseName: string) => {
     window.alert(`📚 ${courseName}\n\n🎯 Quick Actions:\n• View course analytics\n• Edit course content\n• Manage students (24 enrolled)\n• View student feedback (4.8/5)\n• Update pricing or settings\n\n📊 Recent Activity:\n• 3 new enrollments today\n• 12 lessons completed\n• 5 student questions pending\n\nClick on course card to access full details.`);
@@ -135,12 +168,12 @@ const CoachDashboard: React.FC = () => {
             <div className="flex gap-3">
               <div className="px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-full border border-blue-200 dark:border-blue-800">
                 <span className="text-sm font-semibold text-[#304DB5] dark:text-blue-400">
-                  Active courses: {courses.length}
+                  Active courses: {loading ? '...' : activeCoursesCount}
                 </span>
               </div>
               <div className="px-4 py-2 bg-purple-50 dark:bg-purple-900/20 rounded-full border border-purple-200 dark:border-purple-800">
                 <span className="text-sm font-semibold text-purple-700 dark:text-purple-400">
-                  Active students: {studentMetrics.activeStudents}
+                  Active students: {loading ? '...' : activeStudentsCount}
                 </span>
               </div>
             </div>
@@ -154,7 +187,7 @@ const CoachDashboard: React.FC = () => {
             {/* Revenue Overview - Spans 2 columns */}
             <div className="lg:col-span-2 bg-white dark:bg-dark-background-card rounded-3xl shadow-xl p-8">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">Revenue</h2>
-              
+              <p className="text-sm text-slate-600 dark:text-dark-text-secondary">Average rating <span className="ml-2 text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-500 uppercase tracking-wider font-bold">Hard Coded</span></p>
               {/* Main KPI */}
               <div className="mb-6">
                 <div className="text-5xl font-bold text-[#304DB5] mb-2">
@@ -206,7 +239,7 @@ const CoachDashboard: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm text-slate-600 dark:text-dark-text-secondary">Active students</p>
-                    <p className="text-3xl font-bold text-[#304DB5]">{studentMetrics.activeStudents}</p>
+                    <p className="text-3xl font-bold text-[#304DB5]">{loading ? '...' : activeStudentsCount}</p>
                   </div>
                 </div>
               </div>
@@ -218,7 +251,7 @@ const CoachDashboard: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-sm text-slate-600 dark:text-dark-text-secondary">New this week</p>
-                    <p className="text-3xl font-bold text-green-600">{studentMetrics.newThisWeek}</p>
+                    <p className="text-3xl font-bold text-green-600">{loading ? '...' : newEnrolleesCount}</p>
                   </div>
                 </div>
               </div>
@@ -229,7 +262,7 @@ const CoachDashboard: React.FC = () => {
                     <span className="text-xl">⭐</span>
                   </div>
                   <div>
-                    <p className="text-sm text-slate-600 dark:text-dark-text-secondary">Average rating</p>
+                    <p className="text-sm text-slate-600 dark:text-dark-text-secondary">Average rating <span className="ml-2 text-[10px] bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-500 uppercase tracking-wider font-bold">Hard Coded</span></p>
                     <p className="text-3xl font-bold text-yellow-600">{studentMetrics.averageRating}</p>
                   </div>
                 </div>
@@ -239,7 +272,7 @@ const CoachDashboard: React.FC = () => {
 
           {/* Row 2: Course Performance */}
           <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">Course performance</h2>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">Course performance <span className="ml-3 text-xs bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded-full text-gray-500 uppercase tracking-wider font-bold align-middle">Hard Coded</span></h2>
             <div className="space-y-4">
               {courses.map((course) => (
                 <div
@@ -278,35 +311,42 @@ const CoachDashboard: React.FC = () => {
             <div className="bg-white dark:bg-dark-background-card rounded-2xl shadow-md p-6">
               <h2 className="text-2xl font-bold text-slate-900 dark:text-dark-text-primary mb-6">Upcoming coaching sessions</h2>
               <div className="space-y-4">
-                {upcomingSessions.map((session) => (
-                  <div
-                    key={session.id}
-                    className="p-4 border border-slate-200 dark:border-gray-700 rounded-xl hover:border-[#5E7BFF] transition-all"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <p className="text-sm font-semibold text-[#304DB5] mb-1">{session.dateTime}</p>
-                        <p className="text-lg font-semibold text-slate-900 dark:text-dark-text-primary">{session.studentName}</p>
-                        <p className="text-sm text-slate-600 dark:text-dark-text-secondary">{session.sessionType}</p>
-                      </div>
-                      <span
-                        className={`px-3 py-1 text-xs font-bold rounded-full ${
-                          session.status === 'Confirmed'
+                {upcomingSessions.length > 0 ? (
+                  upcomingSessions.map((session) => (
+                    <div
+                      key={session.id}
+                      className="p-4 border border-slate-200 dark:border-gray-700 rounded-xl hover:border-[#5E7BFF] transition-all"
+                    >
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <p className="text-sm font-semibold text-[#304DB5] mb-1">
+                            {new Date(session.scheduled_at).toLocaleDateString()} {new Date(session.scheduled_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                          <p className="text-lg font-semibold text-slate-900 dark:text-dark-text-primary">{session.title}</p>
+                          <p className="text-sm text-slate-600 dark:text-dark-text-secondary">{session.description || 'No description'}</p>
+                        </div>
+                        <span
+                          className={`px-3 py-1 text-xs font-bold rounded-full ${session.status === 'scheduled' || session.status === 'live'
                             ? 'bg-green-100 text-green-700'
                             : 'bg-orange-100 text-orange-700'
-                        }`}
+                            }`}
+                        >
+                          {session.status}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => handleSessionClick(session.id)}
+                        className="text-sm font-medium text-[#304DB5] hover:text-[#5E7BFF] transition-colors"
                       >
-                        {session.status}
-                      </span>
+                        View details →
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleSessionClick(session.id)}
-                      className="text-sm font-medium text-[#304DB5] hover:text-[#5E7BFF] transition-colors"
-                    >
-                      View details →
-                    </button>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-slate-500 dark:text-gray-400 bg-slate-50 dark:bg-gray-800 rounded-xl">
+                    <p>No upcoming sessions scheduled.</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
