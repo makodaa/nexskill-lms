@@ -4,13 +4,15 @@ import CoachAppLayout from '../../layouts/CoachAppLayout';
 import CourseTable from '../../components/coach/course-builder/CourseTable';
 import { useUser } from '../../context/UserContext';
 import { supabase } from '../../lib/supabaseClient';
-import type { Course } from '../../types/db';
+import DeleteCourseModal from '../../components/courses/DeleteCourseModal';
 
 const CourseList: React.FC = () => {
   const navigate = useNavigate();
   const { profile } = useUser();
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<{ id: string; title: string } | null>(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
@@ -19,7 +21,7 @@ const CourseList: React.FC = () => {
       try {
         const { data, error } = await supabase
           .from('courses')
-          .select('*') // Make sure verification_status is selected
+          .select('*, admin_verification_feedback(content, created_at, is_resolved), modules(id, module_content_items(count))')
           .eq('coach_id', profile.id)
           .order('created_at', { ascending: false });
 
@@ -41,13 +43,29 @@ const CourseList: React.FC = () => {
               status = 'draft';
             }
 
+            // Get latest feedback if exists
+            const feedbacks = course.admin_verification_feedback;
+            const latestFeedback = feedbacks && feedbacks.length > 0
+              ? feedbacks.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]
+              : null;
+
+            // Calculate module and lesson counts
+            const moduleCount = course.modules?.length || 0;
+            const lessonCount = course.modules?.reduce((sum: number, m: any) => {
+              const count = m.module_content_items?.[0]?.count || 0;
+              return sum + count;
+            }, 0) || 0;
+
             return {
               id: course.id,
               title: course.title,
               status: status,
               enrolledStudents: 0, // Placeholder
+              moduleCount,
+              lessonCount,
               rating: 0, // Placeholder
               lastUpdated: new Date(course.updated_at).toLocaleDateString(),
+              adminFeedback: latestFeedback
             };
           });
           setCourses(mappedCourses);
@@ -72,6 +90,35 @@ const CourseList: React.FC = () => {
 
   const handleCreateNew = () => {
     navigate('/coach/courses/new');
+  };
+
+  const handleDeleteClick = (courseId: string) => {
+    const course = courses.find((c) => c.id === courseId);
+    if (course) {
+      setCourseToDelete({ id: course.id, title: course.title });
+      setDeleteModalOpen(true);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!courseToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('courses')
+        .delete()
+        .eq('id', courseToDelete.id);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setCourses(courses.filter((c) => c.id !== courseToDelete.id));
+      setDeleteModalOpen(false);
+      setCourseToDelete(null);
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      alert('Failed to delete course. Please try again.');
+    }
   };
 
   return (
@@ -128,10 +175,22 @@ const CourseList: React.FC = () => {
           {loading ? (
             <div className="text-center py-8">Loading courses...</div>
           ) : (
-            <CourseTable courses={courses} onEdit={handleEdit} onPreview={handlePreview} />
+            <CourseTable
+              courses={courses}
+              onEdit={handleEdit}
+              onPreview={handlePreview}
+              onDelete={handleDeleteClick}
+            />
           )}
         </div>
       </div>
+
+      <DeleteCourseModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        courseName={courseToDelete?.title || ''}
+      />
     </CoachAppLayout>
   );
 };

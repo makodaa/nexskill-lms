@@ -16,10 +16,7 @@ import {
     FileQuestion,
 } from "lucide-react";
 import type { Lesson } from "../../../types/lesson";
-import type { Quiz } from "../../../types/quiz";
-
-// Define a union type for content items
-type ContentItem = Lesson | Quiz;
+import type { ContentItem } from "../../../types/content-item";
 
 interface Module {
     id: string;
@@ -47,6 +44,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
     curriculum,
     onChange,
     onEditLesson,
+    onEditQuiz,
     onAddQuiz,
     onAddLesson,
     onDeleteLesson,
@@ -101,8 +99,6 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
         // Find the module to get the lesson count
         const module = curriculum.find((m) => m.id === moduleId);
 
-        // Create a temporary lesson object with a placeholder ID
-        // The actual ID will be generated in the CourseBuilder when saving to DB
         const newLesson: Lesson = {
             id: "", // Will be replaced with UUID in CourseBuilder
             title: `Lesson ${(module?.lessons?.length ?? 0) + 1}`,
@@ -127,7 +123,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
                 if (module.id === moduleId) {
                     return {
                         ...module,
-                        lessons: [...module.lessons, lessonWithTempId],
+                        lessons: [...module.lessons, { ...lessonWithTempId, type: 'lesson' } as ContentItem],
                     };
                 }
                 return module;
@@ -203,7 +199,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
     // Calculate content block statistics for a lesson
     const getContentStats = (item: ContentItem) => {
         // If it's a quiz, return empty stats or quiz-specific stats
-        if ('instructions' in item) {
+        if (item.type === 'quiz') {
             // This is a quiz
             return [{
                 label: 'Quiz',
@@ -213,7 +209,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
         }
 
         // If it's a lesson, calculate stats normally
-        const lesson = item as Lesson;
+        const lesson = item as unknown as Lesson; // Cast to Lesson for content_blocks access if properties differ strictly
         const blocks = lesson.content_blocks || [];
         const stats: { label: string; icon: React.ReactNode; count: number }[] =
             [];
@@ -336,11 +332,10 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
                                     }
                                 >
                                     <ChevronRight
-                                        className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform duration-200 ${
-                                            expandedModules.has(module.id)
-                                                ? "rotate-90"
-                                                : ""
-                                        }`}
+                                        className={`w-5 h-5 text-gray-600 dark:text-gray-400 transition-transform duration-200 ${expandedModules.has(module.id)
+                                            ? "rotate-90"
+                                            : ""
+                                            }`}
                                     />
                                 </button>
 
@@ -464,7 +459,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
                                                                         module
                                                                             .lessons
                                                                             .length -
-                                                                            1
+                                                                        1
                                                                     }
                                                                     className="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 rounded disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                                                                     aria-label="Move item down"
@@ -490,47 +485,47 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
                                                                 {/* Content Statistics */}
                                                                 {contentStats.length >
                                                                     0 && (
-                                                                    <div className="flex items-center gap-2 flex-wrap">
-                                                                        {contentStats.map(
-                                                                            (
-                                                                                stat,
-                                                                                idx
-                                                                            ) => (
-                                                                                <React.Fragment
-                                                                                    key={
-                                                                                        idx
-                                                                                    }
-                                                                                >
-                                                                                    {idx >
-                                                                                        0 && (
-                                                                                        <span className="text-gray-300 dark:text-gray-600">
-                                                                                            •
-                                                                                        </span>
-                                                                                    )}
-                                                                                    <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
-                                                                                        {
-                                                                                            stat.icon
+                                                                        <div className="flex items-center gap-2 flex-wrap">
+                                                                            {contentStats.map(
+                                                                                (
+                                                                                    stat,
+                                                                                    idx
+                                                                                ) => (
+                                                                                    <React.Fragment
+                                                                                        key={
+                                                                                            idx
                                                                                         }
-                                                                                        <span>
+                                                                                    >
+                                                                                        {idx >
+                                                                                            0 && (
+                                                                                                <span className="text-gray-300 dark:text-gray-600">
+                                                                                                    •
+                                                                                                </span>
+                                                                                            )}
+                                                                                        <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-gray-400">
                                                                                             {
-                                                                                                stat.label
+                                                                                                stat.icon
                                                                                             }
-                                                                                        </span>
-                                                                                    </div>
-                                                                                </React.Fragment>
-                                                                            )
-                                                                        )}
-                                                                    </div>
-                                                                )}
+                                                                                            <span>
+                                                                                                {
+                                                                                                    stat.label
+                                                                                                }
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </React.Fragment>
+                                                                                )
+                                                                            )}
+                                                                        </div>
+                                                                    )}
 
                                                                 {contentStats.length ===
                                                                     0 && (
-                                                                    <p className="text-xs text-gray-500 dark:text-gray-500 italic">
-                                                                        No
-                                                                        content
-                                                                        yet
-                                                                    </p>
-                                                                )}
+                                                                        <p className="text-xs text-gray-500 dark:text-gray-500 italic">
+                                                                            No
+                                                                            content
+                                                                            yet
+                                                                        </p>
+                                                                    )}
                                                             </div>
 
                                                             {/* Actions */}
@@ -538,7 +533,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
                                                                 <button
                                                                     onClick={() => {
                                                                         // Check if the item is a quiz or lesson
-                                                                        if ('instructions' in item) {
+                                                                        if (item.type === 'quiz') {
                                                                             // This is a quiz
                                                                             if (onEditQuiz) {
                                                                                 onEditQuiz(module.id, item.id);

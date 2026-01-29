@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient';
 import type { LiveSession } from '../types/db';
 import { useAuth } from '../context/AuthContext';
 
-export const useLiveSessions = () => {
+export const useLiveSessions = (courseId?: string) => {
     const { user } = useAuth();
     const [sessions, setSessions] = useState<LiveSession[]>([]);
     const [loading, setLoading] = useState(true);
@@ -16,25 +16,30 @@ export const useLiveSessions = () => {
             setLoading(true);
             setError(null);
 
-            // 1. Get enrolled course IDs
-            const { data: enrollments, error: enrollmentError } = await supabase
-                .from('enrollments')
-                .select('course_id')
-                .eq('profile_id', user.id);
+            let targetCourseIds: string[] = [];
 
-            if (enrollmentError) throw enrollmentError;
+            if (courseId) {
+                // If courseId is provided, filter by it directly (Coach view)
+                targetCourseIds = [courseId];
+            } else {
+                // 1. Get enrolled course IDs (Student view dashboard)
+                const { data: enrollments, error: enrollmentError } = await supabase
+                    .from('enrollments')
+                    .select('course_id')
+                    .eq('profile_id', user.id);
 
-            const courseIds = enrollments.map(e => e.course_id);
+                if (enrollmentError) throw enrollmentError;
 
-            // If no enrollments, return empty
-            if (courseIds.length === 0) {
+                targetCourseIds = enrollments.map(e => e.course_id);
+            }
+
+            // If no courses to check, return empty
+            if (targetCourseIds.length === 0) {
                 setSessions([]);
                 return;
             }
 
             // 2. Fetch live sessions for these courses
-            // explicit foreign key syntax might be needed if multiple relations exist
-            // Assuming live_sessions.coach_id -> profiles.id and live_sessions.course_id -> courses.id
             const { data, error: sessionError } = await supabase
                 .from('live_sessions')
                 .select(`
@@ -49,11 +54,10 @@ export const useLiveSessions = () => {
                         username
                     )
                 `)
-                .in('course_id', courseIds)
+                .in('course_id', targetCourseIds)
                 .order('scheduled_at', { ascending: true });
 
             if (sessionError) {
-                // strict mode for foreign keys might fail if name is different
                 console.error('Supabase session fetch error:', sessionError);
                 throw sessionError;
             }
@@ -74,22 +78,64 @@ export const useLiveSessions = () => {
         } finally {
             setLoading(false);
         }
-    }, [user]);
+    }, [user, courseId]);
 
     useEffect(() => {
         fetchSessions();
     }, [fetchSessions]);
 
+    const createSession = async (sessionData: Partial<LiveSession>) => {
+        try {
+            const { error: createError } = await supabase
+                .from('live_sessions')
+                .insert([sessionData]);
+
+            if (createError) throw createError;
+            await fetchSessions();
+        } catch (err: any) {
+            console.error('Error creating session:', err);
+            throw err;
+        }
+    };
+
+    const updateSession = async (sessionId: string, updates: Partial<LiveSession>) => {
+        try {
+            const { error: updateError } = await supabase
+                .from('live_sessions')
+                .update(updates)
+                .eq('id', sessionId);
+
+            if (updateError) throw updateError;
+            await fetchSessions();
+        } catch (err: any) {
+            console.error('Error updating session:', err);
+            throw err;
+        }
+    };
+
+    const deleteSession = async (sessionId: string) => {
+        try {
+            const { error: deleteError } = await supabase
+                .from('live_sessions')
+                .delete()
+                .eq('id', sessionId);
+
+            if (deleteError) throw deleteError;
+            await fetchSessions();
+        } catch (err: any) {
+            console.error('Error deleting session:', err);
+            throw err;
+        }
+    };
+
     const upcomingSessions = sessions.filter(s =>
         (s.status === 'scheduled' || s.status === 'in_progress' || s.status === 'live') &&
-        !s.recording_url // If it has recording, it might move to recorded even if scheduled in past? 
-        // Better: scheduled in future OR is live
+        !s.recording_url
     ).sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime());
 
-    // Actually, "Completed" tab usually means past sessions.
     const completedSessions = sessions.filter(s =>
         s.status === 'completed' || s.status === 'cancelled'
-    ).sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime()); // Newest first
+    ).sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime());
 
     const recordedSessions = sessions.filter(s =>
         s.recording_url && s.recording_url.length > 0
@@ -102,7 +148,10 @@ export const useLiveSessions = () => {
         recordedSessions,
         loading,
         error,
-        refresh: fetchSessions
+        refresh: fetchSessions,
+        createSession,
+        updateSession,
+        deleteSession
     };
 };
 

@@ -9,6 +9,7 @@ interface CheckItem {
 interface CoursePublishWorkflowProps {
   courseStatus: 'draft' | 'published';
   verificationStatus: string;
+  adminFeedback?: string;
   onPublish: () => void;
   onUnpublish: () => void;
   onSubmitForReview: () => void;
@@ -17,6 +18,7 @@ interface CoursePublishWorkflowProps {
 const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
   courseStatus,
   verificationStatus,
+  adminFeedback,
   onPublish,
   onUnpublish,
   onSubmitForReview,
@@ -57,9 +59,9 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
 
       {/* Verification Status */}
       <div className={`mb-6 p-4 rounded-2xl border ${badge.bg}`}>
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{badge.icon}</span>
-          <div>
+        <div className="flex items-start gap-3">
+          <span className="text-2xl mt-1">{badge.icon}</span>
+          <div className="flex-1">
             <p className="font-semibold text-slate-900">Verification Status</p>
             <p className={`text-sm capitalize ${badge.color}`}>{badge.text}</p>
           </div>
@@ -113,7 +115,7 @@ const CoursePublishWorkflow: React.FC<CoursePublishWorkflowProps> = ({
       <div className="space-y-3">
         {verificationStatus !== 'approved' && verificationStatus !== 'pending_review' && (
           <div className="space-y-4">
-            {verificationStatus === 'changes_requested' && (
+            {(verificationStatus === 'changes_requested' || verificationStatus === 'rejected') && (
               <div className="bg-amber-50 text-amber-800 p-4 rounded-xl text-sm border border-amber-200">
                 <strong>Wait!</strong> Have you addressed all the feedback? Once you resubmit, the admin will be notified.
               </div>

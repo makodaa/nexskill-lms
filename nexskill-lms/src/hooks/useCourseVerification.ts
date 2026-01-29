@@ -57,7 +57,7 @@ interface UseCourseVerificationReturn {
     error: string | null;
     addFeedback: (lessonId: string | null, content: string) => Promise<void>;
     resolveFeedback: (feedbackId: string) => Promise<void>;
-    updateVerificationStatus: (status: CourseVerificationStatus) => Promise<void>;
+    updateVerificationStatus: (status: CourseVerificationStatus, feedback?: string) => Promise<void>;
     refetch: () => Promise<void>;
 }
 
@@ -203,13 +203,17 @@ export const useCourseVerification = (courseId: string | undefined): UseCourseVe
         }
     };
 
-    const updateVerificationStatus = async (status: CourseVerificationStatus) => {
+    const updateVerificationStatus = async (status: CourseVerificationStatus, feedback?: string) => {
         if (!courseId) return;
 
         try {
+            const updates: any = { verification_status: status };
+            // admin_feedback column does not exist on courses table, so we don't update it.
+            // Feedback is stored in admin_verification_feedback table via addFeedback.
+
             const { error: updateError } = await supabase
                 .from('courses')
-                .update({ verification_status: status })
+                .update(updates)
                 .eq('id', courseId);
 
             if (updateError) throw updateError;

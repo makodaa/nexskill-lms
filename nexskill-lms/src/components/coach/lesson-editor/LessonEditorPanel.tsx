@@ -15,6 +15,7 @@ import {
     Eye,
     EyeOff,
     MonitorPlay,
+    File,
 } from "lucide-react";
 import LessonPreview from "./LessonPreview";
 import LessonHeader from "./LessonHeader";
@@ -349,6 +350,7 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                             icon: Video,
                                             label: "Video",
                                         },
+                                        document: { icon: File, label: "Document" },
                                     };
                                     const blockConfig = config[block.type] || {
                                         icon: FileText,
@@ -1060,6 +1062,17 @@ const LessonEditorPanel: React.FC<LessonEditorPanelProps> = ({
                                                             rows={6}
                                                             className="w-full px-4 py-4 bg-gray-900 text-gray-300 rounded-xl border border-gray-800 focus:border-gray-700 focus:ring-0 font-mono text-sm leading-relaxed resize-y"
                                                             spellCheck={false}
+                                                        />
+                                                    </div>
+                                                ) : block.type === "document" ? (
+                                                    <div className="space-y-4">
+                                                        <MediaUploader
+                                                            resourceType="document"
+                                                            currentUrl={block.content}
+                                                            currentMetadata={block.attributes?.media_metadata}
+                                                            onUploadComplete={(metadata) =>
+                                                                handleMediaUpload(block.id, metadata)
+                                                            }
                                                         />
                                                     </div>
                                                 ) : (

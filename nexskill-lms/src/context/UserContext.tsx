@@ -175,22 +175,51 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
     );
 
     const getDefaultRoute = useCallback(async (): Promise<string> => {
-        if (!profile) return "/login";
+        // Retry mechanism to wait for profile if it's null but user might be logged in
+        let currentProfile = profile;
+        if (!currentProfile) {
+            // Wait a moment and try fetching again if not loaded
+            // loops max 5 times (500ms total)
+            for (let i = 0; i < 5; i++) {
+                await new Promise(r => setTimeout(r, 100));
+                if (profile) {
+                    currentProfile = profile;
+                    break;
+                }
+                // If not in state, try checking supabase session directly as fallback?
+                // Actually fetchProfile updates state.
+            }
+        }
+
+        // Final check
+        if (!currentProfile) {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                // Force fetch if user exists but profile doesnt
+                // We can try one-off fetch here to be sure
+                const { data } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+                if (data && data.role) {
+                    const mappedRole = mapStringToRole(data.role);
+                    if (mappedRole) return defaultLandingRouteByRole[mappedRole];
+                }
+            }
+            return "/login";
+        }
 
         // Check if user is a student AND hasn't completed onboarding
-        if (profile.role === 'STUDENT') {
+        if (currentProfile.role === 'STUDENT') {
             try {
                 // Fetch student_profile to check if onboarding fields are filled
                 const { data: studentProfile, error } = await supabase
                     .from('student_profiles')
                     .select('current_skill_level')
-                    .eq('user_id', profile.id)
+                    .eq('user_id', currentProfile.id)
                     .maybeSingle();
 
                 if (error) {
                     console.error('Error checking student profile:', error);
                     // If there's an error, just go to default route
-                    return defaultLandingRouteByRole[profile.role];
+                    return defaultLandingRouteByRole[currentProfile.role];
                 }
 
                 // Check if student_profile exists and has onboarding data
@@ -203,7 +232,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
             }
         }
 
-        return defaultLandingRouteByRole[profile.role];
+        return defaultLandingRouteByRole[currentProfile.role];
     }, [profile]);
     const switchRole = useCallback((role: UserRole) => {
         if (!profile) return;

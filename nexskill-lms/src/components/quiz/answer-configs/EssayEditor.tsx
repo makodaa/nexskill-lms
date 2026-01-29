@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback, useRef } from "react";
 import type { EssayConfig } from "../../../types/quiz";
 
 interface EssayEditorProps {
@@ -7,6 +7,69 @@ interface EssayEditorProps {
 }
 
 const EssayEditor: React.FC<EssayEditorProps> = ({ config, onChange }) => {
+    // Use refs to track focus state to avoid overwriting during active editing
+    const minWordsFocusedRef = useRef(false);
+    const maxWordsFocusedRef = useRef(false);
+    const rubricFocusedRef = useRef(false);
+
+    // Local state for all input fields to prevent re-renders on every keystroke
+    const [localMinWords, setLocalMinWords] = useState<string>(
+        config.min_words?.toString() || ""
+    );
+    const [localMaxWords, setLocalMaxWords] = useState<string>(
+        config.max_words?.toString() || ""
+    );
+    const [localRubric, setLocalRubric] = useState(config.rubric || "");
+
+    // Display values: use local state when focused, parent state when not focused
+    const displayMinWords = minWordsFocusedRef.current
+        ? localMinWords
+        : config.min_words?.toString() || "";
+    const displayMaxWords = maxWordsFocusedRef.current
+        ? localMaxWords
+        : config.max_words?.toString() || "";
+    const displayRubric = rubricFocusedRef.current
+        ? localRubric
+        : config.rubric || "";
+
+    const handleMinWordsFocus = useCallback(() => {
+        minWordsFocusedRef.current = true;
+        setLocalMinWords(config.min_words?.toString() || "");
+    }, [config.min_words]);
+
+    const handleMinWordsBlur = useCallback(() => {
+        minWordsFocusedRef.current = false;
+        const newValue = localMinWords ? parseInt(localMinWords) : undefined;
+        if (newValue !== config.min_words) {
+            onChange({ ...config, min_words: newValue });
+        }
+    }, [localMinWords, config, onChange]);
+
+    const handleMaxWordsFocus = useCallback(() => {
+        maxWordsFocusedRef.current = true;
+        setLocalMaxWords(config.max_words?.toString() || "");
+    }, [config.max_words]);
+
+    const handleMaxWordsBlur = useCallback(() => {
+        maxWordsFocusedRef.current = false;
+        const newValue = localMaxWords ? parseInt(localMaxWords) : undefined;
+        if (newValue !== config.max_words) {
+            onChange({ ...config, max_words: newValue });
+        }
+    }, [localMaxWords, config, onChange]);
+
+    const handleRubricFocus = useCallback(() => {
+        rubricFocusedRef.current = true;
+        setLocalRubric(config.rubric || "");
+    }, [config.rubric]);
+
+    const handleRubricBlur = useCallback(() => {
+        rubricFocusedRef.current = false;
+        if (localRubric !== (config.rubric || "")) {
+            onChange({ ...config, rubric: localRubric });
+        }
+    }, [localRubric, config, onChange]);
+
     return (
         <div className="space-y-4">
             <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -22,15 +85,10 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ config, onChange }) => {
                     </label>
                     <input
                         type="number"
-                        value={config.min_words || ""}
-                        onChange={(e) =>
-                            onChange({
-                                ...config,
-                                min_words: e.target.value
-                                    ? parseInt(e.target.value)
-                                    : undefined,
-                            })
-                        }
+                        value={displayMinWords}
+                        onChange={(e) => setLocalMinWords(e.target.value)}
+                        onFocus={handleMinWordsFocus}
+                        onBlur={handleMinWordsBlur}
                         min={0}
                         placeholder="Optional"
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
@@ -43,15 +101,10 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ config, onChange }) => {
                     </label>
                     <input
                         type="number"
-                        value={config.max_words || ""}
-                        onChange={(e) =>
-                            onChange({
-                                ...config,
-                                max_words: e.target.value
-                                    ? parseInt(e.target.value)
-                                    : undefined,
-                            })
-                        }
+                        value={displayMaxWords}
+                        onChange={(e) => setLocalMaxWords(e.target.value)}
+                        onFocus={handleMaxWordsFocus}
+                        onBlur={handleMaxWordsBlur}
                         min={0}
                         placeholder="Optional"
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
@@ -64,10 +117,10 @@ const EssayEditor: React.FC<EssayEditorProps> = ({ config, onChange }) => {
                     Grading Rubric
                 </label>
                 <textarea
-                    value={config.rubric || ""}
-                    onChange={(e) =>
-                        onChange({ ...config, rubric: e.target.value })
-                    }
+                    value={displayRubric}
+                    onChange={(e) => setLocalRubric(e.target.value)}
+                    onFocus={handleRubricFocus}
+                    onBlur={handleRubricBlur}
                     placeholder="Define the criteria for grading this essay..."
                     rows={6}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"

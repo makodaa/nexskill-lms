@@ -316,11 +316,7 @@ const CourseSettingsForm: React.FC<CourseSettingsFormProps> = ({ settings, onCha
               <p className="text-sm text-red-700">Once deleted, it cannot be recovered.</p>
             </div>
             <button
-              onClick={() => {
-                if (window.confirm('Are you sure you want to delete this course? This action cannot be undone.')) {
-                  onDelete();
-                }
-              }}
+              onClick={onDelete}
               className="px-4 py-2 bg-white border border-red-200 text-red-600 font-semibold rounded-lg hover:bg-red-50 hover:border-red-300 transition-colors"
             >
               Delete Course

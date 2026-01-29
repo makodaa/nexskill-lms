@@ -13,6 +13,8 @@ export default {
           'primary-light': '#5E7BFF',
           'primary-soft': '#E0E5FF',
           'primary-dark': '#152457',
+          neon: '#39FF14',
+          electric: '#007BFF',
         },
         background: {
           'app-outer': '#E8ECFD',
