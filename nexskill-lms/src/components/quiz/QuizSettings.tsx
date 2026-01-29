@@ -103,7 +103,7 @@ const QuizSettings: React.FC<QuizSettingsProps> = ({ quiz, onChange }) => {
                             </label>
                             <input
                                 type="number"
-                                value={quiz.late_penalty_percent}
+                                value={quiz.late_penalty_percent || ""}
                                 onChange={(e) =>
                                     onChange({
                                         late_penalty_percent:
@@ -125,16 +125,37 @@ const QuizSettings: React.FC<QuizSettingsProps> = ({ quiz, onChange }) => {
                             </label>
                             <input
                                 type="datetime-local"
-                                value={quiz.available_from?.slice(0, 16) || ""}
-                                onChange={(e) =>
-                                    onChange({
-                                        available_from: e.target.value
-                                            ? new Date(
-                                                  e.target.value
-                                              ).toISOString()
-                                            : undefined,
-                                    })
+                                value={
+                                    quiz.available_from
+                                        ? (() => {
+                                            const date = new Date(
+                                                quiz.available_from
+                                            );
+                                            const pad = (num: number) =>
+                                                num.toString().padStart(2, "0");
+                                            const year = date.getFullYear();
+                                            const month = pad(
+                                                date.getMonth() + 1
+                                            );
+                                            const day = pad(date.getDate());
+                                            const hours = pad(date.getHours());
+                                            const minutes = pad(
+                                                date.getMinutes()
+                                            );
+                                            return `${year}-${month}-${day}T${hours}:${minutes}`;
+                                        })()
+                                        : ""
                                 }
+                                onChange={(e) => {
+                                    if (!e.target.value) {
+                                        onChange({ available_from: undefined });
+                                        return;
+                                    }
+                                    const date = new Date(e.target.value);
+                                    onChange({
+                                        available_from: date.toISOString(),
+                                    });
+                                }}
                                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                             />
                         </div>
@@ -145,16 +166,37 @@ const QuizSettings: React.FC<QuizSettingsProps> = ({ quiz, onChange }) => {
                             </label>
                             <input
                                 type="datetime-local"
-                                value={quiz.due_date?.slice(0, 16) || ""}
-                                onChange={(e) =>
-                                    onChange({
-                                        due_date: e.target.value
-                                            ? new Date(
-                                                  e.target.value
-                                              ).toISOString()
-                                            : undefined,
-                                    })
+                                value={
+                                    quiz.due_date
+                                        ? (() => {
+                                            const date = new Date(
+                                                quiz.due_date
+                                            );
+                                            const pad = (num: number) =>
+                                                num.toString().padStart(2, "0");
+                                            const year = date.getFullYear();
+                                            const month = pad(
+                                                date.getMonth() + 1
+                                            );
+                                            const day = pad(date.getDate());
+                                            const hours = pad(date.getHours());
+                                            const minutes = pad(
+                                                date.getMinutes()
+                                            );
+                                            return `${year}-${month}-${day}T${hours}:${minutes}`;
+                                        })()
+                                        : ""
                                 }
+                                onChange={(e) => {
+                                    if (!e.target.value) {
+                                        onChange({ due_date: undefined });
+                                        return;
+                                    }
+                                    const date = new Date(e.target.value);
+                                    onChange({
+                                        due_date: date.toISOString(),
+                                    });
+                                }}
                                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white"
                             />
                         </div>

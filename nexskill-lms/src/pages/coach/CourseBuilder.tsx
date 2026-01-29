@@ -601,7 +601,10 @@ const CourseBuilder: React.FC = () => {
   const handleSaveQuiz = async (updatedQuiz: Quiz) => {
     if (!editingQuiz || !updatedQuiz.id) return;
     try {
-      const { error } = await supabase.from("quizzes").upsert(updatedQuiz, { onConflict: "id" });
+      // Sanitize payload: Remove 'type' or other UI-only props that might have crept in
+      const { type, ...quizDataToSave } = updatedQuiz as any;
+
+      const { error } = await supabase.from("quizzes").upsert(quizDataToSave, { onConflict: "id" });
       if (error) throw error;
 
       await supabase.from("module_content_items").update({ is_published: updatedQuiz.is_published })
@@ -614,29 +617,53 @@ const CourseBuilder: React.FC = () => {
       ));
       setEditingQuiz({ ...editingQuiz, quiz: updatedQuiz });
     } catch (err) {
+      console.error("Error saving quiz:", err);
       alert("Error saving quiz");
     }
   };
 
   const handleSaveQuizQuestions = async (updatedQuestions: QuizQuestion[]) => {
     if (!editingQuiz) return;
+
+    // Immediate UI update to prevent lag/focus loss
+    setEditingQuiz({ ...editingQuiz, questions: updatedQuestions });
+
     if (saveQuizQuestionsTimeoutRef.current) clearTimeout(saveQuizQuestionsTimeoutRef.current);
 
     saveQuizQuestionsTimeoutRef.current = setTimeout(async () => {
       try {
-        await supabase.from("quiz_questions").delete().eq("quiz_id", editingQuiz.quiz.id);
+        // Use upsert to update existing questions or insert new ones without changing IDs
+        // This preserves the stable identity of questions
+        const questionsToSave = updatedQuestions.map((q, index) => ({
+          ...q,
+          quiz_id: editingQuiz.quiz.id,
+          position: index
+        }));
 
-        for (let i = 0; i < updatedQuestions.length; i++) {
-          const { id, ...questionWithoutId } = updatedQuestions[i];
-          await supabase.from("quiz_questions").insert({ ...questionWithoutId, quiz_id: editingQuiz.quiz.id, position: i });
+        const { error } = await supabase.from("quiz_questions").upsert(questionsToSave, { onConflict: 'id' });
+
+        if (error) throw error;
+
+        // Identify deleted questions
+        // This is a naive check: anything in DB for this quiz NOT in our list should be deleted
+        // For robustness, we might want to do this differently, but for now let's stick to upsert for stability.
+        // If we strictly need to handle deletions here without the delete-all approach:
+        const currentIds = updatedQuestions.map(q => q.id).filter(Boolean);
+        if (currentIds.length > 0) {
+          await supabase.from("quiz_questions").delete()
+            .eq('quiz_id', editingQuiz.quiz.id)
+            .not('id', 'in', `(${currentIds.join(',')})`);
+        } else if (updatedQuestions.length === 0) {
+          await supabase.from("quiz_questions").delete().eq('quiz_id', editingQuiz.quiz.id);
         }
 
-        const { data: newQuestions } = await supabase.from("quiz_questions").select("*").eq("quiz_id", editingQuiz.quiz.id).order("position", { ascending: true });
-        if (newQuestions) setEditingQuiz({ ...editingQuiz, questions: newQuestions });
+        // CRITICAL: Do NOT re-fetch and setEditingQuiz here. 
+        // That causes the focus loss/UI reset loop. 
+        // The local state is already the source of truth for the editor session.
       } catch (err) {
-        alert("Error saving quiz questions");
+        console.error("Error saving quiz questions:", err);
       }
-    }, 500);
+    }, 1000); // Increased debounce to 1s
   };
 
   const handleCloseQuizEditor = () => setEditingQuiz(null);
@@ -751,8 +778,7 @@ const CourseBuilder: React.FC = () => {
             courseTitle={settings.title}
             courseSubtitle={settings.subtitle}
             courseDescription={settings.longDescription}
-            instructorName={instructorName}
-            learningObjectives={settings.learningObjectives}
+            instructorName="Your Name"
           />
         );
       default:
