@@ -20,9 +20,7 @@ import { supabase } from "../../lib/supabaseClient";
 type SectionKey =
     | "settings"
     | "curriculum"
-    | "lessons"
     | "live-sessions"
-    | "quizzes"
     | "drip"
     | "pricing"
     | "publish"
@@ -77,6 +75,7 @@ const CourseBuilder: React.FC = () => {
     const [courseStatus, setCourseStatus] = useState<"draft" | "published">(
         "draft"
     );
+    const [verificationStatus, setVerificationStatus] = useState<string>("draft");
 
     // Settings state
     const [settings, setSettings] = useState<CourseSettings>({
@@ -125,6 +124,9 @@ const CourseBuilder: React.FC = () => {
                             (ct: any) => ct.topic_id
                         ) || [],
                 }));
+                
+                setCourseStatus(courseData.is_published ? "published" : "draft");
+                setVerificationStatus(courseData.verification_status || "draft");
 
                 // Fetch modules and their associated lessons
                 const { data: modulesData, error: modulesError } =
@@ -1236,6 +1238,7 @@ const CourseBuilder: React.FC = () => {
                         settings={settings}
                         onChange={setSettings}
                         onSave={handleSaveSettings}
+                        onDelete={handleDeleteCourse}
                     />
                 );
             case "curriculum":
@@ -1251,44 +1254,8 @@ const CourseBuilder: React.FC = () => {
                         onMoveLesson={handleMoveLesson}
                     />
                 );
-            case "lessons":
-                return (
-                    <div className="text-center py-16">
-                        <div className="text-6xl mb-4">🎬</div>
-                        <p className="text-xl font-semibold text-slate-900 dark:text-dark-text-primary mb-2">
-                            Lesson content
-                        </p>
-                        <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
-                            Edit individual lessons from the Curriculum section
-                        </p>
-                        <button
-                            onClick={() => setActiveSection("curriculum")}
-                            className="px-6 py-3 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-semibold rounded-full hover:shadow-lg transition-all"
-                        >
-                            Go to Curriculum
-                        </button>
-                    </div>
-                );
             case "live-sessions":
                 return <LiveSessionManager />;
-            case "quizzes":
-                return (
-                    <div className="text-center py-16">
-                        <div className="text-6xl mb-4">📝</div>
-                        <p className="text-xl font-semibold text-slate-900 dark:text-dark-text-primary mb-2">
-                            Quiz management
-                        </p>
-                        <p className="text-slate-600 dark:text-dark-text-secondary mb-6">
-                            Manage quizzes from the Curriculum section
-                        </p>
-                        <button
-                            onClick={() => setActiveSection("curriculum")}
-                            className="px-6 py-3 bg-gradient-to-r from-[#304DB5] to-[#5E7BFF] text-white font-semibold rounded-full hover:shadow-lg transition-all"
-                        >
-                            Go to Curriculum
-                        </button>
-                    </div>
-                );
             case "drip":
                 return <DripSchedulePanel modules={drip} onChange={setDrip} />;
             case "pricing":
@@ -1304,6 +1271,8 @@ const CourseBuilder: React.FC = () => {
                         courseStatus={courseStatus}
                         onPublish={handlePublish}
                         onUnpublish={handleUnpublish}
+                        verificationStatus={verificationStatus}
+                        onSubmitForReview={handleSubmitForReview}
                     />
                 );
             case "preview":
@@ -1329,9 +1298,38 @@ const CourseBuilder: React.FC = () => {
         };
     }, []);
 
+    const handleDeleteCourse = async () => {
+        if (!courseId) return;
+        try {
+            const { error } = await supabase.from("courses").delete().eq("id", courseId);
+            if (error) throw error;
+            navigate("/coach/courses");
+        } catch (error) {
+             console.error("Error deleting course:", error);
+             alert("Error deleting course");
+        }
+    };
+
+    const handleSubmitForReview = async () => {
+        if (!courseId) return;
+        try {
+            const { error } = await supabase
+                .from("courses")
+                .update({ verification_status: "pending_review" })
+                .eq("id", courseId);
+
+            if (error) throw error;
+            setVerificationStatus("pending_review");
+            alert("Course submitted for review!");
+        } catch (error) {
+            console.error("Error submitting for review:", error);
+            alert("Error submitting for review");
+        }
+    };
+
     return (
         <CoachAppLayout>
-            <div className="max-w-[1400px] mx-auto">
+            <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Breadcrumb */}
                 <div className="mb-6">
                     <button
