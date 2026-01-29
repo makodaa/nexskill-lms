@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import StudentAppLayout from "../../layouts/StudentAppLayout";
 import { useCourse } from "../../hooks/useCourse";
 import { useEnrollment } from "../../hooks/useEnrollment";
 import CourseDetailContent from "../../components/courses/CourseDetailContent";
 import CourseEnrollmentCard from "../../components/courses/CourseEnrollmentCard";
+import CourseCurriculumTab from "../../components/courses/tabs/CourseCurriculumTab";
+import CourseReviewsTab from "../../components/courses/tabs/CourseReviewsTab";
+import CourseCoachTab from "../../components/courses/tabs/CourseCoachTab";
 
 /**
  * CourseDetail Page - Clean component focused on presentation
@@ -23,8 +26,13 @@ const CourseDetailRefactored: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
 
+  // Tab State
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "curriculum" | "reviews" | "coach"
+  >("overview");
+
   // Custom hooks handle all data and business logic
-  const { course, loading: loadingCourse } = useCourse(courseId);
+  const { course, loading: loadingCourse, error } = useCourse(courseId);
   const {
     isEnrolled,
     checking,
@@ -89,6 +97,26 @@ const CourseDetailRefactored: React.FC = () => {
     );
   }
 
+  // Error state
+  if (error) {
+    return (
+      <StudentAppLayout>
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="text-center text-red-500">
+            <h2 className="text-2xl font-bold mb-2">Error Loading Course</h2>
+            <p className="mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-gray-100 rounded hover:bg-gray-200 text-black"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </StudentAppLayout>
+    );
+  }
+
   // Not found state
   if (!course) {
     return (
@@ -102,6 +130,7 @@ const CourseDetailRefactored: React.FC = () => {
             <p className="text-text-secondary dark:text-dark-text-secondary mb-6">
               The course you're looking for doesn't exist.
             </p>
+            <p className="text-xs text-gray-400 mb-4">Course ID: {courseId}</p>
             <button
               onClick={() => navigate("/student/courses")}
               className="px-6 py-3 bg-gradient-to-r from-brand-primary to-brand-primary-light text-white font-medium rounded-full hover:shadow-lg transition-all"
@@ -156,7 +185,7 @@ const CourseDetailRefactored: React.FC = () => {
               <div className="flex items-center gap-1">
                 <span className="text-yellow-500">★</span>
                 <span className="font-semibold text-text-primary dark:text-dark-text-primary">
-                  {course.rating}
+                  {course.rating.toFixed(1)}
                 </span>
                 <span className="text-text-muted dark:text-dark-text-muted">
                   ({course.reviewCount} reviews)
@@ -180,33 +209,49 @@ const CourseDetailRefactored: React.FC = () => {
         <div className="flex gap-6">
           {/* Left: Course Content */}
           <div className="flex-1 min-w-0">
-            <div className="flex gap-2 mb-6 border-b border-[#EDF0FB] dark:border-gray-700">
-              <button className="px-6 py-3 text-sm font-medium capitalize text-brand-primary border-b-2 border-brand-primary">
-                Overview
-              </button>
-              <div className="flex-1 flex items-center justify-end gap-2 text-sm pb-3">
-                {isEnrolled ? (
+            {/* Tab Bar */}
+            <div className="flex gap-4 mb-6 border-b border-[#EDF0FB] dark:border-gray-700">
+              {(["overview", "curriculum", "reviews", "coach"] as const).map(
+                (tab) => (
                   <button
-                    onClick={() => navigate(`/student/courses/${courseId}/curriculum`)}
-                    className="px-4 py-2 bg-brand-primary text-white rounded-full text-sm font-medium hover:bg-brand-primary-dark transition-colors flex items-center gap-2"
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-4 py-3 text-sm font-medium capitalize transition-all border-b-2 ${activeTab === tab
+                      ? "text-brand-primary border-brand-primary"
+                      : "text-text-secondary border-transparent hover:text-brand-primary"
+                      }`}
                   >
-                    📚 View Curriculum
+                    {tab}
                   </button>
-                ) : (
-                  <span className="px-3 py-1 bg-gray-100 dark:bg-slate-700 text-text-muted dark:text-dark-text-muted rounded-full text-xs">
-                    Enroll to access curriculum
-                  </span>
-                )}
-              </div>
+                ),
+              )}
             </div>
 
             <div className="bg-white dark:bg-dark-background-card rounded-3xl shadow-card p-8">
-              <CourseDetailContent
-                description={course.description}
-                whatYouLearn={course.whatYouLearn}
-                tools={course.tools}
-                isEnrolled={isEnrolled}
-              />
+              {activeTab === "overview" && (
+                <CourseDetailContent
+                  description={course.description}
+                  whatYouLearn={course.whatYouLearn}
+                  tools={course.tools}
+                  isEnrolled={isEnrolled}
+                />
+              )}
+
+              {activeTab === "curriculum" && (
+                <CourseCurriculumTab curriculum={course.curriculum || []} />
+              )}
+
+              {activeTab === "reviews" && (
+                <CourseReviewsTab
+                  reviews={course.reviews || []}
+                  rating={course.rating}
+                  reviewCount={course.reviewCount}
+                />
+              )}
+
+              {activeTab === "coach" && (
+                <CourseCoachTab coach={course.coach || null} />
+              )}
             </div>
           </div>
 
