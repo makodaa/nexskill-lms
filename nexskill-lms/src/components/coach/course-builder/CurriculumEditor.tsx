@@ -47,6 +47,7 @@ const CurriculumEditor: React.FC<CurriculumEditorProps> = ({
     curriculum,
     onChange,
     onEditLesson,
+    onEditQuiz,
     onAddQuiz,
     onAddLesson,
     onDeleteLesson,
